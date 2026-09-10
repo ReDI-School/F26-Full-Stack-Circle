@@ -1,4 +1,4 @@
-import { avatar } from './Avatar.styles';
+import { avatarStyles } from './Avatar.styles';
 import type { AvatarProps } from './Avatar.types';
 
 /**
@@ -8,7 +8,7 @@ import type { AvatarProps } from './Avatar.types';
  * 32px, md 44px, lg 64px.
  */
 const Avatar = ({ name }: AvatarProps) => {
-  return <span className={avatar()}>{name}</span>;
+  return <span className={avatarStyles()}>{name}</span>;
 };
 
 export default Avatar;

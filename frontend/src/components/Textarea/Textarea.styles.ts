@@ -6,7 +6,7 @@ import { tv } from 'tailwind-variants';
  *
  * same look as TextField, vertically resizable.
  */
-export const textarea = tv({
+export const textareaStyles = tv({
   base: [],
   variants: {},
 });

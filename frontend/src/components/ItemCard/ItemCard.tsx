@@ -1,4 +1,4 @@
-import { itemCard } from './ItemCard.styles';
+import { itemCardStyles } from './ItemCard.styles';
 import type { ItemCardProps } from './ItemCard.types';
 
 /**
@@ -9,7 +9,7 @@ import type { ItemCardProps } from './ItemCard.types';
  * price in display black 20px secondary. Hover lifts 2px with shadow-card.
  */
 const ItemCard = ({ title }: ItemCardProps) => {
-  return <div className={itemCard()}>{title}</div>;
+  return <div className={itemCardStyles()}>{title}</div>;
 };
 
 export default ItemCard;

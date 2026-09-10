@@ -1,4 +1,4 @@
-import { toast } from './Toast.styles';
+import { toastStyles } from './Toast.styles';
 import type { ToastProps } from './Toast.types';
 
 /**
@@ -8,7 +8,7 @@ import type { ToastProps } from './Toast.types';
  * success, secondary for error.
  */
 const Toast = ({ message }: ToastProps) => {
-  return <div className={toast()}>{message}</div>;
+  return <div className={toastStyles()}>{message}</div>;
 };
 
 export default Toast;

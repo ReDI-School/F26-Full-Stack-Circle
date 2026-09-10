@@ -8,7 +8,7 @@ import { tv } from 'tailwind-variants';
  * secondary = tertiary bg, ghost = 2px tertiary border, danger = secondary-100 bg with
  * danger text, outlineLight = white border for colored backgrounds. Hover darkens ~8%.
  */
-export const button = tv({
+export const buttonStyles = tv({
   base: [],
   variants: {},
 });

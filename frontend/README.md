@@ -139,7 +139,9 @@ Styles are written with [tailwind-variants](https://www.tailwind-variants.org/),
 the variants of a component in one place:
 
 ```ts
-export const button = tv({
+// Button.styles.ts — name it <component>Styles so it is obvious at the call
+// site which component a class list belongs to.
+export const buttonStyles = tv({
   // Every class on its own line: easy to read, easy to diff, and you can
   // comment a single one out while you experiment.
   base: [
@@ -179,7 +181,8 @@ export const button = tv({
 });
 ```
 
-You then pick the variants when you render: `button({ variant: 'ghost', stretch: true })`.
+You then pick the variants when you render:
+`buttonStyles({ variant: 'ghost', stretch: true })`.
 
 > [!IMPORTANT]
 > The example above is just to show the shape — `Button.styles.ts` in this repo is still

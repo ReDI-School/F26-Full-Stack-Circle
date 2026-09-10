@@ -1,4 +1,4 @@
-import { banner } from './Banner.styles';
+import { bannerStyles } from './Banner.styles';
 import type { BannerProps } from './Banner.types';
 
 /**
@@ -8,7 +8,7 @@ import type { BannerProps } from './Banner.types';
  * pushed to the right. Both full width, white text.
  */
 const Banner = ({ title }: BannerProps) => {
-  return <div className={banner()}>{title}</div>;
+  return <div className={bannerStyles()}>{title}</div>;
 };
 
 export default Banner;

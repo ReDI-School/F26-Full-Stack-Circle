@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * pill shape, brand-colored circle, initials centred in the display font. Sizes: sm
  * 32px, md 44px, lg 64px.
  */
-export const avatar = tv({
+export const avatarStyles = tv({
   base: [],
   variants: {},
 });

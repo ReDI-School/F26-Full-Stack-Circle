@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * pill, 14px. Default = white bg, 1.5px border-input, tertiary text. Selected = tertiary
  * bg, white bold text.
  */
-export const categoryChip = tv({
+export const categoryChipStyles = tv({
   base: [],
   variants: {},
 });

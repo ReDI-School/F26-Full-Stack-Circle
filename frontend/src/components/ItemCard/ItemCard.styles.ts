@@ -8,7 +8,7 @@ import { tv } from 'tailwind-variants';
  * top-left, then title (display 800, 17px), 'category · seller' in muted 13px, and the
  * price in display black 20px secondary. Hover lifts 2px with shadow-card.
  */
-export const itemCard = tv({
+export const itemCardStyles = tv({
   base: [],
   variants: {},
 });

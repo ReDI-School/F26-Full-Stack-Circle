@@ -1,4 +1,4 @@
-import { button } from './Button.styles';
+import { buttonStyles } from './Button.styles';
 import type { ButtonProps } from './Button.types';
 
 /**
@@ -9,7 +9,7 @@ import type { ButtonProps } from './Button.types';
  * danger text, outlineLight = white border for colored backgrounds. Hover darkens ~8%.
  */
 const Button = ({ children }: ButtonProps) => {
-  return <button className={button()}>{children}</button>;
+  return <button className={buttonStyles()}>{children}</button>;
 };
 
 export default Button;

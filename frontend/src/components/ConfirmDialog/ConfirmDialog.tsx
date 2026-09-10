@@ -1,4 +1,4 @@
-import { confirmDialog } from './ConfirmDialog.styles';
+import { confirmDialogStyles } from './ConfirmDialog.styles';
 import type { ConfirmDialogProps } from './ConfirmDialog.types';
 
 /**
@@ -8,7 +8,7 @@ import type { ConfirmDialogProps } from './ConfirmDialog.types';
  * white, radius-card, shadow-menu. Buttons bottom-right: ghost then primary.
  */
 const ConfirmDialog = ({ title }: ConfirmDialogProps) => {
-  return <div className={confirmDialog()}>{title}</div>;
+  return <div className={confirmDialogStyles()}>{title}</div>;
 };
 
 export default ConfirmDialog;

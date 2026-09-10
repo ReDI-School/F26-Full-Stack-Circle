@@ -1,4 +1,4 @@
-import { layout } from './Layout.styles';
+import { layoutStyles } from './Layout.styles';
 import type { LayoutProps } from './Layout.types';
 
 /**
@@ -8,7 +8,7 @@ import type { LayoutProps } from './Layout.types';
  * padding.
  */
 const Layout = ({ children }: LayoutProps) => {
-  return <div className={layout()}>{children}</div>;
+  return <div className={layoutStyles()}>{children}</div>;
 };
 
 export default Layout;

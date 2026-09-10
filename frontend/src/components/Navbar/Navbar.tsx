@@ -1,4 +1,4 @@
-import { navbar } from './Navbar.styles';
+import { navbarStyles } from './Navbar.styles';
 import type { NavbarProps } from './Navbar.types';
 
 /**
@@ -8,7 +8,7 @@ import type { NavbarProps } from './Navbar.types';
  * pill, then right-aligned '+ Add item', inbox icon with a count bubble, and the avatar.
  */
 const Navbar = ({ userName }: NavbarProps) => {
-  return <nav className={navbar()}>{userName}</nav>;
+  return <nav className={navbarStyles()}>{userName}</nav>;
 };
 
 export default Navbar;

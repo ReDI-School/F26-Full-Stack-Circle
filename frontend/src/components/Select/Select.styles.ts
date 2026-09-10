@@ -6,7 +6,7 @@ import { tv } from 'tailwind-variants';
  *
  * same look as TextField: radius-input, 1.5px border-input, focus ring in primary-100.
  */
-export const select = tv({
+export const selectStyles = tv({
   base: [],
   variants: {},
 });

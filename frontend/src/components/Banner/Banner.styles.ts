@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * hero = primary bg, 26px display black title. cta = tertiary bg, 20px title, action
  * pushed to the right. Both full width, white text.
  */
-export const banner = tv({
+export const bannerStyles = tv({
   base: [],
   variants: {},
 });

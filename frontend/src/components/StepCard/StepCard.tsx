@@ -1,4 +1,4 @@
-import { stepCard } from './StepCard.styles';
+import { stepCardStyles } from './StepCard.styles';
 import type { StepCardProps } from './StepCard.types';
 
 /**
@@ -8,7 +8,7 @@ import type { StepCardProps } from './StepCard.types';
  * title and description.
  */
 const StepCard = ({ title }: StepCardProps) => {
-  return <div className={stepCard()}>{title}</div>;
+  return <div className={stepCardStyles()}>{title}</div>;
 };
 
 export default StepCard;

@@ -1,4 +1,4 @@
-import { conditionBadge } from './ConditionBadge.styles';
+import { conditionBadgeStyles } from './ConditionBadge.styles';
 import type { ConditionBadgeProps } from './ConditionBadge.types';
 
 /**
@@ -8,7 +8,7 @@ import type { ConditionBadgeProps } from './ConditionBadge.types';
  * primary-100/#2e7d96, good = tertiary-100/tertiary, used = bg/muted with a border.
  */
 const ConditionBadge = ({ condition }: ConditionBadgeProps) => {
-  return <span className={conditionBadge()}>{condition}</span>;
+  return <span className={conditionBadgeStyles()}>{condition}</span>;
 };
 
 export default ConditionBadge;

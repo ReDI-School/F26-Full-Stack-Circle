@@ -1,4 +1,4 @@
-import { avatarMenu } from './AvatarMenu.styles';
+import { avatarMenuStyles } from './AvatarMenu.styles';
 import type { AvatarMenuProps } from './AvatarMenu.types';
 
 /**
@@ -8,7 +8,7 @@ import type { AvatarMenuProps } from './AvatarMenu.types';
  * radius 10, hover bg-bg. 'Log out' uses the danger color.
  */
 const AvatarMenu = ({ items }: AvatarMenuProps) => {
-  return <div className={avatarMenu()}>{items.join(', ')}</div>;
+  return <div className={avatarMenuStyles()}>{items.join(', ')}</div>;
 };
 
 export default AvatarMenu;

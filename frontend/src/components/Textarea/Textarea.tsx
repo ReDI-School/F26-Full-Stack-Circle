@@ -1,4 +1,4 @@
-import { textarea } from './Textarea.styles';
+import { textareaStyles } from './Textarea.styles';
 import type { TextareaProps } from './Textarea.types';
 
 /**
@@ -7,7 +7,7 @@ import type { TextareaProps } from './Textarea.types';
  * same look as TextField, vertically resizable.
  */
 const Textarea = ({ label }: TextareaProps) => {
-  return <div className={textarea()}>{label}</div>;
+  return <div className={textareaStyles()}>{label}</div>;
 };
 
 export default Textarea;

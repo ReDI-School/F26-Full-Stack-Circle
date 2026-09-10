@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * white card, radius-card, centred column: a large Avatar, the shop name in display 800,
  * then '4 items' in muted 13px.
  */
-export const shopCard = tv({
+export const shopCardStyles = tv({
   base: [],
   variants: {},
 });

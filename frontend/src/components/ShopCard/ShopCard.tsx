@@ -1,4 +1,4 @@
-import { shopCard } from './ShopCard.styles';
+import { shopCardStyles } from './ShopCard.styles';
 import type { ShopCardProps } from './ShopCard.types';
 
 /**
@@ -8,7 +8,7 @@ import type { ShopCardProps } from './ShopCard.types';
  * then '4 items' in muted 13px.
  */
 const ShopCard = ({ name }: ShopCardProps) => {
-  return <div className={shopCard()}>{name}</div>;
+  return <div className={shopCardStyles()}>{name}</div>;
 };
 
 export default ShopCard;

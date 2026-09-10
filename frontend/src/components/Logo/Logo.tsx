@@ -1,4 +1,4 @@
-import { logo, wordmark } from './Logo.styles';
+import { logoStyles, wordmarkStyles } from './Logo.styles';
 import type { LogoProps } from './Logo.types';
 
 /** The wordmark grows with the mark, so the two always look balanced. */
@@ -11,7 +11,7 @@ const wordmarkSize = (size: number) => {
 
 const Logo = ({ size = 28, withWordmark = true }: LogoProps) => {
   return (
-    <span className={logo()}>
+    <span className={logoStyles()}>
       <svg
         width={size}
         height={size}
@@ -30,7 +30,7 @@ const Logo = ({ size = 28, withWordmark = true }: LogoProps) => {
       </svg>
 
       {withWordmark ? (
-        <span className={wordmark({ size: wordmarkSize(size) })}>
+        <span className={wordmarkStyles({ size: wordmarkSize(size) })}>
           ReDiCycle<span className="text-secondary">.</span>
         </span>
       ) : null}

@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * white card, radius-card, row: a 40px tertiary circle with the step number, then the
  * title and description.
  */
-export const stepCard = tv({
+export const stepCardStyles = tv({
   base: [],
   variants: {},
 });

@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * full-height column, bg-bg. Content is centred with max-width 1140px and horizontal
  * padding.
  */
-export const layout = tv({
+export const layoutStyles = tv({
   base: [],
   variants: {},
 });

@@ -1,4 +1,4 @@
-import { categoryChip } from './CategoryChip.styles';
+import { categoryChipStyles } from './CategoryChip.styles';
 import type { CategoryChipProps } from './CategoryChip.types';
 
 /**
@@ -8,7 +8,7 @@ import type { CategoryChipProps } from './CategoryChip.types';
  * bg, white bold text.
  */
 const CategoryChip = ({ label }: CategoryChipProps) => {
-  return <button className={categoryChip()}>{label}</button>;
+  return <button className={categoryChipStyles()}>{label}</button>;
 };
 
 export default CategoryChip;

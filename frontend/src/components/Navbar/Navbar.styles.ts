@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * sticky white bar, border-bottom, shadow-nav. Content max-width 1076px: logo, search
  * pill, then right-aligned '+ Add item', inbox icon with a count bubble, and the avatar.
  */
-export const navbar = tv({
+export const navbarStyles = tv({
   base: [],
   variants: {},
 });

@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * dark ink pill, radius 14, white 14px text, with an 8px dot on the left: green for
  * success, secondary for error.
  */
-export const toast = tv({
+export const toastStyles = tv({
   base: [],
   variants: {},
 });

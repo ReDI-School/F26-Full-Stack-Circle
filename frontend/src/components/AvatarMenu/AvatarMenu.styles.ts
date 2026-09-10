@@ -7,7 +7,7 @@ import { tv } from 'tailwind-variants';
  * white dropdown, radius 16, shadow-menu, 8px padding. Entries are bold 14px tertiary,
  * radius 10, hover bg-bg. 'Log out' uses the danger color.
  */
-export const avatarMenu = tv({
+export const avatarMenuStyles = tv({
   base: [],
   variants: {},
 });

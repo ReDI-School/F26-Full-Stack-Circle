@@ -1,4 +1,4 @@
-import { categoryTile } from './CategoryTile.styles';
+import { categoryTileStyles } from './CategoryTile.styles';
 import type { CategoryTileProps } from './CategoryTile.types';
 
 /**
@@ -8,7 +8,7 @@ import type { CategoryTileProps } from './CategoryTile.types';
  * Background cycles the 100-tints. Selected = tertiary bg, white text. Hover lifts 2px.
  */
 const CategoryTile = ({ name }: CategoryTileProps) => {
-  return <button className={categoryTile()}>{name}</button>;
+  return <button className={categoryTileStyles()}>{name}</button>;
 };
 
 export default CategoryTile;
