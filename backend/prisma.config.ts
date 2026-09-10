@@ -1,12 +1,19 @@
 import dotenv from 'dotenv';
-
 import { defineConfig } from 'prisma/config';
 
 dotenv.config();
 
-// Falls back to the database defined in docker-compose.yml, so a fresh
-// clone can run `prisma generate` before you have created your .env file.
-const DATABASE_URL = process.env.DATABASE_URL ?? 'postgresql://redi:redi@localhost:5434/redicycle';
+// Schema changes and migrations need a direct connection, not the pooled
+// one, so this uses POSTGRES_URL_NON_POOLING. Locally both point at the
+// same Docker database; on Supabase they are genuinely different.
+//
+// The fallback keeps `prisma generate` working on a fresh clone, before
+// anyone has created their .env file.
+const directUrl = (
+  process.env.POSTGRES_URL_NON_POOLING ??
+  process.env.POSTGRES_PRISMA_URL ??
+  'postgres://redi:redi@localhost:5434/redicycle'
+).replace('sslmode=require', 'sslmode=no-verify');
 
 export default defineConfig({
   schema: 'prisma/schema.prisma',
@@ -15,6 +22,6 @@ export default defineConfig({
     seed: 'tsx prisma/seed.ts',
   },
   datasource: {
-    url: DATABASE_URL,
+    url: directUrl,
   },
 });

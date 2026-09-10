@@ -37,12 +37,19 @@ That reads `docker-compose.yml` and starts a PostgreSQL 18 container named `redi
 cp backend/.env.example backend/.env
 ```
 
-The `DATABASE_URL` in `.env.example` already matches the container, so there is nothing to
+The connection strings in `.env.example` already match the container, so there is nothing to
 change:
 
 ```bash
-DATABASE_URL="postgresql://redi:redi@localhost:5434/redicycle"
+POSTGRES_PRISMA_URL="postgres://redi:redi@localhost:5434/redicycle"
+POSTGRES_URL_NON_POOLING="postgres://redi:redi@localhost:5434/redicycle"
 ```
+
+> [!NOTE]
+> Two variables for one database looks odd locally, where they are identical. They are the
+> same names the deployed app uses, where they really are different: the **pooled** connection
+> for queries, and the **direct** one for schema changes and migrations. Using the same names
+> everywhere means the code never has to care which environment it is in.
 
 ### Create the tables
 
@@ -104,7 +111,8 @@ and follow the wizard.
 Put your own connection string in `backend/.env` — note the standard port 5432 here:
 
 ```bash
-DATABASE_URL="postgresql://YOUR_USER:YOUR_PASSWORD@localhost:5432/redicycle"
+POSTGRES_PRISMA_URL="postgres://YOUR_USER:YOUR_PASSWORD@localhost:5432/redicycle"
+POSTGRES_URL_NON_POOLING="postgres://YOUR_USER:YOUR_PASSWORD@localhost:5432/redicycle"
 ```
 
 And create the tables:

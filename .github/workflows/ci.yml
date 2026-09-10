@@ -62,8 +62,11 @@ jobs:
           --health-timeout=5s
           --health-retries=10
 
+    # Same variable names as preview and production, pointed at the
+    # throwaway PostgreSQL service above.
     env:
-      DATABASE_URL: postgresql://redi:redi@localhost:5432/redicycle
+      POSTGRES_PRISMA_URL: postgres://redi:redi@localhost:5432/redicycle
+      POSTGRES_URL_NON_POOLING: postgres://redi:redi@localhost:5432/redicycle
 
     steps:
       - uses: actions/checkout@v4

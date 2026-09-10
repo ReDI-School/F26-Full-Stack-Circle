@@ -48,7 +48,7 @@ This starts PostgreSQL in Docker on port **5434**. See
 cp .env.example .env
 ```
 
-The `DATABASE_URL` in there already matches the Docker database, so there is nothing to edit.
+The connection strings in there already match the Docker database, so there is nothing to edit.
 
 ### 4. Create the tables
 
