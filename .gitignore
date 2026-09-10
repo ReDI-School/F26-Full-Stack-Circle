@@ -121,8 +121,9 @@ next-env.d.ts
 
 # Vercel
 .vercel
-.env*.local
+.env*
 
-# ...but the example files must stay in the repo
+# ...but the example files must stay in the repo.
+# These negations have to come last: the last matching rule wins.
 !.env.example
 !**/.env.example
