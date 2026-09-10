@@ -1,6 +1,8 @@
-import 'dotenv/config';
+import dotenv from 'dotenv';
 
 import { defineConfig } from 'prisma/config';
+
+dotenv.config();
 
 // Falls back to the database defined in docker-compose.yml, so a fresh
 // clone can run `prisma generate` before you have created your .env file.

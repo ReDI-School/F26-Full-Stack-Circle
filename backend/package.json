@@ -2,7 +2,7 @@
   "name": "backend",
   "version": "1.0.0",
   "description": "ReDiCycle REST API in TypeScript using Express and Prisma",
-  "main": "dist/index.js",
+  "main": "dist/src/index.js",
   "author": "Fabio Rodrigues",
   "license": "MIT",
   "repository": {
@@ -12,7 +12,7 @@
   "scripts": {
     "dev": "prisma generate && tsx watch src/index.ts",
     "build": "prisma generate && tsc && tsc-alias",
-    "start": "node dist/index.js",
+    "start": "node dist/src/index.js",
     "lint": "eslint src prisma/seed.ts prisma.config.ts",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
