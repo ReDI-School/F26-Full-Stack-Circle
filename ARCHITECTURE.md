@@ -144,6 +144,12 @@ change, the migration file in your PR _is_ the deployment step — see
 They overlap on purpose. CI runs almost exactly what the Vercel build runs, but against a
 throwaway PostgreSQL container — so it fails **fast, safely, and with logs you can read**.
 
+> [!IMPORTANT]
+> The CI jobs are **not running yet**, so for now nothing checks your branch before Vercel
+> does. Run the checks locally (see [Before you ask for a
+> review](./CONTRIBUTING.md#before-you-ask-for-a-review)) — everything in the "Caught by CI?"
+> column below is on you until they are switched on.
+
 | Failure                                                 | Caught by CI?        | Caught by Vercel?     |
 | ------------------------------------------------------- | -------------------- | --------------------- |
 | Lint / TypeScript errors                                | ✅                   | ✅                    |

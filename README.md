@@ -110,6 +110,11 @@ Every pull request is checked automatically by GitHub Actions
 
 **Your pull request cannot be merged while any of these are red.**
 
+> [!IMPORTANT]
+> These jobs are **not running yet** — the checks on your PR will stay empty for now. Until
+> they come online, running the commands below before you push is the only thing standing
+> between a mistake and the deployed app.
+
 You can run exactly the same checks locally before you push — this is much faster than
 waiting for CI:
 
