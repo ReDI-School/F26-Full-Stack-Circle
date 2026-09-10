@@ -9,10 +9,9 @@
       "root": "backend",
       "entrypoint": "src/index.ts",
       "rewrites": [
-        {
-          "source": "/api/:path*",
-          "destination": "/:path*"
-        }
+        { "source": "/api", "destination": "/" },
+        { "source": "/api/", "destination": "/" },
+        { "source": "/api/:path+", "destination": "/:path+" }
       ]
     },
     "storybook": {
@@ -21,42 +20,18 @@
       "buildCommand": "STORYBOOK_BASE_PATH=/storybook/ pnpm build-storybook",
       "outputDirectory": "storybook-static",
       "rewrites": [
-        {
-          "source": "/storybook/:path+",
-          "destination": "/:path+"
-        },
-        {
-          "source": "/storybook/:path*",
-          "destination": "/index.html"
-        }
+        { "source": "/storybook", "destination": "/index.html" },
+        { "source": "/storybook/", "destination": "/index.html" },
+        { "source": "/storybook/:path+", "destination": "/:path+" }
       ]
     }
   },
+  "redirects": [{ "source": "/storybook", "destination": "/storybook/", "permanent": false }],
   "rewrites": [
-    {
-      "source": "/storybook/:path*",
-      "destination": {
-        "service": "storybook"
-      }
-    },
-    {
-      "source": "/api/:path*",
-      "destination": {
-        "service": "backend"
-      }
-    },
-    {
-      "source": "/:path*",
-      "destination": {
-        "service": "frontend"
-      }
-    }
-  ],
-  "redirects": [
-    {
-      "source": "/storybook",
-      "destination": "/storybook/",
-      "permanent": false
-    }
+    { "source": "/storybook", "destination": { "service": "storybook" } },
+    { "source": "/storybook/(.*)", "destination": { "service": "storybook" } },
+    { "source": "/api", "destination": { "service": "backend" } },
+    { "source": "/api/(.*)", "destination": { "service": "backend" } },
+    { "source": "/(.*)", "destination": { "service": "frontend" } }
   ]
 }
