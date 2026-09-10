@@ -66,21 +66,25 @@ Two endpoints are useful for checking things are wired up:
 
 Run these from the root of the project.
 
-| Command               | What it does                                   |
-| --------------------- | ---------------------------------------------- |
-| `pnpm install`        | Install every dependency, frontend and backend |
-| `pnpm start:all`      | Run the frontend and the backend together      |
-| `pnpm start:frontend` | Run only the frontend                          |
-| `pnpm start:backend`  | Run only the backend                           |
-| `pnpm storybook`      | Open Storybook, the component library          |
-| `pnpm db:up`          | Start the PostgreSQL container                 |
-| `pnpm db:down`        | Stop it (your data is kept)                    |
-| `pnpm db:reset`       | Delete the data and start over                 |
-| `pnpm db:push`        | Apply `schema.prisma` to the database          |
-| `pnpm db:seed`        | Insert the seed data                           |
-| `pnpm db:studio`      | Browse the data in Prisma Studio               |
-| `pnpm lint`           | Lint both projects                             |
-| `pnpm format`         | Format both projects with Prettier             |
+| Command               | What it does                                                    |
+| --------------------- | --------------------------------------------------------------- |
+| `pnpm install`        | Install every dependency, frontend and backend                  |
+| `pnpm start:all`      | Run the frontend and the backend together                       |
+| `pnpm start:frontend` | Run only the frontend                                           |
+| `pnpm start:backend`  | Run only the backend                                            |
+| `pnpm storybook`      | Open Storybook, the component library                           |
+| `pnpm build`          | Build both projects                                             |
+| `pnpm typecheck`      | Type-check both projects                                        |
+| `pnpm db:up`          | Start the PostgreSQL container                                  |
+| `pnpm db:down`        | Stop it (your data is kept)                                     |
+| `pnpm db:reset`       | Delete the data and start over                                  |
+| `pnpm db:push`        | Apply `schema.prisma` to the database                           |
+| `pnpm db:seed`        | Insert the seed data                                            |
+| `pnpm db:studio`      | Browse the data in Prisma Studio                                |
+| `pnpm lint`           | Lint both projects                                              |
+| `pnpm format`         | Format both projects with Prettier                              |
+| `pnpm format:check`   | Check formatting without changing anything                      |
+| `pnpm clean`          | Delete build output and `node_modules`, then run `pnpm install` |
 
 > [!TIP]
 > To run a command inside one workspace only, use `--filter`:

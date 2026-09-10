@@ -8,18 +8,21 @@
   },
   "scripts": {
     "install:all": "pnpm install",
+    "clean": "pnpm --recursive --parallel run clean && rm -rf node_modules frontend/node_modules backend/node_modules",
+    "start:all": "pnpm --parallel --filter backend --filter frontend dev",
+    "start:backend": "pnpm --filter backend dev",
+    "start:frontend": "pnpm --filter frontend dev",
+    "storybook": "pnpm --filter frontend storybook",
+    "build": "pnpm --recursive build",
+    "typecheck": "pnpm --recursive --parallel typecheck",
+    "lint": "pnpm --recursive --parallel lint",
+    "format": "pnpm --recursive --parallel format",
+    "format:check": "pnpm --recursive --parallel format:check",
     "db:up": "docker compose up -d",
     "db:down": "docker compose down",
     "db:reset": "docker compose down -v && docker compose up -d",
     "db:push": "pnpm --filter backend db:push",
     "db:seed": "pnpm --filter backend db:seed",
-    "db:studio": "pnpm --filter backend db:studio",
-    "start:all": "pnpm --parallel --filter backend --filter frontend dev",
-    "start:backend": "pnpm --filter backend dev",
-    "start:frontend": "pnpm --filter frontend dev",
-    "storybook": "pnpm --filter frontend storybook",
-    "lint": "pnpm --recursive lint",
-    "format": "pnpm --recursive format",
-    "format:check": "pnpm --recursive format:check"
+    "db:studio": "pnpm --filter backend db:studio"
   }
 }
