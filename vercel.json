@@ -9,10 +9,20 @@
       "root": "backend",
       "entrypoint": "src/index.ts",
       "rewrites": [
-        { "source": "/api", "destination": "/" },
-        { "source": "/api/", "destination": "/" },
-        { "source": "/api/:path+", "destination": "/:path+" }
-      ]
+        {
+          "source": "/api",
+          "destination": "/"
+        },
+        {
+          "source": "/api/",
+          "destination": "/"
+        },
+        {
+          "source": "/api/:path+",
+          "destination": "/:path+"
+        }
+      ],
+      "buildCommand": "pnpm exec prisma generate"
     },
     "storybook": {
       "root": "frontend",
@@ -20,18 +30,58 @@
       "buildCommand": "STORYBOOK_BASE_PATH=/storybook/ pnpm build-storybook",
       "outputDirectory": "storybook-static",
       "rewrites": [
-        { "source": "/storybook", "destination": "/index.html" },
-        { "source": "/storybook/", "destination": "/index.html" },
-        { "source": "/storybook/:path+", "destination": "/:path+" }
+        {
+          "source": "/storybook",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/storybook/",
+          "destination": "/index.html"
+        },
+        {
+          "source": "/storybook/:path+",
+          "destination": "/:path+"
+        }
       ]
     }
   },
-  "redirects": [{ "source": "/storybook", "destination": "/storybook/", "permanent": false }],
+  "redirects": [
+    {
+      "source": "/storybook",
+      "destination": "/storybook/",
+      "permanent": false
+    }
+  ],
   "rewrites": [
-    { "source": "/storybook", "destination": { "service": "storybook" } },
-    { "source": "/storybook/(.*)", "destination": { "service": "storybook" } },
-    { "source": "/api", "destination": { "service": "backend" } },
-    { "source": "/api/(.*)", "destination": { "service": "backend" } },
-    { "source": "/(.*)", "destination": { "service": "frontend" } }
+    {
+      "source": "/storybook",
+      "destination": {
+        "service": "storybook"
+      }
+    },
+    {
+      "source": "/storybook/(.*)",
+      "destination": {
+        "service": "storybook"
+      }
+    },
+    {
+      "source": "/api",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/api/(.*)",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/(.*)",
+      "destination": {
+        "service": "frontend"
+      }
+    }
   ]
 }
