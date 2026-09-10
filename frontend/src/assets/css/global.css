@@ -1,0 +1,111 @@
+/* ============================================================
+   ReDiCycle global stylesheet
+
+   The Google Fonts import MUST stay on the very first line,
+   above `@import 'tailwindcss'`. CSS only allows @import rules
+   before other rules, and Tailwind inlines its own import here --
+   anything below it gets silently dropped and the fonts never load.
+
+   Fonts are loaded here rather than with next/font so that
+   Storybook gets them too: .storybook/preview.ts imports this
+   same file, but never runs the Next font pipeline.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400&display=swap');
+@import 'tailwindcss';
+
+/* ============================================================
+   Tailwind v4 Theme -- the ReDiCycle design tokens
+
+   Anything declared here becomes a utility class automatically.
+   `--color-primary` gives you `bg-primary`, `text-primary`,
+   `border-primary`, and so on. Always use the tokens instead of
+   hard-coded hex values.
+   ============================================================ */
+@theme {
+  /* Font Families */
+  --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+
+  /* Colors -- Brand */
+  --color-primary: #58adc5;
+  --color-primary-100: #e3f1f5;
+  --color-secondary: #f05a21;
+  --color-secondary-100: #fde5db;
+  --color-tertiary: #385a65;
+  --color-tertiary-100: #e1e9ec;
+
+  /* Colors -- Surfaces & text */
+  --color-bg: #f2f7f9;
+  --color-surface: #ffffff;
+  --color-ink: #22343a;
+  --color-body: #4a6570;
+  --color-muted: #6b8893;
+  --color-placeholder: #9ab0b8;
+  --color-border: #e1e9ec;
+  --color-border-input: #cfdee4;
+
+  /* Colors -- Hover / state */
+  --color-primary-hover: #4699b1;
+  --color-secondary-hover: #d84c16;
+  --color-tertiary-hover: #2b4750;
+  --color-danger-text: #c2410c;
+  --color-success: #7ed3a8;
+
+  /* Font Sizes -- the scale used across the design */
+  --text-caption: 0.8125rem; /* 13px */
+  --text-body: 0.9375rem; /* 15px */
+  --text-h2: 1.375rem; /* 22px */
+  --text-h1: 1.875rem; /* 30px */
+  --text-display: 2.75rem; /* 44px */
+
+  /* Border Radius */
+  --radius-input: 0.75rem; /* 12px -- inputs, small surfaces */
+  --radius-card: 1.25rem; /* 20px -- cards, panels */
+  --radius-pill: 999px; /* buttons, chips, badges, avatars */
+
+  /* Shadows */
+  --shadow-nav: 0 4px 16px rgba(56, 90, 101, 0.06);
+  --shadow-card: 0 8px 24px rgba(56, 90, 101, 0.14);
+  --shadow-menu: 0 12px 32px rgba(56, 90, 101, 0.16);
+}
+
+/* ============================================================
+   Base Layer -- Global element styles
+   ============================================================ */
+@layer base {
+  *,
+  *::before,
+  *::after {
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-size: var(--text-body);
+    line-height: 1.6;
+    color: var(--color-ink);
+    background-color: var(--color-bg);
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: var(--font-display);
+    font-weight: 800;
+    line-height: 1.2;
+    color: var(--color-ink);
+  }
+
+  h1 {
+    font-size: var(--text-h1);
+  }
+  h2 {
+    font-size: var(--text-h2);
+  }
+}

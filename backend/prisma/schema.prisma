@@ -1,0 +1,25 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client"
+  output   = "../generated/prisma"
+}
+
+// From Prisma 7 on, the connection URL lives in prisma.config.ts
+// instead of here.
+datasource db {
+  provider = "postgresql"
+}
+
+model User {
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+// TODO: this is where the ReDiCycle data model goes.
+// Think about what the shop needs: items, categories, conditions,
+// messages between buyer and seller... and how they relate to a User.

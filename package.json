@@ -1,0 +1,25 @@
+{
+  "name": "redicycle",
+  "private": true,
+  "packageManager": "pnpm@11.3.0",
+  "engines": {
+    "node": ">=22.0.0",
+    "pnpm": ">=11.0.0"
+  },
+  "scripts": {
+    "install:all": "pnpm install",
+    "db:up": "docker compose up -d",
+    "db:down": "docker compose down",
+    "db:reset": "docker compose down -v && docker compose up -d",
+    "db:push": "pnpm --filter backend db:push",
+    "db:seed": "pnpm --filter backend db:seed",
+    "db:studio": "pnpm --filter backend db:studio",
+    "start:all": "pnpm --parallel --filter backend --filter frontend dev",
+    "start:backend": "pnpm --filter backend dev",
+    "start:frontend": "pnpm --filter frontend dev",
+    "storybook": "pnpm --filter frontend storybook",
+    "lint": "pnpm --recursive lint",
+    "format": "pnpm --recursive format",
+    "format:check": "pnpm --recursive format:check"
+  }
+}

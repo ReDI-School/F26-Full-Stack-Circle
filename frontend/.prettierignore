@@ -1,0 +1,10 @@
+node_modules
+.next
+storybook-static
+dist
+build
+coverage
+.git
+*.log
+pnpm-lock.yaml
+next-env.d.ts

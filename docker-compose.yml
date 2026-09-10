@@ -1,0 +1,23 @@
+services:
+  db:
+    image: postgres:18
+    container_name: redicycle-db
+    restart: unless-stopped
+    ports:
+      # Host port 5433 so it does not collide with a Postgres you may
+      # already have running locally on 5432 (S26 uses 5433).
+      - '5434:5432'
+    environment:
+      POSTGRES_USER: redi
+      POSTGRES_PASSWORD: redi
+      POSTGRES_DB: redicycle
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U redi -d redicycle']
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgres_data:

@@ -1,0 +1,55 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "ReDiCycle REST API in TypeScript using Express and Prisma",
+  "main": "dist/index.js",
+  "author": "Fabio Rodrigues",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/ReDI-School/F26-Full-Stack-Circle.git"
+  },
+  "scripts": {
+    "dev": "prisma generate && tsx watch src/index.ts",
+    "build": "prisma generate && tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "lint": "eslint src prisma/seed.ts prisma.config.ts",
+    "format": "prettier --write .",
+    "typecheck": "tsc --noEmit",
+    "db:generate": "prisma generate",
+    "db:migrate": "prisma migrate dev",
+    "db:push": "prisma db push",
+    "db:studio": "prisma studio",
+    "db:seed": "tsx prisma/seed.ts",
+    "postinstall": "prisma generate",
+    "format:check": "prettier --check ."
+  },
+  "engines": {
+    "node": ">=22.0.0"
+  },
+  "dependencies": {
+    "@prisma/adapter-pg": "^7.10.0",
+    "@prisma/client": "^7.10.0",
+    "cors": "^2.8.6",
+    "dotenv": "^17.2.4",
+    "express": "^5.2.1",
+    "helmet": "^8.3.0"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.39.5",
+    "@types/cors": "^2.8.19",
+    "@types/express": "^5.0.6",
+    "@types/node": "^22.20.2",
+    "@typescript-eslint/eslint-plugin": "^8.70.0",
+    "@typescript-eslint/parser": "^8.70.0",
+    "eslint": "^9.39.5",
+    "eslint-config-prettier": "^10.1.8",
+    "eslint-plugin-prettier": "^5.5.6",
+    "globals": "^16.5.0",
+    "prettier": "^3.9.6",
+    "prisma": "^7.10.0",
+    "tsc-alias": "^1.9.4",
+    "tsx": "^4.23.13",
+    "typescript": "~5.9.3"
+  }
+}
