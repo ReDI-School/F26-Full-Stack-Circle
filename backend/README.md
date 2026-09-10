@@ -53,7 +53,7 @@ The connection strings in there already match the Docker database, so there is n
 ### 4. Create the tables
 
 ```bash
-pnpm db:push     # applies prisma/schema.prisma to the database
+pnpm db:deploy   # applies the migrations in prisma/migrations/ to the database
 pnpm db:seed     # inserts the seed data
 ```
 
@@ -104,13 +104,13 @@ export class UserService {
     });
   }
 
-  async createUser(data: any) {
+  async createUser(data: { email: string; name?: string }) {
     return await prisma.user.create({
       data,
     });
   }
 
-  async updateUser(id: number, data: any) {
+  async updateUser(id: number, data: { email?: string; name?: string }) {
     return await prisma.user.update({
       where: { id },
       data,
@@ -132,16 +132,12 @@ export class UserService {
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 
+const userService = new UserService();
+
 export class UserController {
-  private userService: UserService;
-
-  constructor() {
-    this.userService = new UserService();
-  }
-
-  async getAllUsers(req: Request, res: Response) {
+  async getUsers(req: Request, res: Response) {
     try {
-      const users = await this.userService.getAllUsers();
+      const users = await userService.getAllUsers();
       res.json({ users });
     } catch (error) {
       console.error('Error fetching users:', error);
@@ -152,7 +148,7 @@ export class UserController {
   async getUserById(req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
-      const user = await this.userService.getUserById(id);
+      const user = await userService.getUserById(id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
       }
@@ -166,7 +162,7 @@ export class UserController {
   async createUser(req: Request, res: Response) {
     try {
       const data = req.body;
-      const user = await this.userService.createUser(data);
+      const user = await userService.createUser(data);
       res.status(201).json({ user });
     } catch (error) {
       console.error('Error creating user:', error);
@@ -178,7 +174,7 @@ export class UserController {
     try {
       const id = Number(req.params.id);
       const data = req.body;
-      const user = await this.userService.updateUser(id, data);
+      const user = await userService.updateUser(id, data);
       res.json({ user });
     } catch (error) {
       console.error('Error updating user:', error);
@@ -189,7 +185,7 @@ export class UserController {
   async deleteUser(req: Request, res: Response) {
     try {
       const id = Number(req.params.id);
-      await this.userService.deleteUser(id);
+      await userService.deleteUser(id);
       res.json({ message: 'User deleted successfully' });
     } catch (error) {
       console.error('Error deleting user:', error);
@@ -210,7 +206,7 @@ const userRouter = Router();
 const userController = new UserController();
 
 // GET /api/users
-userRouter.get('/', (req, res) => userController.getAllUsers(req, res));
+userRouter.get('/', (req, res) => userController.getUsers(req, res));
 
 // GET /api/users/:id
 userRouter.get('/:id', (req, res) => userController.getUserById(req, res));
@@ -262,23 +258,26 @@ model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
-  password  String
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
-  posts     Post[]   // Relation to Post model
+  items     Item[]   // Relation to Item model
 }
 
-model Post {
-  id        Int      @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean  @default(false)
-  author    User     @relation(fields: [authorId], references: [id])
-  authorId  Int
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+model Item {
+  id          Int      @id @default(autoincrement())
+  title       String
+  description String?
+  published   Boolean  @default(false)
+  seller      User     @relation(fields: [sellerId], references: [id])
+  sellerId    Int
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
 }
 ```
+
+> [!NOTE]
+> This is an example of the kind of model ReDiCycle needs — `Item` does not exist yet. The
+> real `schema.prisma` currently has only `User`, and the data model is yours to design.
 
 ### Model Features
 
@@ -297,17 +296,24 @@ After modifying the schema, you need to update the database:
 pnpm db:generate
 ```
 
-### 2. Push the changes to the database
+This writes the typed client to `backend/generated/prisma`. That folder is generated code, so
+it is not committed — `pnpm install` recreates it automatically. If imports from
+`generated/prisma` suddenly break (typically right after `pnpm clean`), run this command.
 
-```bash
-pnpm db:push
-```
-
-Or, if you want to create a migration:
+### 2. Create a migration
 
 ```bash
 pnpm db:migrate --name your_migration_name
 ```
+
+This creates a new folder under `prisma/migrations/` and applies it to your local database.
+**Commit that folder with your PR** — CI and the Vercel deployment both run
+`prisma migrate deploy`, so a change without a migration file never reaches the deployed
+database.
+
+`pnpm db:push` applies the schema without creating a migration file. It is fine for
+experimenting on a throwaway local database, but it can silently drop columns and their data,
+and it leaves nothing for CI or the deployment to apply.
 
 > [!NOTE] > `prisma migrate` is Prisma's CLI tool used to manage and apply database schema changes in a structured and version-controlled way. So it will create a new migration file and apply it to the database, keeping your local database in sync with the schema and creating a backup of the previous state of the database to be able to rollback if needed. you can read more about it [here](https://www.prisma.io/docs/concepts/components/prisma-migrate).
 
@@ -322,21 +328,20 @@ From Prisma 7 on, the client is created once, with a driver adapter, in
 import prisma from '../libs/prisma';
 
 export class UserService {
-  async createUser(data: { email: string; name?: string; password: string }) {
+  async createUser(data: { email: string; name?: string }) {
     return await prisma.user.create({
       data: {
         email: data.email,
         name: data.name,
-        password: data.password, // Remember to hash passwords!
       },
     });
   }
 
-  async getUserWithPosts(id: number) {
+  async getUserWithItems(id: number) {
     return await prisma.user.findUnique({
       where: { id },
       include: {
-        posts: true, // Include related posts
+        items: true, // Include related items — once the Item model exists
       },
     });
   }
@@ -354,8 +359,9 @@ export class UserService {
 ### Common Commands
 
 - `pnpm db:generate` - Generate Prisma Client
-- `pnpm db:push` - Push schema changes to database
-- `pnpm db:migrate` - Create and apply migrations
+- `pnpm db:migrate` - Create and apply a migration (the normal way to change the schema)
+- `pnpm db:deploy` - Apply the existing migrations (what CI and Vercel run)
+- `pnpm db:push` - Push schema changes without a migration file (throwaway databases only)
 - `pnpm db:studio` - Open Prisma Studio for database management
 
 ## 🔧 Available Scripts
@@ -363,10 +369,13 @@ export class UserService {
 - `pnpm dev` - Start development server with hot reload
 - `pnpm build` - Build the project
 - `pnpm start` - Run the built project
-- `pnpm db:generate` - Generate Prisma client
-- `pnpm db:migrate` - Run database migrations
-- `pnpm db:push` - Push schema changes to database
-- `pnpm db:studio` - Open Prisma Studio for database management
+- `pnpm lint` - Check code quality with ESLint
+- `pnpm typecheck` - Type-check without emitting anything
+- `pnpm format` / `pnpm format:check` - Format the code, or just check it
+- `pnpm clean` - Delete `dist/` and `generated/`
+- `pnpm db:seed` - Insert the seed data
+
+The database commands are listed under [Common Commands](#common-commands) above.
 
 ## 🔒 Security Features
 

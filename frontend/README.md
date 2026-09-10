@@ -34,7 +34,7 @@ frontend/
 │   ├── hooks/         # Custom React hooks
 │   ├── assets/        # CSS and images
 │   └── config/        # Runtime configuration (API URL, environment)
-├── public/            # Static files served as-is
+├── public/            # Static files served as-is (empty for now)
 ├── .storybook/        # Storybook configuration
 ├── package.json       # Dependencies and scripts
 └── next.config.ts     # Next.js configuration
@@ -58,15 +58,7 @@ cd ..
 pnpm install
 ```
 
-### Step 2: Configure the environment
-
-```bash
-cp .env.example .env
-```
-
-The default points at the backend running locally on port 4000.
-
-### Step 3: Start the Development Server
+### Step 2: Start the Development Server
 
 ```bash
 cd frontend
@@ -92,8 +84,10 @@ route render.
 src/app/
 ├── layout.tsx        → wraps every page (html, body, global CSS)
 ├── page.tsx          → "/"
-└── sign-in/
-    └── page.tsx      → "/sign-in"
+├── login/
+│   └── page.tsx      → "/login"
+└── register/
+    └── page.tsx      → "/register"
 ```
 
 To add a page, create a folder and put a `page.tsx` in it. That's the whole routing setup —
@@ -175,13 +169,15 @@ tokens rather than hard-coded hex values so the whole app stays consistent.
 
 ### 6. Configuration (`src/config/`)
 
-`src/config/index.ts` resolves the API URL for the current environment, and the `useConfig`
-hook exposes it to components:
+The frontend has **no environment file**. The API is always at the relative `/api`:
+in production Vercel routes `/api` to the backend service, and in development the rewrite in
+`next.config.ts` proxies it to the backend on port 4000. So one URL works everywhere — and because the dev
+request goes through the Next.js server, there is no CORS involved either.
 
 ```tsx
-const { config, loadingConfig } = useConfig();
+import { apiUrl } from '../config';
 
-const response = await fetch(`${config?.apiUrl}/users`);
+const response = await fetch(apiUrl('/users')); // → /api/users
 ```
 
 ## 🔧 Available Scripts
@@ -191,9 +187,12 @@ pnpm dev              # Start development server
 pnpm build            # Build for production
 pnpm start            # Run the production build
 pnpm lint             # Check code quality
+pnpm typecheck        # Type-check without emitting anything
 pnpm format           # Format code with Prettier
+pnpm format:check     # Check the formatting without changing anything
 pnpm storybook        # Open Storybook (component library)
 pnpm build-storybook  # Build a static Storybook
+pnpm clean            # Delete .next and storybook-static
 ```
 
 ## 📖 Understanding the Backend
@@ -209,7 +208,7 @@ The backend is a Node.js server that provides:
 
 ### How Frontend and Backend Connect
 
-1. **Frontend makes a request**: a component calls `fetch(`${config?.apiUrl}/users`)`
+1. **Frontend makes a request**: a component calls `fetch(apiUrl('/users'))`, i.e. `/api/users`
 2. **Backend receives the request**: the Express server handles the `/users` endpoint
 3. **Database query**: Prisma queries the PostgreSQL database
 4. **Response**: data is sent back to the frontend
@@ -229,6 +228,11 @@ pnpm storybook
 
 > [!NOTE]
 > [See Storybook documentation here](https://storybook.js.org/docs/get-started/install)
+
+### Tests
+
+Vitest, Playwright and the Storybook test addon are installed, but nothing is wired up yet:
+there is no `test` script and no Vitest config. Setting that up is one of the tickets.
 
 ### ESLint, Prettier and TypeScript
 

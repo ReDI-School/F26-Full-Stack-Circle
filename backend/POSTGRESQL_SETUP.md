@@ -54,7 +54,7 @@ POSTGRES_URL_NON_POOLING="postgres://redi:redi@localhost:5434/redicycle"
 ### Create the tables
 
 ```bash
-pnpm db:push     # applies prisma/schema.prisma to the database
+pnpm db:deploy   # applies the migrations in prisma/migrations/ to the database
 pnpm db:seed     # inserts the seed data
 ```
 
@@ -118,6 +118,6 @@ POSTGRES_URL_NON_POOLING="postgres://YOUR_USER:YOUR_PASSWORD@localhost:5432/redi
 And create the tables:
 
 ```bash
-pnpm db:push
+pnpm db:deploy
 pnpm db:seed
 ```

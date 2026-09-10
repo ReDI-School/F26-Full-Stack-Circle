@@ -4,7 +4,7 @@ services:
     container_name: redicycle-db
     restart: unless-stopped
     ports:
-      # Host port 5433 so it does not collide with a Postgres you may
+      # Host port 5434 so it does not collide with a Postgres you may
       # already have running locally on 5432 (S26 uses 5433).
       - '5434:5432'
     environment:
