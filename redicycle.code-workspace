@@ -1,0 +1,29 @@
+{
+  "folders": [
+    {
+      "name": "redicycle (root)",
+      "path": "."
+    },
+    {
+      "name": "frontend",
+      "path": "frontend"
+    },
+    {
+      "name": "backend",
+      "path": "backend"
+    }
+  ],
+  "settings": {
+    // frontend/ and backend/ get their own roots above, so hide them from
+    // the root tree to avoid every file showing up twice.
+    "files.exclude": {
+      "frontend": true,
+      "backend": true
+    },
+    // Window-scoped, so a multi-root workspace ignores the copy in
+    // .vscode/settings.json - it has to be repeated here.
+    "json.schemaDownload.trustedDomains": {
+      "https://openapi.vercel.sh/": true
+    }
+  }
+}

@@ -1,0 +1,51 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      // Plain launch, not `tsx watch`: the watcher respawns the process on
+      // every save and the debugger detaches with it. Restart to pick up edits.
+      "name": "Debug backend (API)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/src/index.ts",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeArgs": ["--import", "tsx"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "Debug backend (seed script)",
+      "type": "node",
+      "request": "launch",
+      "program": "${workspaceFolder}/backend/prisma/seed.ts",
+      "cwd": "${workspaceFolder}/backend",
+      "runtimeArgs": ["--import", "tsx"],
+      "console": "integratedTerminal",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      "name": "Debug frontend (server)",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "pnpm start:frontend",
+      "cwd": "${workspaceFolder}",
+      "skipFiles": ["<node_internals>/**", "**/node_modules/**"]
+    },
+    {
+      // Attaches to the browser; start "Debug frontend (server)" first.
+      "name": "Debug frontend (browser)",
+      "type": "chrome",
+      "request": "launch",
+      "url": "http://localhost:3000",
+      "webRoot": "${workspaceFolder}/frontend"
+    }
+  ],
+  "compounds": [
+    {
+      "name": "Debug full stack",
+      "configurations": ["Debug backend (API)", "Debug frontend (server)"],
+      "stopAll": true,
+      "presentation": { "group": "1-fullstack", "order": 1 }
+    }
+  ]
+}

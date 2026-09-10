@@ -3,5 +3,8 @@
     "redicycle",
     "ReDiCycle",
     "storybook"
-  ]
+  ],
+  "json.schemaDownload.trustedDomains": {
+    "https://openapi.vercel.sh/": true
+  }
 }
