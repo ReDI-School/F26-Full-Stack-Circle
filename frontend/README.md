@@ -140,15 +140,42 @@ the variants of a component in one place:
 
 ```ts
 export const button = tv({
-  base: ['rounded-pill px-6 py-3', 'font-display font-extrabold'],
+  // Every class on its own line: easy to read, easy to diff, and you can
+  // comment a single one out while you experiment.
+  base: [
+    'rounded-pill',
+    'px-6',
+    'py-3',
+    'font-display',
+    'font-extrabold',
+    'transition-colors',
+    'cursor-pointer',
+    'disabled:pointer-events-none',
+    'disabled:opacity-50',
+  ],
   variants: {
     variant: {
-      primary: 'bg-secondary text-white hover:bg-secondary-hover',
-      ghost: 'border-2 border-tertiary text-tertiary',
+      primary: [
+        'bg-secondary',
+        'text-white',
+        'hover:bg-secondary-hover',
+        'focus-visible:outline-secondary',
+      ],
+      ghost: [
+        'border-2',
+        'border-tertiary',
+        'text-tertiary',
+        'hover:bg-tertiary',
+        'hover:text-white',
+      ],
     },
-    stretch: { true: 'w-full' },
+    stretch: {
+      true: ['w-full'],
+    },
   },
-  defaultVariants: { variant: 'primary' },
+  defaultVariants: {
+    variant: 'primary',
+  },
 });
 ```
 
