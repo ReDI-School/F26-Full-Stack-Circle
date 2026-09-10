@@ -91,8 +91,8 @@ jobs:
       - name: Build
         run: pnpm --filter backend build
 
-      - name: Apply the schema to the database
-        run: pnpm --filter backend db:push
+      - name: Apply the migrations to the database
+        run: pnpm --filter backend db:deploy
 
       - name: Run the seed
         run: pnpm --filter backend db:seed

@@ -106,10 +106,6 @@ Thumbs.db
 *.sqlite
 *.sqlite3
 
-# Prisma
-prisma/migrations/
-!prisma/migrations/.gitkeep
-
 # Generated files
 generated/
 *.generated.*
