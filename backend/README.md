@@ -15,7 +15,7 @@ This project is designed to help students learn backend development using modern
 
 Before you begin, ensure you have the following installed:
 
-- Node.js v22
+- Node.js v24
 - pnpm 11+
 - Docker (to run the PostgreSQL database)
 

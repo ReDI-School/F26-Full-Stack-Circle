@@ -8,11 +8,55 @@
     "backend": {
       "root": "backend",
       "entrypoint": "src/index.ts",
-      "rewrites": [{ "source": "/api/:path*", "destination": "/:path*" }]
+      "rewrites": [
+        {
+          "source": "/api/:path*",
+          "destination": "/:path*"
+        }
+      ]
+    },
+    "storybook": {
+      "root": "frontend",
+      "framework": "storybook",
+      "buildCommand": "STORYBOOK_BASE_PATH=/storybook/ pnpm build-storybook",
+      "outputDirectory": "storybook-static",
+      "rewrites": [
+        {
+          "source": "/storybook/:path+",
+          "destination": "/:path+"
+        },
+        {
+          "source": "/storybook/:path*",
+          "destination": "/index.html"
+        }
+      ]
     }
   },
   "rewrites": [
-    { "source": "/api/:path*", "destination": { "service": "backend" } },
-    { "source": "/:path*", "destination": { "service": "frontend" } }
+    {
+      "source": "/storybook/:path*",
+      "destination": {
+        "service": "storybook"
+      }
+    },
+    {
+      "source": "/api/:path*",
+      "destination": {
+        "service": "backend"
+      }
+    },
+    {
+      "source": "/:path*",
+      "destination": {
+        "service": "frontend"
+      }
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/storybook",
+      "destination": "/storybook/",
+      "permanent": false
+    }
   ]
 }

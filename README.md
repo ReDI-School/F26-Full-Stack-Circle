@@ -8,7 +8,7 @@ setup and a small set of example files. The features are yours to build.
 
 ## Prerequisites
 
-- **Node.js** 22 or higher (see `.nvmrc` — if you use `nvm`, run `nvm use`)
+- **Node.js** 24 or higher (see `.nvmrc` — if you use `nvm`, run `nvm use`)
 - **pnpm** 11 or higher — install it with `npm install -g pnpm` or `corepack enable`
 - **Docker** — used to run the PostgreSQL database
 

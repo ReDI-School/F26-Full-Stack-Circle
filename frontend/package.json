@@ -20,7 +20,7 @@
     "format:check": "prettier --check ."
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "dependencies": {
     "next": "^16.3.4",

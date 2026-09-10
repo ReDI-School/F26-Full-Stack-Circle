@@ -44,7 +44,7 @@ frontend/
 
 ### Prerequisites
 
-- **Node.js** version 22.0.0 or higher (see `.nvmrc`)
+- **Node.js** version 24.0.0 or higher (see `.nvmrc`)
 - **pnpm** as the package manager
 - Basic understanding of HTML, CSS and JavaScript
 

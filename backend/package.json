@@ -25,7 +25,7 @@
     "format:check": "prettier --check ."
   },
   "engines": {
-    "node": ">=22.0.0"
+    "node": ">=24.0.0"
   },
   "dependencies": {
     "@prisma/adapter-pg": "^7.10.0",
