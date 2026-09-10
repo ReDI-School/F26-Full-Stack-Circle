@@ -8,20 +8,6 @@
     "backend": {
       "root": "backend",
       "entrypoint": "src/index.ts",
-      "rewrites": [
-        {
-          "source": "/api",
-          "destination": "/"
-        },
-        {
-          "source": "/api/",
-          "destination": "/"
-        },
-        {
-          "source": "/api/:path+",
-          "destination": "/:path+"
-        }
-      ],
       "buildCommand": "pnpm exec prisma generate"
     },
     "storybook": {

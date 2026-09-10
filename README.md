@@ -52,7 +52,15 @@ pnpm start:all
 ```
 
 - Frontend → <http://localhost:3000>
-- Backend → <http://localhost:4000>
+- Backend → <http://localhost:4000/api>
+- Storybook → run `pnpm storybook`, then <http://localhost:6006>
+
+Two endpoints are useful for checking things are wired up:
+
+| Endpoint      | What it tells you                                                    |
+| ------------- | -------------------------------------------------------------------- |
+| `/api`        | the API is running                                                   |
+| `/api/health` | the API is running **and** can reach the database (503 if it cannot) |
 
 ## All the commands
 

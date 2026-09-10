@@ -231,7 +231,7 @@ export default userRouter;
 
 ```typescript
 import userRouter from './routes/userRoutes';
-app.use('/users', userRouter);
+api.use('/users', userRouter); // mounted under /api in src/index.ts
 ```
 
 This structure follows the separation of concerns principle:
