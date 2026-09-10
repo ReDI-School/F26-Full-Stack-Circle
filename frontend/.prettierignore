@@ -8,3 +8,4 @@ coverage
 *.log
 pnpm-lock.yaml
 next-env.d.ts
+.vercel
