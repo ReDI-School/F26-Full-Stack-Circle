@@ -7,8 +7,8 @@
  * - the editorial rows of items ("fresh finds", "shops we love", ...)
  * - the browse results when a search or category filter is active
  *
- * The items should come from the backend — see src/hooks/useConfig.ts for
- * the API URL.
+ * The items should come from the backend: `fetch(apiUrl('/items'))`,
+ * see src/config/index.ts.
  */
 const Home = () => {
   return (
