@@ -9,6 +9,7 @@ embedded at the top of the page tickets so you can see the screen before reading
 
 | File | Ticket |
 | ---- | ------ |
+| `Home.png` | Home: hero, category tiles, CTA banner · and the four editorial rows |
 | `Home-Browse.png`, `Home-NoResults.png` | Home: search and category browse results |
 | `Login.png` | Log in page |
 | `Register.png` | Register page |
@@ -19,6 +20,6 @@ embedded at the top of the page tickets so you can see the screen before reading
 
 ## Not captured yet
 
-`Home.png` (the default homepage with the editorial rows), `OtherShop`, `Inbox`,
-`Inbox-Empty`, `Admin`, `Account`, `Account-Delete`, `HowToBuy`, `Safety` and `Faq`.
-Those tickets link to the prototype instead.
+`MyShop-Discount`, `OtherShop`, `Inbox`, `Inbox-Empty`, `Admin`, `Account`,
+`Account-Delete`, `HowToBuy`, `Safety` and `Faq`. Those tickets link to the prototype
+instead.
