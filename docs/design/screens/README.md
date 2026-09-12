@@ -16,10 +16,13 @@ embedded at the top of the page tickets so you can see the screen before reading
 | `ItemDetail.png` | Item detail page |
 | `ItemDetail-Sold.png`, `ItemDetail-Mine.png` | Item detail: "I'm interested" and its other states |
 | `AddItem.png` | Add item page |
-| `MyShop.png`, `MyShop-Empty.png` | My shop, and the manage actions |
+| `MyShop.png`, `MyShop-Empty.png` | My shop: banner and item grid |
+| `MyShop-Discount.png` | My shop: the inline discount editor (a crop, not a full page) |
+| `OtherShop.png` | Someone else's shop |
+| `Inbox.png`, `Inbox-Empty.png` | Inbox |
+| `Admin.png` | Admin homepage curation |
+| `Account.png`, `Account-Delete.png` | Account settings and the danger zone |
+| `HowToBuy.png`, `Safety.png`, `Faq.png` | The info pages and the FAQ |
 
-## Not captured yet
-
-`MyShop-Discount`, `OtherShop`, `Inbox`, `Inbox-Empty`, `Admin`, `Account`,
-`Account-Delete`, `HowToBuy`, `Safety` and `Faq`. Those tickets link to the prototype
-instead.
+All 21 screens are captured. `MyShop-Discount.png` is a crop of one card; every other file is a
+full-page capture at 1440px.
