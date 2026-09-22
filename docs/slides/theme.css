@@ -1,0 +1,367 @@
+/* ============================================================
+   ReDiCycle reveal.js theme
+
+   Shared by every deck in docs/slides. The colors and fonts are
+   copied from frontend/src/assets/css/global.css so the slides
+   look like the product we are building.
+   ============================================================ */
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=DM+Sans:wght@400;500;700&family=DM+Mono:wght@400&display=swap');
+
+:root {
+  --primary: #58adc5;
+  --primary-100: #e3f1f5;
+  --secondary: #f05a21;
+  --secondary-100: #fde5db;
+  --tertiary: #385a65;
+  --tertiary-100: #e1e9ec;
+  --bg: #f2f7f9;
+  --surface: #ffffff;
+  --ink: #22343a;
+  --body: #4a6570;
+  --muted: #6b8893;
+  --border: #e1e9ec;
+  --success: #7ed3a8;
+  --success-100: #e2f6ec;
+
+  --radius-card: 20px;
+  --radius-input: 12px;
+  --shadow-card: 0 8px 24px rgba(56, 90, 101, 0.14);
+
+  --font-display: 'Nunito', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-sans: 'DM Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+  --font-mono: 'DM Mono', ui-monospace, monospace;
+
+  /* reveal.js theme variables */
+  --r-background-color: var(--bg);
+  --r-main-font: var(--font-sans);
+  --r-main-font-size: 30px;
+  --r-main-color: var(--body);
+  --r-heading-font: var(--font-display);
+  --r-heading-color: var(--ink);
+  --r-heading-font-weight: 900;
+  --r-heading-text-transform: none;
+  --r-heading-letter-spacing: -0.01em;
+  --r-heading-line-height: 1.15;
+  --r-heading1-size: 2.3em;
+  --r-heading2-size: 1.5em;
+  --r-heading3-size: 1.1em;
+  --r-code-font: var(--font-mono);
+  --r-link-color: var(--primary-hover, #4699b1);
+  --r-link-color-hover: var(--secondary);
+  --r-selection-background-color: var(--primary-100);
+  --r-selection-color: var(--ink);
+}
+
+body,
+.reveal-viewport {
+  background: var(--bg);
+}
+
+.reveal {
+  font-family: var(--r-main-font);
+  font-size: var(--r-main-font-size);
+  color: var(--r-main-color);
+}
+
+.reveal .slides {
+  text-align: left;
+}
+
+.reveal h1,
+.reveal h2,
+.reveal h3,
+.reveal h4 {
+  margin: 0 0 0.5em;
+  font-family: var(--r-heading-font);
+  font-weight: var(--r-heading-font-weight);
+  line-height: var(--r-heading-line-height);
+  letter-spacing: var(--r-heading-letter-spacing);
+  color: var(--r-heading-color);
+  text-transform: none;
+}
+
+.reveal h1 { font-size: var(--r-heading1-size); }
+.reveal h2 { font-size: var(--r-heading2-size); }
+.reveal h3 { font-size: var(--r-heading3-size); }
+.reveal h4 { font-size: 0.9em; }
+
+.reveal p,
+.reveal li {
+  line-height: 1.4;
+}
+
+.reveal p { margin: 0 0 0.6em; }
+
+.reveal ul,
+.reveal ol {
+  margin: 0 0 0.6em 1.1em;
+}
+
+.reveal li + li { margin-top: 0.3em; }
+
+.reveal strong { color: var(--ink); }
+
+.reveal a {
+  color: var(--r-link-color);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.reveal a:hover { color: var(--r-link-color-hover); }
+
+/* ---------- Code ---------- */
+.reveal code {
+  font-family: var(--r-code-font);
+  font-size: 0.85em;
+  background: var(--tertiary-100);
+  color: var(--tertiary);
+  padding: 0.08em 0.35em;
+  border-radius: 6px;
+}
+
+.reveal pre {
+  width: 100%;
+  margin: 0.4em 0 0.8em;
+  font-size: 0.6em;
+  box-shadow: var(--shadow-card);
+  border-radius: var(--radius-input);
+  overflow: hidden;
+}
+
+.reveal pre code {
+  display: block;
+  padding: 0.9em 1.1em;
+  max-height: 460px;
+  background: #22343a;
+  color: #e3f1f5;
+  border-radius: var(--radius-input);
+  line-height: 1.5;
+}
+
+.reveal pre code .comment,
+.reveal pre code .hljs-comment {
+  color: #9ab0b8;
+}
+
+/* ---------- Layout helpers ---------- */
+.reveal .center { text-align: center; }
+
+.reveal .grid-2,
+.reveal .grid-3,
+.reveal .grid-4 {
+  display: grid;
+  gap: 0.6em;
+  align-items: stretch;
+}
+
+.reveal .grid-2 { grid-template-columns: repeat(2, 1fr); }
+.reveal .grid-3 { grid-template-columns: repeat(3, 1fr); }
+.reveal .grid-4 { grid-template-columns: repeat(4, 1fr); }
+
+.reveal .card {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 0.7em 0.9em;
+  font-size: 0.8em;
+}
+
+.reveal .card h3 { margin-bottom: 0.3em; }
+.reveal .card p:last-child { margin-bottom: 0; }
+
+.reveal .card.primary { border-top: 6px solid var(--primary); }
+.reveal .card.secondary { border-top: 6px solid var(--secondary); }
+.reveal .card.tertiary { border-top: 6px solid var(--tertiary); }
+.reveal .card.success { border-top: 6px solid var(--success); }
+
+.reveal .card.tinted-primary { background: var(--primary-100); border-color: transparent; box-shadow: none; }
+.reveal .card.tinted-secondary { background: var(--secondary-100); border-color: transparent; box-shadow: none; }
+
+.reveal .emoji {
+  font-size: 1.6em;
+  line-height: 1;
+  margin-bottom: 0.2em;
+  display: block;
+}
+
+.reveal .big-emoji {
+  font-size: 3.2em;
+  line-height: 1;
+  display: block;
+  margin-bottom: 0.2em;
+}
+
+.reveal .eyebrow {
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.6em;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--secondary);
+  margin-bottom: 0.4em;
+}
+
+.reveal .lead {
+  font-size: 1.1em;
+  color: var(--body);
+}
+
+.reveal .small { font-size: 0.7em; }
+.reveal .muted { color: var(--muted); }
+
+.reveal .chip {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-weight: 800;
+  font-size: 0.65em;
+  padding: 0.25em 0.8em;
+  border-radius: 999px;
+  background: var(--primary-100);
+  color: var(--tertiary);
+  margin: 0.15em 0.2em 0.15em 0;
+}
+
+.reveal .chip.orange { background: var(--secondary-100); color: #c2410c; }
+.reveal .chip.dark { background: var(--tertiary); color: #fff; }
+.reveal .chip.green { background: var(--success-100); color: #1f7a4d; }
+
+/* A callout box, for "watch out" moments */
+.reveal .callout {
+  border-left: 6px solid var(--secondary);
+  background: var(--secondary-100);
+  color: var(--ink);
+  border-radius: var(--radius-input);
+  padding: 0.5em 0.9em;
+  font-size: 0.75em;
+  margin-top: 0.6em;
+}
+
+.reveal .callout.info {
+  border-left-color: var(--primary);
+  background: var(--primary-100);
+}
+
+/* Numbered rule cards */
+.reveal .rule {
+  display: flex;
+  gap: 0.6em;
+  align-items: flex-start;
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-card);
+  padding: 0.5em 0.8em;
+  font-size: 0.68em;
+  box-shadow: var(--shadow-card);
+}
+
+.reveal .rule .num {
+  flex: none;
+  width: 1.9em;
+  height: 1.9em;
+  border-radius: 999px;
+  background: var(--secondary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 900;
+  display: grid;
+  place-items: center;
+}
+
+.reveal .rule strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+/* Tables */
+.reveal table {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.75em;
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  overflow: hidden;
+  box-shadow: var(--shadow-card);
+}
+
+.reveal table th,
+.reveal table td {
+  text-align: left;
+  padding: 0.55em 0.9em;
+  border-bottom: 1px solid var(--border);
+}
+
+.reveal table th {
+  background: var(--tertiary);
+  color: #fff;
+  font-family: var(--font-display);
+  font-weight: 800;
+}
+
+.reveal table tr:last-child td { border-bottom: 0; }
+
+/* Numbered pipeline (steps in a row) */
+.reveal .pipeline {
+  display: flex;
+  gap: 0.35em;
+  align-items: stretch;
+  font-size: 0.6em;
+}
+
+.reveal .pipeline .step {
+  flex: 1;
+  background: var(--surface);
+  border-radius: var(--radius-card);
+  box-shadow: var(--shadow-card);
+  padding: 0.7em 0.5em;
+  text-align: center;
+  border-top: 6px solid var(--primary);
+}
+
+.reveal .pipeline .step .emoji { font-size: 2em; }
+
+.reveal .pipeline .step strong {
+  display: block;
+  font-family: var(--font-display);
+  font-weight: 900;
+  margin-bottom: 0.2em;
+}
+
+/* Title slides */
+.reveal section.title-slide h1 { margin-bottom: 0.2em; }
+
+.reveal .logo {
+  font-family: var(--font-display);
+  font-weight: 900;
+  color: var(--tertiary);
+  font-size: 0.8em;
+}
+
+.reveal .logo span { color: var(--primary); }
+
+/* SVG diagrams */
+.reveal svg.diagram {
+  display: block;
+  margin: 0 auto;
+  max-width: 100%;
+  height: auto;
+  font-family: var(--font-display);
+}
+
+.reveal svg.diagram text { font-family: var(--font-display); }
+.reveal svg.diagram .mono { font-family: var(--font-mono); }
+
+/* Fragments: a softer "fade-up" default */
+.reveal .fragment.fade-up { transform: translate(0, 20px); }
+.reveal .fragment.fade-up.visible { transform: translate(0, 0); }
+
+/* Progress bar + controls in brand colors */
+.reveal .progress { color: var(--secondary); height: 5px; }
+.reveal .controls { color: var(--primary); }
+.reveal .slide-number {
+  background: transparent;
+  color: var(--muted);
+  font-family: var(--font-display);
+  font-weight: 800;
+}
