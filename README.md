@@ -172,3 +172,5 @@ goes red.
 - [Database setup](./backend/POSTGRESQL_SETUP.md) — Docker and the alternatives
 - [Architecture](./ARCHITECTURE.md) — how the pieces fit together and how deployment works
 - [Contributing](./CONTRIBUTING.md) — how we work as a team: tickets, PRs, reviews, sprints
+- [Team slides](./docs/slides/) — intros to Agile/Scrum and the Git & GitHub workflow (open
+  `docs/slides/index.html` in a browser)

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ReDiCycle Team Slides</title>
+    <link rel="stylesheet" href="theme.css" />
+    <style>
+      * { box-sizing: border-box; }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg);
+        color: var(--body);
+        font-family: var(--font-sans);
+        font-size: 17px;
+        line-height: 1.5;
+        display: grid;
+        place-items: center;
+        padding: 40px 16px;
+      }
+
+      main { width: 100%; max-width: 860px; }
+
+      .logo {
+        font-family: var(--font-display);
+        font-weight: 900;
+        color: var(--tertiary);
+        margin: 0 0 8px;
+      }
+
+      .logo span { color: var(--primary); }
+
+      h1 {
+        font-family: var(--font-display);
+        font-weight: 900;
+        color: var(--ink);
+        font-size: clamp(2rem, 5vw, 2.75rem);
+        line-height: 1.1;
+        margin: 0 0 8px;
+      }
+
+      .intro { margin: 0 0 32px; }
+
+      .decks {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 20px;
+      }
+
+      a.deck {
+        display: block;
+        text-decoration: none;
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-top: 6px solid var(--primary);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        padding: 24px;
+        color: var(--body);
+        transition: transform 0.15s ease;
+      }
+
+      a.deck.orange { border-top-color: var(--secondary); }
+      a.deck:hover { transform: translateY(-3px); }
+
+      a.deck .emoji { font-size: 2.5rem; line-height: 1; }
+
+      a.deck h2 {
+        font-family: var(--font-display);
+        font-weight: 900;
+        color: var(--ink);
+        font-size: 1.375rem;
+        margin: 12px 0 6px;
+      }
+
+      a.deck p { margin: 0 0 12px; }
+
+      a.deck .go {
+        font-family: var(--font-display);
+        font-weight: 800;
+        color: var(--secondary);
+      }
+
+      .tips {
+        margin-top: 32px;
+        font-size: 0.9375rem;
+        color: var(--muted);
+      }
+
+      kbd {
+        font-family: var(--font-mono);
+        background: var(--surface);
+        border: 1px solid var(--border-input, #cfdee4);
+        border-radius: 6px;
+        padding: 1px 6px;
+        color: var(--ink);
+      }
+    </style>
+  </head>
+  <body>
+    <main>
+      <p class="logo">♻️ Re<span>Di</span>Cycle · Full Stack Circle</p>
+      <h1>Team slides</h1>
+      <p class="intro">Two short intros to how we build ReDiCycle together.</p>
+
+      <div class="decks">
+        <a class="deck" href="agile/index.html">
+          <span class="emoji">🏃</span>
+          <h2>How we work as a team</h2>
+          <p>Agile, Scrum, sprints, the board, and our team rules.</p>
+          <span class="go">Open slides →</span>
+        </a>
+        <a class="deck orange" href="github/index.html">
+          <span class="emoji">🌿</span>
+          <h2>Git &amp; GitHub: working together</h2>
+          <p>Clone, branch, keep up to date with main, pull requests and code review.</p>
+          <span class="go">Open slides →</span>
+        </a>
+      </div>
+
+      <p class="tips">
+        Use <kbd>→</kbd> / <kbd>Space</kbd> to move forward, <kbd>Esc</kbd> for an overview of all
+        slides, <kbd>S</kbd> for speaker notes, <kbd>F</kbd> for full screen.
+      </p>
+    </main>
+  </body>
+</html>

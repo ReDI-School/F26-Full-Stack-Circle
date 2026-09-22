@@ -1,0 +1,742 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Git and GitHub Workflow</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css" />
+    <link rel="stylesheet" href="../theme.css" />
+
+    <style>
+      /* A small mock of GitHub's "Files changed" view */
+      .gh {
+        background: var(--surface);
+        border: 1px solid #d0d7de;
+        border-radius: var(--radius-input);
+        font-size: 0.5em;
+        overflow: hidden;
+        box-shadow: var(--shadow-card);
+      }
+
+      .gh .file {
+        background: #f6f8fa;
+        border-bottom: 1px solid #d0d7de;
+        padding: 0.5em 0.8em;
+        font-family: var(--font-mono);
+        color: #1f2328;
+      }
+
+      .gh .line {
+        display: grid;
+        grid-template-columns: 3em 1.5em 1fr;
+        font-family: var(--font-mono);
+        color: #1f2328;
+        line-height: 1.7;
+      }
+
+      .gh .line .n { color: #8c959f; text-align: right; padding-right: 0.5em; }
+      .gh .line .plus { position: relative; }
+      .gh .line.add { background: #e6ffec; }
+      .gh .line.add .n { background: #ccffd8; }
+
+      .gh .plus-btn {
+        position: absolute;
+        left: -0.4em;
+        top: 0.25em;
+        width: 1.3em;
+        height: 1.3em;
+        border-radius: 5px;
+        background: #0969da;
+        color: #fff;
+        font-weight: 700;
+        display: grid;
+        place-items: center;
+        line-height: 1;
+      }
+
+      .gh .comment {
+        margin: 0.5em 0.8em 0.6em 4.5em;
+        border: 1px solid #d0d7de;
+        border-radius: 8px;
+        padding: 0.6em 0.8em;
+        font-family: var(--font-sans);
+        color: #1f2328;
+        background: #fff;
+      }
+
+      .gh .comment .who { font-weight: 700; margin-bottom: 0.3em; }
+      .gh .comment .who span { font-weight: 400; color: #656d76; }
+
+      .gh .suggestion {
+        margin-top: 0.4em;
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        overflow: hidden;
+        font-family: var(--font-mono);
+      }
+
+      .gh .suggestion .head {
+        background: #f6f8fa;
+        padding: 0.2em 0.6em;
+        font-family: var(--font-sans);
+        color: #656d76;
+      }
+
+      .gh .suggestion .del { background: #ffebe9; padding: 0 0.6em; }
+      .gh .suggestion .ins { background: #e6ffec; padding: 0 0.6em; }
+
+      .gh .buttons {
+        display: flex;
+        gap: 0.4em;
+        margin-top: 0.5em;
+        font-family: var(--font-sans);
+        font-weight: 700;
+      }
+
+      .gh .btn {
+        border: 1px solid #d0d7de;
+        border-radius: 6px;
+        padding: 0.25em 0.7em;
+        background: #f6f8fa;
+      }
+
+      .gh .btn.green { background: #1f883d; color: #fff; border-color: #1f883d; }
+
+      /* Review decision cards */
+      .decision {
+        display: flex;
+        gap: 0.5em;
+        align-items: flex-start;
+        font-size: 0.62em;
+        margin-bottom: 0.45em;
+      }
+
+      .decision .dot {
+        flex: none;
+        width: 1.1em;
+        height: 1.1em;
+        border-radius: 999px;
+        margin-top: 0.2em;
+      }
+
+      /* Merge conflict colours for the plaintext code block */
+      .conflict .ours { color: #7ed3a8; }
+      .conflict .theirs { color: #f7a27f; }
+      .conflict .marker { color: #ffd166; font-weight: 700; }
+
+      /* Git vs GitHub */
+      .vs {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.6em;
+        align-items: center;
+      }
+
+      .vs .mid {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.1em;
+        color: var(--muted);
+        text-align: center;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- 1. Title -->
+        <section class="title-slide">
+          <p class="logo">♻️ Re<span>Di</span>Cycle · Full Stack Circle</p>
+          <h1>Git &amp; GitHub:<br />working together</h1>
+          <p class="lead">From "I picked a ticket" to "my code is live"</p>
+          <p>
+            <span class="chip">clone</span><span class="chip">branch</span><span class="chip">commit</span
+            ><span class="chip">merge</span><span class="chip orange">pull request</span
+            ><span class="chip orange">code review</span>
+          </p>
+        </section>
+
+        <!-- 2. Git vs GitHub -->
+        <section>
+          <p class="eyebrow">First things first</p>
+          <h2>Git is not GitHub</h2>
+          <div class="vs">
+            <div class="card tertiary">
+              <span class="emoji">💻</span>
+              <h3>Git</h3>
+              <p>A tool on <strong>your computer</strong> that saves snapshots of your code (<strong>commits</strong>) and lets you work on separate <strong>branches</strong>.</p>
+              <p class="small muted">You use it in the terminal or in VS Code.</p>
+            </div>
+            <div class="mid">+</div>
+            <div class="card secondary">
+              <span class="emoji">🌍</span>
+              <h3>GitHub</h3>
+              <p>A <strong>website</strong> that hosts our repository so the whole team can share code, open <strong>pull requests</strong> and <strong>review</strong> each other.</p>
+              <p class="small muted">Issues and our project board live here too.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. Mental model -->
+        <section>
+          <p class="eyebrow">The mental model</p>
+          <h2><code>main</code> is the product. You work on a branch.</h2>
+          <svg class="diagram" viewBox="0 0 1100 360" width="1100" role="img"
+            aria-label="The main branch is a line of commits. Two feature branches split off it and later merge back into main.">
+            <!-- main -->
+            <line x1="40" y1="180" x2="1060" y2="180" stroke="#385a65" stroke-width="8" stroke-linecap="round" />
+            <text x="40" y="150" font-size="24" font-weight="900" fill="#385a65" class="mono">main</text>
+            <g fill="#385a65">
+              <circle cx="90" cy="180" r="16" />
+              <circle cx="220" cy="180" r="16" />
+              <circle cx="640" cy="180" r="16" />
+              <circle cx="960" cy="180" r="16" />
+            </g>
+
+            <!-- your branch -->
+            <g class="fragment" data-fragment-index="1">
+              <path d="M 220 180 C 280 180, 280 70, 340 70 L 560 70 C 620 70, 620 180, 640 180" fill="none" stroke="#f05a21" stroke-width="7" />
+              <g fill="#f05a21">
+                <circle cx="360" cy="70" r="13" />
+                <circle cx="450" cy="70" r="13" />
+                <circle cx="540" cy="70" r="13" />
+              </g>
+              <text x="340" y="38" font-size="22" font-weight="900" fill="#f05a21" class="mono">feat/12-login-page</text>
+            </g>
+
+            <!-- teammate branch -->
+            <g class="fragment" data-fragment-index="2">
+              <path d="M 220 180 C 300 180, 300 290, 380 290 L 860 290 C 930 290, 930 180, 960 180" fill="none" stroke="#58adc5" stroke-width="7" />
+              <g fill="#58adc5">
+                <circle cx="420" cy="290" r="13" />
+                <circle cx="560" cy="290" r="13" />
+                <circle cx="700" cy="290" r="13" />
+                <circle cx="820" cy="290" r="13" />
+              </g>
+              <text x="420" y="335" font-size="22" font-weight="900" fill="#4699b1" class="mono">feat/13-register-page</text>
+            </g>
+
+            <g class="fragment" data-fragment-index="3">
+              <text x="640" y="228" text-anchor="middle" font-size="20" font-weight="800" fill="#22343a">merged ✅</text>
+              <text x="960" y="228" text-anchor="middle" font-size="20" font-weight="800" fill="#22343a">merged ✅</text>
+            </g>
+          </svg>
+          <p class="small center">
+            <span class="fragment" data-fragment-index="1">Your branch is your own safe copy.</span>
+            <span class="fragment" data-fragment-index="2">Everyone works in parallel.</span>
+            <span class="fragment" data-fragment-index="3">A pull request brings the work back into <code>main</code>.</span>
+          </p>
+          <aside class="notes">Nobody commits directly to main. Every change goes through a branch and a pull request.</aside>
+        </section>
+
+        <!-- 4. Setup -->
+        <section>
+          <p class="eyebrow">Once, on day one</p>
+          <h2>Get the code on your machine</h2>
+          <div class="grid-2" style="grid-template-columns: 1fr 1.4fr; align-items: start">
+            <div>
+              <div class="rule">
+                <span class="num">1</span>
+                <div><strong>GitHub account</strong>Send your username to the teachers so you get access to the repo.</div>
+              </div>
+              <div class="rule" style="margin-top: 0.45em">
+                <span class="num">2</span>
+                <div><strong>SSH key</strong>Follow GitHub's guide "Connecting to GitHub with SSH".</div>
+              </div>
+              <div class="rule" style="margin-top: 0.45em">
+                <span class="num">3</span>
+                <div><strong>Clone &amp; install</strong>"Clone" = download the repo with its full history.</div>
+              </div>
+            </div>
+            <div>
+              <pre><code class="language-bash" data-trim>
+# download the repository
+git clone git@github.com:ReDI-School/F26-Full-Stack-Circle.git
+
+# go into the folder
+cd F26-Full-Stack-Circle
+
+# install everything (frontend + backend)
+pnpm install
+              </code></pre>
+              <p class="small">Then follow <strong>Getting started</strong> in the <code>README.md</code> to run the app.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. The whole flow -->
+        <section>
+          <p class="eyebrow">The big picture</p>
+          <h2>The flow, for every ticket</h2>
+          <div class="pipeline">
+            <div class="step fragment fade-up"><span class="emoji">📋</span><strong>1. Pick</strong>an issue from Todo</div>
+            <div class="step fragment fade-up"><span class="emoji">🌿</span><strong>2. Branch</strong>from fresh main</div>
+            <div class="step fragment fade-up"><span class="emoji">💾</span><strong>3. Commit</strong>small &amp; often</div>
+            <div class="step fragment fade-up"><span class="emoji">☁️</span><strong>4. Push</strong>+ draft PR, day one</div>
+            <div class="step fragment fade-up"><span class="emoji">🔄</span><strong>5. Update</strong>merge main in</div>
+            <div class="step fragment fade-up" style="border-top-color: var(--secondary)"><span class="emoji">👀</span><strong>6. Review</strong>a teammate approves</div>
+            <div class="step fragment fade-up" style="border-top-color: var(--success)"><span class="emoji">🎉</span><strong>7. Merge</strong>into main</div>
+          </div>
+          <p class="small muted center" style="margin-top: 1em">Let's go through each step.</p>
+        </section>
+
+        <!-- 6. Pick an issue -->
+        <section>
+          <p class="eyebrow">Step 1</p>
+          <h2>📋 Pick an issue</h2>
+          <div class="grid-3">
+            <div class="card primary">
+              <h3>Choose</h3>
+              <p>Pick a ticket from the <strong>Todo</strong> column of the <a href="https://github.com/orgs/ReDI-School/projects/11/views/2" target="_blank" rel="noopener">project board</a>.</p>
+            </div>
+            <div class="card primary">
+              <h3>Assign</h3>
+              <p>Assign yourself on the issue, so nobody else starts the same work.</p>
+            </div>
+            <div class="card primary">
+              <h3>Move</h3>
+              <p>Move the card to <strong>In Progress</strong>. Read the acceptance criteria.</p>
+            </div>
+          </div>
+          <div class="callout">Remember: <strong>one ticket in progress at a time</strong>, and <strong>7 days max</strong>.</div>
+        </section>
+
+        <!-- 7. Branch -->
+        <section>
+          <p class="eyebrow">Step 2</p>
+          <h2>🌿 Create a branch</h2>
+          <pre><code class="language-bash" data-trim>
+# 1. go to main and download the latest changes
+git switch main
+git pull
+
+# 2. create your branch and switch to it
+git switch -c feat/12-login-page
+          </code></pre>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr">
+            <div class="card tinted-primary">
+              <h3>Branch names</h3>
+              <p><code>type/issue-number-short-name</code></p>
+              <p>
+                <span class="chip">feat/12-login-page</span><span class="chip">fix/31-price-rounding</span
+                ><span class="chip">docs/40-api-readme</span><span class="chip">chore/44-update-deps</span>
+              </p>
+            </div>
+            <div class="card tinted-secondary">
+              <h3>Why from fresh main?</h3>
+              <p>So you start from the newest code and get fewer conflicts later.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 8. Commit -->
+        <section>
+          <p class="eyebrow">Step 3</p>
+          <h2>💾 Commit small and often</h2>
+          <div class="grid-2" style="grid-template-columns: 1.3fr 1fr; align-items: start">
+            <pre><code class="language-bash" data-trim>
+# what did I change?
+git status
+git diff
+
+# pick the files for the next snapshot
+git add frontend/src/app/login/page.tsx
+
+# save the snapshot with a message
+git commit -m "feat(frontend): add the login form"
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>A commit = one small step</h3>
+                <p>That still works on its own. Many small commits &gt; one giant one.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3>Messages we use</h3>
+                <p><code>type(scope): what it does</code></p>
+                <p class="small muted">Types: <code>feat</code> <code>fix</code> <code>docs</code> <code>refactor</code> <code>chore</code>. Look at <code>git log</code> for examples.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9. Push + draft PR -->
+        <section>
+          <p class="eyebrow">Step 4</p>
+          <h2>☁️ Push and open a draft PR — on day one</h2>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr; align-items: start">
+            <div>
+              <pre><code class="language-bash" data-trim>
+# first push: create the branch on GitHub too
+git push -u origin feat/12-login-page
+
+# every push after that
+git push
+              </code></pre>
+              <p class="small">GitHub then shows a <strong>"Compare &amp; pull request"</strong> button. Click it, choose <strong>"Create draft pull request"</strong>.</p>
+            </div>
+            <div>
+              <div class="card secondary">
+                <h3>Why so early?</h3>
+                <ul>
+                  <li>The team can see your progress</li>
+                  <li>Your work is backed up</li>
+                  <li>Vercel builds a <strong>preview link</strong></li>
+                  <li>Someone can take over if needed</li>
+                </ul>
+              </div>
+              <div class="callout">Push <strong>every day</strong>. Nothing should live only on your laptop.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10. Why update -->
+        <section>
+          <p class="eyebrow">Step 5</p>
+          <h2>🔄 Meanwhile, <code>main</code> moves on</h2>
+          <svg class="diagram" viewBox="0 0 1100 330" width="1100" role="img"
+            aria-label="While you work on your branch, teammates merge their pull requests, so main gets new commits. Then you merge main into your branch.">
+            <line x1="40" y1="220" x2="1060" y2="220" stroke="#385a65" stroke-width="8" stroke-linecap="round" />
+            <text x="40" y="270" font-size="24" font-weight="900" fill="#385a65" class="mono">main</text>
+            <circle cx="120" cy="220" r="16" fill="#385a65" />
+            <circle cx="220" cy="220" r="16" fill="#385a65" />
+
+            <path d="M 220 220 C 280 220, 280 90, 340 90 L 900 90" fill="none" stroke="#f05a21" stroke-width="7" />
+            <g fill="#f05a21">
+              <circle cx="370" cy="90" r="13" />
+              <circle cx="470" cy="90" r="13" />
+              <circle cx="570" cy="90" r="13" />
+            </g>
+            <text x="340" y="55" font-size="22" font-weight="900" fill="#f05a21" class="mono">feat/12-login-page (you)</text>
+
+            <g class="fragment" data-fragment-index="1">
+              <circle cx="420" cy="220" r="16" fill="#58adc5" />
+              <circle cx="560" cy="220" r="16" fill="#58adc5" />
+              <circle cx="680" cy="220" r="16" fill="#58adc5" />
+              <text x="550" y="265" text-anchor="middle" font-size="19" font-weight="800" fill="#4699b1">teammates' PRs get merged</text>
+            </g>
+
+            <g class="fragment" data-fragment-index="2">
+              <path d="M 680 220 C 740 220, 740 90, 800 90" fill="none" stroke="#58adc5" stroke-width="6" stroke-dasharray="10 8" />
+              <circle cx="800" cy="90" r="18" fill="#fff" stroke="#f05a21" stroke-width="6" />
+              <text x="830" y="140" font-size="20" font-weight="800" fill="#22343a">merge commit:</text>
+              <text x="830" y="166" font-size="20" font-weight="800" fill="#22343a">your work + new main</text>
+            </g>
+          </svg>
+          <p class="small center">
+            <span class="fragment" data-fragment-index="1">Your branch is now <strong>behind</strong> main — you don't have your teammates' code.</span>
+            <span class="fragment" data-fragment-index="2">Fix it by <strong>merging main into your branch</strong>. Do it often, and always before asking for a review.</span>
+          </p>
+        </section>
+
+        <!-- 11. How to update -->
+        <section>
+          <p class="eyebrow">Step 5</p>
+          <h2>🔄 Bring main into your branch</h2>
+          <div class="grid-2" style="grid-template-columns: 1.3fr 1fr; align-items: start">
+            <div>
+              <pre><code class="language-bash" data-trim>
+# 1. save your work first
+git status        # nothing uncommitted? good
+git switch feat/12-login-page
+
+# 2. download what's new on GitHub
+git fetch origin
+
+# 3. merge the latest main into YOUR branch
+#    (--no-edit keeps the default message, no editor pops up)
+git merge origin/main --no-edit
+
+# 4. send the result to GitHub
+git push
+              </code></pre>
+            </div>
+            <div>
+              <div class="card success">
+                <h3>✅ No conflicts?</h3>
+                <p>Git makes a merge commit for you. Push and you're done.</p>
+              </div>
+              <div class="card secondary" style="margin-top: 0.5em">
+                <h3>⚠️ Conflicts?</h3>
+                <p>Git stops and asks you to decide. Next slide!</p>
+              </div>
+              <div class="callout info">
+                We <strong>merge</strong>, we <strong>don't rebase</strong>. You can also click <strong>"Update branch"</strong> on the PR (choose "Update with merge commit") — only when there are no conflicts.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 12. What is a conflict -->
+        <section>
+          <p class="eyebrow">Merge conflicts</p>
+          <h2>😱 A conflict is normal, not an error</h2>
+          <p>It happens when <strong>you and someone else changed the same lines</strong>. Git can't guess which version is right, so it shows you both:</p>
+          <pre class="conflict"><code class="nohighlight" data-trim data-noescape>
+export function Header() {
+<span class="marker">&lt;&lt;&lt;&lt;&lt;&lt;&lt; HEAD</span>
+<span class="ours">  const title = 'Log in to ReDiCycle';</span>
+<span class="marker">=======</span>
+<span class="theirs">  const title = 'Welcome back';</span>
+<span class="marker">&gt;&gt;&gt;&gt;&gt;&gt;&gt; origin/main</span>
+  return &lt;h1&gt;{title}&lt;/h1&gt;;
+}
+          </code></pre>
+          <div class="grid-2">
+            <p class="small"><span class="chip green">HEAD</span> = your branch's version</p>
+            <p class="small"><span class="chip orange">origin/main</span> = the version on main</p>
+          </div>
+        </section>
+
+        <!-- 13. Resolve a conflict -->
+        <section>
+          <p class="eyebrow">Merge conflicts</p>
+          <h2>🧹 Resolving a conflict, step by step</h2>
+          <div class="grid-2" style="grid-template-columns: 1fr 1fr; align-items: start">
+            <div>
+              <div class="rule fragment fade-up"><span class="num">1</span><div><strong>Find the files</strong><code>git status</code> lists them under "both modified".</div></div>
+              <div class="rule fragment fade-up" style="margin-top: 0.4em"><span class="num">2</span><div><strong>Open them in VS Code</strong>Use "Accept Current / Incoming / Both", or the merge editor.</div></div>
+              <div class="rule fragment fade-up" style="margin-top: 0.4em"><span class="num">3</span><div><strong>Keep the right code</strong>Sometimes it's a mix of both. Delete every <code>&lt;&lt;&lt;</code> <code>===</code> <code>&gt;&gt;&gt;</code> line.</div></div>
+              <div class="rule fragment fade-up" style="margin-top: 0.4em"><span class="num">4</span><div><strong>Check it still works</strong>Run the app and the checks.</div></div>
+            </div>
+            <div class="fragment fade-up">
+              <pre><code class="language-bash" data-trim>
+# 5. mark the files as resolved
+git add frontend/src/components/Header/Header.tsx
+
+# 6. finish the merge (keeps the default message)
+git commit --no-edit
+
+# 7. share it
+git push
+              </code></pre>
+              <div class="callout">Not sure which version is right? <strong>Ask the person who wrote the other change</strong>, or pair with someone. Never just delete their code.</div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 14. Before review -->
+        <section>
+          <p class="eyebrow">Before you ask for a review</p>
+          <h2>✅ Run the checks locally</h2>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr; align-items: start">
+            <pre><code class="language-bash" data-trim>
+pnpm lint
+pnpm format:check   # or: pnpm format (fixes it)
+pnpm typecheck
+pnpm build
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>Why?</h3>
+                <p>A PR can't be merged with broken lint, types or build. Catch it on your machine — it's much faster.</p>
+              </div>
+              <div class="callout">
+                The automatic CI checks on GitHub are <strong>not running yet</strong>, so the PR checks may stay empty. Right now <strong>these local checks are the real gate</strong>.
+              </div>
+            </div>
+          </div>
+          <p class="small muted">Changed the database schema? See "Before you ask for a review" in <code>CONTRIBUTING.md</code>.</p>
+        </section>
+
+        <!-- 15. A good PR -->
+        <section>
+          <p class="eyebrow">Pull request</p>
+          <h2>📝 A good pull request</h2>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr; align-items: start">
+            <pre><code class="language-markdown" data-trim>
+## Login page
+
+Closes #12
+
+### What
+Adds the log in page with email + password,
+and an error message for wrong passwords.
+
+### How to test
+1. Open the Vercel preview → /login
+2. Log in with the seed user
+3. Try a wrong password
+
+### Screenshots
+(drag &amp; drop an image here)
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>Include</h3>
+                <ul>
+                  <li><code>Closes #12</code> — closes the issue on merge</li>
+                  <li>What changed, and why</li>
+                  <li>How to test it (+ preview link)</li>
+                  <li>Screenshots for UI changes</li>
+                </ul>
+              </div>
+              <div class="card secondary" style="margin-top: 0.5em">
+                <h3>Then</h3>
+                <p>Click <strong>"Ready for review"</strong>, move the card to <strong>Code Review</strong>, and <strong>ask for a review in Slack</strong>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 16. Reviewing -->
+        <section>
+          <p class="eyebrow">Code review</p>
+          <h2>👀 Reviewing a teammate's PR</h2>
+          <p>Reviews are <strong>peer-to-peer</strong> — everyone reviews, not just the "seniors". It's the best way to learn the codebase.</p>
+          <div class="grid-4">
+            <div class="card primary fragment fade-up"><span class="emoji">📋</span><h3>1. Read the issue</h3><p>What should this PR do?</p></div>
+            <div class="card primary fragment fade-up"><span class="emoji">🔗</span><h3>2. Try it</h3><p>Open the Vercel preview and click around.</p></div>
+            <div class="card primary fragment fade-up"><span class="emoji">📂</span><h3>3. Read the code</h3><p>In the <strong>Files changed</strong> tab.</p></div>
+            <div class="card primary fragment fade-up"><span class="emoji">💬</span><h3>4. Comment</h3><p>Ask, suggest, praise. Then submit.</p></div>
+          </div>
+          <p class="small muted" style="margin-top: 0.8em">Asked for a review? Try to do it within a day — someone is waiting on you.</p>
+        </section>
+
+        <!-- 17. Comments -->
+        <section>
+          <p class="eyebrow">Code review</p>
+          <h2>💬 Leaving comments on GitHub</h2>
+          <div class="grid-2" style="grid-template-columns: 1.25fr 1fr; align-items: start">
+            <div class="gh">
+              <div class="file">frontend/src/app/login/page.tsx</div>
+              <div class="line add"><span class="n">14</span><span>+</span><span>&lt;form onSubmit={handleSubmit}&gt;</span></div>
+              <div class="line add"><span class="n">15</span><span class="plus"><span class="plus-btn">+</span></span><span>&nbsp;&nbsp;&lt;input type="text" name="email" /&gt;</span></div>
+              <div class="comment">
+                <div class="who">you <span>· Pending review</span></div>
+                Could we use <code>type="email"</code>? Phones then show the email keyboard.
+                <div class="suggestion">
+                  <div class="head">Suggested change</div>
+                  <div class="del">-  &lt;input type="text" name="email" /&gt;</div>
+                  <div class="ins">+  &lt;input type="email" name="email" /&gt;</div>
+                </div>
+                <div class="buttons"><span class="btn">Add single comment</span><span class="btn green">Start a review</span></div>
+              </div>
+            </div>
+            <div class="small">
+              <p><strong>Hover a line → click the blue +</strong>. Drag it to select several lines.</p>
+              <p><strong>Suggestion</strong>: the ± button writes a <code>```suggestion</code> block the author can apply in one click.</p>
+              <p><strong>Start a review</strong> collects your comments; then <strong>Finish your review</strong>:</p>
+              <div class="decision"><span class="dot" style="background: #8c959f"></span><div><strong>Comment</strong> — questions, no decision</div></div>
+              <div class="decision"><span class="dot" style="background: #1f883d"></span><div><strong>Approve</strong> — good to merge</div></div>
+              <div class="decision"><span class="dot" style="background: #cf222e"></span><div><strong>Request changes</strong> — must fix first</div></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 18. Kind comments -->
+        <section>
+          <p class="eyebrow">Code review</p>
+          <h2>🤝 Kind and useful comments</h2>
+          <div class="grid-2">
+            <div class="card secondary">
+              <h3>😬 Instead of…</h3>
+              <p>"This is wrong."</p>
+              <p>"Why didn't you use a component?"</p>
+              <p>"Rename this."</p>
+            </div>
+            <div class="card success">
+              <h3>🙂 Try…</h3>
+              <p>"This breaks when the list is empty — could we add a check?"</p>
+              <p>"We have a <code>Button</code> component — could we reuse it here?"</p>
+              <p>"<code>nit:</code> <code>data</code> → <code>items</code> reads clearer. Up to you!"</p>
+            </div>
+          </div>
+          <p class="small" style="margin-top: 0.8em">
+            <strong>Comment on the code, not the person.</strong> Explain <em>why</em>. Ask questions. Use <code>nit:</code> for tiny things.
+            And say when something is good — "Nice, this is really clean!" 🙌
+          </p>
+        </section>
+
+        <!-- 19. Author side + merge -->
+        <section>
+          <p class="eyebrow">Getting to merge</p>
+          <h2>🎉 From feedback to merged</h2>
+          <div class="pipeline" style="font-size: 0.58em">
+            <div class="step"><span class="emoji">💬</span><strong>Reply</strong>to every comment</div>
+            <div class="step"><span class="emoji">🛠️</span><strong>Fix &amp; push</strong>new commits to the same branch</div>
+            <div class="step"><span class="emoji">✔️</span><strong>Resolve</strong>conversations that are done</div>
+            <div class="step"><span class="emoji">🔁</span><strong>Re-request</strong>review (↻ next to the name)</div>
+            <div class="step" style="border-top-color: var(--success)"><span class="emoji">👍</span><strong>1 approval</strong>from a teammate</div>
+            <div class="step" style="border-top-color: var(--secondary)"><span class="emoji">🎉</span><strong>You merge</strong>with "Merge pull request"</div>
+          </div>
+          <div class="grid-2" style="margin-top: 0.8em; align-items: start">
+            <pre><code class="language-bash" data-trim>
+# after merging: back to a fresh main
+git switch main
+git pull
+            </code></pre>
+            <div class="small">
+              <p>Then: <strong>delete the branch</strong> (GitHub offers a button), check the card is in <strong>Done</strong>, and pick your next ticket.</p>
+              <p class="muted">Merge with "Merge pull request" — not "Rebase and merge".</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 20. Cheat sheet -->
+        <section>
+          <p class="eyebrow">Cheat sheet</p>
+          <h2>All the commands</h2>
+          <div class="grid-2" style="align-items: start">
+            <pre><code class="language-bash" data-trim>
+# once
+git clone git@github.com:ReDI-School/F26-Full-Stack-Circle.git
+
+# new ticket
+git switch main
+git pull
+git switch -c feat/12-login-page
+
+# while working
+git status
+git add &lt;file&gt;
+git commit -m "feat(frontend): ..."
+git push            # first time: git push -u origin &lt;branch&gt;
+            </code></pre>
+            <pre><code class="language-bash" data-trim>
+# keep up to date with main
+git fetch origin
+git merge origin/main --no-edit
+# conflicts? fix the files, then
+git add &lt;file&gt;
+git commit --no-edit
+git push
+
+# before asking for review
+pnpm lint
+pnpm format:check
+pnpm typecheck
+pnpm build
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- 21. End -->
+        <section class="center">
+          <span class="big-emoji">🚀</span>
+          <h2>Questions?</h2>
+          <p>Stuck on git? <strong>Ask in Slack or pair with someone</strong> — everyone gets stuck on git.</p>
+          <p class="muted"><a href="../agile/index.html">← How we work as a team</a> · <a href="../index.html">All slides</a></p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1280,
+        height: 720,
+        margin: 0.06,
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'slide',
+        center: true,
+        plugins: [RevealHighlight, RevealNotes],
+      });
+    </script>
+  </body>
+</html>

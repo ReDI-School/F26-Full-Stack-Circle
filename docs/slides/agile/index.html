@@ -1,0 +1,685 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>How We Work as a Team</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css" />
+    <link rel="stylesheet" href="../theme.css" />
+
+    <style>
+      /* Kanban board used on the "board" slides */
+      .board {
+        display: grid;
+        grid-template-columns: repeat(4, 1fr);
+        gap: 0.5em;
+        font-size: 0.62em;
+      }
+
+      .board .col {
+        background: var(--tertiary-100);
+        border-radius: var(--radius-card);
+        padding: 0.6em;
+        min-height: 330px;
+      }
+
+      .board .col h4 {
+        font-size: 1em;
+        margin: 0 0 0.5em;
+        display: flex;
+        justify-content: space-between;
+      }
+
+      .board .ticket {
+        background: var(--surface);
+        border-radius: var(--radius-input);
+        box-shadow: 0 4px 12px rgba(56, 90, 101, 0.12);
+        padding: 0.5em 0.6em;
+        margin-bottom: 0.45em;
+        border-left: 5px solid var(--primary);
+        color: var(--ink);
+      }
+
+      .board .ticket small {
+        display: block;
+        color: var(--muted);
+        font-family: var(--font-mono);
+        font-size: 0.8em;
+      }
+
+      .board .ticket.yours {
+        border-left-color: var(--secondary);
+        background: var(--secondary-100);
+        font-weight: 700;
+      }
+
+      /* Backlog funnel */
+      .funnel {
+        display: grid;
+        grid-template-columns: 1.3fr auto 1fr auto 0.8fr;
+        gap: 0.4em;
+        align-items: center;
+        font-size: 0.62em;
+      }
+
+      .funnel .arrow {
+        font-size: 2em;
+        color: var(--primary);
+        font-weight: 900;
+      }
+
+      .funnel .stack {
+        background: var(--surface);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        padding: 0.7em;
+      }
+
+      .funnel .stack h4 { margin-bottom: 0.4em; }
+
+      .funnel .mini {
+        background: var(--primary-100);
+        border-radius: 8px;
+        padding: 0.2em 0.5em;
+        margin-bottom: 0.3em;
+        color: var(--ink);
+      }
+
+      .funnel .done .mini { background: var(--success-100); }
+
+      /* GitHub issue mock */
+      .issue {
+        background: var(--surface);
+        border: 1px solid var(--border);
+        border-radius: var(--radius-card);
+        box-shadow: var(--shadow-card);
+        padding: 0.8em 1em;
+        font-size: 0.6em;
+      }
+
+      .issue .issue-title {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.5em;
+        color: var(--ink);
+      }
+
+      .issue .issue-title span { color: var(--muted); font-weight: 600; }
+
+      .issue .meta { margin: 0.3em 0 0.7em; }
+
+      .issue .open {
+        display: inline-block;
+        background: #1f883d;
+        color: #fff;
+        border-radius: 999px;
+        padding: 0.15em 0.7em;
+        font-weight: 700;
+        margin-right: 0.4em;
+      }
+
+      .issue h4 { margin: 0.6em 0 0.2em; }
+      .issue ul { margin-bottom: 0; }
+
+      .note-label {
+        font-family: var(--font-display);
+        font-weight: 800;
+        color: var(--secondary);
+        font-size: 0.8em;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- 1. Title -->
+        <section class="title-slide">
+          <p class="logo">♻️ Re<span>Di</span>Cycle · Full Stack Circle</p>
+          <h1>How we work<br />as a team</h1>
+          <p class="lead">A short intro to Agile, Scrum and our team rules</p>
+          <p>
+            <span class="chip">Agile</span><span class="chip">Scrum</span
+            ><span class="chip orange">Our working agreement</span>
+          </p>
+          <aside class="notes">
+            Goal of this session: not to make anyone a Scrum expert. Just enough so that everyone
+            understands the words we will use every day (ticket, sprint, board, review) and knows
+            our team rules.
+          </aside>
+        </section>
+
+        <!-- 2. Why process -->
+        <section>
+          <p class="eyebrow">Why do we need this?</p>
+          <h2>15 people, one codebase</h2>
+          <div class="grid-3">
+            <div class="card secondary fragment fade-up">
+              <span class="emoji">💥</span>
+              <h3>Stepping on toes</h3>
+              <p>Two people build the same thing, or change the same file at the same time.</p>
+            </div>
+            <div class="card secondary fragment fade-up">
+              <span class="emoji">🤷</span>
+              <h3>Nobody knows the status</h3>
+              <p>"Is the login page done?" "Who is working on search?" "Is anyone blocked?"</p>
+            </div>
+            <div class="card secondary fragment fade-up">
+              <span class="emoji">🐢</span>
+              <h3>Work gets stuck</h3>
+              <p>Someone struggles alone for days and the rest of the team waits.</p>
+            </div>
+          </div>
+          <p class="fragment fade-up" style="margin-top: 1em">
+            Real teams solve this with a <strong>shared way of working</strong>. The most common
+            one is called <strong>Agile</strong>.
+          </p>
+        </section>
+
+        <!-- 3. Waterfall vs Agile -->
+        <section>
+          <p class="eyebrow">Two ways to build software</p>
+          <h2>Waterfall vs Agile</h2>
+          <svg class="diagram" viewBox="0 0 1100 430" width="1100" role="img"
+            aria-label="Waterfall delivers once at the end; Agile delivers a small working piece every two weeks">
+            <!-- Waterfall -->
+            <text x="0" y="30" font-size="30" font-weight="900" fill="#22343a">Waterfall</text>
+            <text x="0" y="62" font-size="20" fill="#6b8893">plan everything → build everything → deliver once</text>
+            <g font-size="20" font-weight="800" fill="#fff">
+              <rect x="0" y="85" width="170" height="44" rx="12" fill="#385a65" />
+              <text x="85" y="114" text-anchor="middle">Plan</text>
+              <rect x="180" y="115" width="170" height="44" rx="12" fill="#385a65" />
+              <text x="265" y="144" text-anchor="middle">Design</text>
+              <rect x="360" y="145" width="170" height="44" rx="12" fill="#385a65" />
+              <text x="445" y="174" text-anchor="middle">Build</text>
+              <rect x="540" y="175" width="170" height="44" rx="12" fill="#385a65" />
+              <text x="625" y="204" text-anchor="middle">Test</text>
+            </g>
+            <text x="760" y="212" font-size="44">🎁</text>
+            <text x="820" y="196" font-size="20" fill="#4a6570">One delivery, months later.</text>
+            <text x="820" y="222" font-size="20" fill="#c2410c" font-weight="800">Wrong? Too late to change.</text>
+
+            <!-- Agile -->
+            <g class="fragment" data-fragment-index="1">
+              <text x="0" y="290" font-size="30" font-weight="900" fill="#22343a">Agile</text>
+              <text x="0" y="322" font-size="20" fill="#6b8893">build a small piece → show it → learn → repeat</text>
+              <g font-size="18" font-weight="800" fill="#22343a">
+                <circle cx="60" cy="385" r="38" fill="#e3f1f5" stroke="#58adc5" stroke-width="4" />
+                <text x="60" y="391" text-anchor="middle">Sprint 1</text>
+                <text x="104" y="372" font-size="28">🎁</text>
+                <circle cx="240" cy="385" r="38" fill="#e3f1f5" stroke="#58adc5" stroke-width="4" />
+                <text x="240" y="391" text-anchor="middle">Sprint 2</text>
+                <text x="284" y="372" font-size="28">🎁</text>
+                <circle cx="420" cy="385" r="38" fill="#e3f1f5" stroke="#58adc5" stroke-width="4" />
+                <text x="420" y="391" text-anchor="middle">Sprint 3</text>
+                <text x="464" y="372" font-size="28">🎁</text>
+                <circle cx="600" cy="385" r="38" fill="#e3f1f5" stroke="#58adc5" stroke-width="4" />
+                <text x="600" y="391" text-anchor="middle">Sprint 4</text>
+                <text x="644" y="372" font-size="28">🎁</text>
+              </g>
+              <text x="760" y="378" font-size="20" fill="#4a6570">Something working every 2 weeks.</text>
+              <text x="760" y="404" font-size="20" fill="#1f7a4d" font-weight="800">Feedback early, change course often.</text>
+            </g>
+          </svg>
+        </section>
+
+        <!-- 4. What is Agile -->
+        <section>
+          <p class="eyebrow">What is Agile?</p>
+          <h2>Four simple ideas</h2>
+          <div class="grid-2">
+            <div class="card primary fragment fade-up">
+              <span class="emoji">🧩</span>
+              <h3>Small steps</h3>
+              <p>Split big work into small pieces you can finish in a few days.</p>
+            </div>
+            <div class="card primary fragment fade-up">
+              <span class="emoji">✅</span>
+              <h3>Working software</h3>
+              <p>A small feature that works beats a big one that is "90% done".</p>
+            </div>
+            <div class="card primary fragment fade-up">
+              <span class="emoji">💬</span>
+              <h3>Talk and get feedback</h3>
+              <p>Show your work early. Ask questions. Review each other's code.</p>
+            </div>
+            <div class="card primary fragment fade-up">
+              <span class="emoji">🔁</span>
+              <h3>Adapt</h3>
+              <p>Plans change. Look back regularly and improve how you work.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 5. What is Scrum -->
+        <section>
+          <p class="eyebrow">What is Scrum?</p>
+          <h2>Scrum is a "recipe" for Agile</h2>
+          <p>Agile is the idea. <strong>Scrum</strong> is one popular way to do it, with three ingredients:</p>
+          <div class="grid-3">
+            <div class="card tertiary fragment fade-up">
+              <span class="emoji">📋</span>
+              <h3>A backlog</h3>
+              <p>The list of everything we want to build, split into <strong>tickets</strong>.</p>
+            </div>
+            <div class="card tertiary fragment fade-up">
+              <span class="emoji">⏱️</span>
+              <h3>Sprints</h3>
+              <p>Short, fixed periods of work. Ours are <strong>2 weeks</strong>.</p>
+            </div>
+            <div class="card tertiary fragment fade-up">
+              <span class="emoji">🗓️</span>
+              <h3>Ceremonies</h3>
+              <p>Regular meetings to plan, show the work, and improve.</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 6. Roles -->
+        <section>
+          <p class="eyebrow">Who does what?</p>
+          <h2>Roles in Scrum</h2>
+          <div class="grid-3">
+            <div class="card primary">
+              <span class="emoji">🧭</span>
+              <h3>Product Owner</h3>
+              <p>Decides <strong>what</strong> to build and in which order. Writes and prioritises the tickets.</p>
+            </div>
+            <div class="card primary">
+              <span class="emoji">🛠️</span>
+              <h3>Development Team</h3>
+              <p>Decides <strong>how</strong> to build it, and builds it. Designers, developers, testers.</p>
+            </div>
+            <div class="card primary">
+              <span class="emoji">🤝</span>
+              <h3>Scrum Master</h3>
+              <p>Helps the team follow the process and removes things that block them.</p>
+            </div>
+          </div>
+          <div class="callout info fragment fade-up">
+            <strong>In our cohort:</strong> you are the team and <strong>you own the delivery</strong>.
+            Teachers guide and answer questions.
+          </div>
+        </section>
+
+        <!-- 7. Backlog funnel -->
+        <section>
+          <p class="eyebrow">Where does the work come from?</p>
+          <h2>From backlog to done</h2>
+          <div class="funnel">
+            <div class="stack">
+              <h4>📚 Product backlog</h4>
+              <div class="mini">Login page</div>
+              <div class="mini">Register page</div>
+              <div class="mini">Item detail page</div>
+              <div class="mini">Add item page</div>
+              <div class="mini">My shop</div>
+              <div class="mini">Inbox</div>
+              <div class="mini muted">… and more</div>
+            </div>
+            <div class="arrow">→</div>
+            <div class="stack fragment fade-up" data-fragment-index="1">
+              <h4>🏃 Sprint backlog</h4>
+              <div class="mini">Login page</div>
+              <div class="mini">Register page</div>
+              <div class="mini">Item detail page</div>
+            </div>
+            <div class="arrow fragment" data-fragment-index="2">→</div>
+            <div class="stack done fragment fade-up" data-fragment-index="2">
+              <h4>🎉 Done</h4>
+              <div class="mini">Login page</div>
+              <div class="mini">Register page</div>
+            </div>
+          </div>
+          <p class="small fragment" data-fragment-index="1" style="margin-top: 0.8em">
+            In <strong>Sprint Planning</strong> we pick what fits in the next 2 weeks. The rest waits in the backlog.
+          </p>
+        </section>
+
+        <!-- 8. A ticket -->
+        <section>
+          <p class="eyebrow">A ticket</p>
+          <h2>One ticket = one GitHub Issue</h2>
+          <div class="grid-2" style="grid-template-columns: 1.3fr 1fr; align-items: start">
+            <div class="issue">
+              <div class="issue-title">Login page <span>#12</span></div>
+              <div class="meta"><span class="open">Open</span><span class="muted">assigned to you · Sprint 1</span></div>
+              <h4>What</h4>
+              <p>Build the log in page from the design: email, password, "Log in" button.</p>
+              <h4>Acceptance criteria</h4>
+              <ul>
+                <li>Matches the design in <code>docs/design/screens/Login.png</code></li>
+                <li>Shows an error when the password is wrong</li>
+                <li>Redirects to the homepage after log in</li>
+              </ul>
+            </div>
+            <div>
+              <div class="card tinted-primary fragment fade-up">
+                <h3>What</h3>
+                <p>What to build, in plain words.</p>
+              </div>
+              <div class="card tinted-primary fragment fade-up" style="margin-top: 0.5em">
+                <h3>Acceptance criteria</h3>
+                <p>The checklist that says when it is <strong>done</strong>. Read it before you start!</p>
+              </div>
+              <div class="card tinted-secondary fragment fade-up" style="margin-top: 0.5em">
+                <h3>Not clear?</h3>
+                <p>Ask on the issue or in Slack <em>before</em> you start coding.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9a. Board (auto-animate) -->
+        <section data-auto-animate>
+          <p class="eyebrow">The board</p>
+          <h2>Everyone can see the status</h2>
+          <div class="board">
+            <div class="col">
+              <h4>Todo</h4>
+              <div class="ticket yours" data-id="t12">Login page<small>#12</small></div>
+              <div class="ticket" data-id="t15">Item detail page<small>#15</small></div>
+              <div class="ticket" data-id="t18">Search results<small>#18</small></div>
+            </div>
+            <div class="col"><h4>In Progress</h4>
+              <div class="ticket" data-id="t13">Register page<small>#13 · Ana</small></div>
+            </div>
+            <div class="col"><h4>Code Review</h4>
+              <div class="ticket" data-id="t9">Header component<small>#9 · Sam</small></div>
+            </div>
+            <div class="col"><h4>Done</h4>
+              <div class="ticket" data-id="t4">Button component<small>#4</small></div>
+            </div>
+          </div>
+          <aside class="notes">Walk the orange card across the board on the next slides.</aside>
+        </section>
+
+        <!-- 9b -->
+        <section data-auto-animate>
+          <p class="eyebrow">The board</p>
+          <h2>You pick a ticket → In Progress</h2>
+          <div class="board">
+            <div class="col">
+              <h4>Todo</h4>
+              <div class="ticket" data-id="t15">Item detail page<small>#15</small></div>
+              <div class="ticket" data-id="t18">Search results<small>#18</small></div>
+            </div>
+            <div class="col"><h4>In Progress</h4>
+              <div class="ticket" data-id="t13">Register page<small>#13 · Ana</small></div>
+              <div class="ticket yours" data-id="t12">Login page<small>#12 · you</small></div>
+            </div>
+            <div class="col"><h4>Code Review</h4>
+              <div class="ticket" data-id="t9">Header component<small>#9 · Sam</small></div>
+            </div>
+            <div class="col"><h4>Done</h4>
+              <div class="ticket" data-id="t4">Button component<small>#4</small></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9c -->
+        <section data-auto-animate>
+          <p class="eyebrow">The board</p>
+          <h2>Pull request ready → Code Review</h2>
+          <div class="board">
+            <div class="col">
+              <h4>Todo</h4>
+              <div class="ticket" data-id="t15">Item detail page<small>#15</small></div>
+              <div class="ticket" data-id="t18">Search results<small>#18</small></div>
+            </div>
+            <div class="col"><h4>In Progress</h4>
+              <div class="ticket" data-id="t13">Register page<small>#13 · Ana</small></div>
+            </div>
+            <div class="col"><h4>Code Review</h4>
+              <div class="ticket yours" data-id="t12">Login page<small>#12 · you</small></div>
+            </div>
+            <div class="col"><h4>Done</h4>
+              <div class="ticket" data-id="t9">Header component<small>#9 · Sam</small></div>
+              <div class="ticket" data-id="t4">Button component<small>#4</small></div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 9d -->
+        <section data-auto-animate>
+          <p class="eyebrow">The board</p>
+          <h2>Approved and merged → Done 🎉</h2>
+          <div class="board">
+            <div class="col">
+              <h4>Todo</h4>
+              <div class="ticket" data-id="t15">Item detail page<small>#15</small></div>
+              <div class="ticket" data-id="t18">Search results<small>#18</small></div>
+            </div>
+            <div class="col"><h4>In Progress</h4>
+              <div class="ticket" data-id="t13">Register page<small>#13 · Ana</small></div>
+            </div>
+            <div class="col"><h4>Code Review</h4></div>
+            <div class="col"><h4>Done</h4>
+              <div class="ticket yours" data-id="t12">Login page<small>#12 · you</small></div>
+              <div class="ticket" data-id="t9">Header component<small>#9 · Sam</small></div>
+              <div class="ticket" data-id="t4">Button component<small>#4</small></div>
+            </div>
+          </div>
+          <p class="small" style="margin-top: 0.6em">
+            Our board:
+            <a href="https://github.com/orgs/ReDI-School/projects/11/views/2" target="_blank" rel="noopener">github.com/orgs/ReDI-School/projects/11</a>
+            — <strong>keep your card in the right column.</strong>
+          </p>
+        </section>
+
+        <!-- 10. Sprint cycle -->
+        <section>
+          <p class="eyebrow">The rhythm</p>
+          <h2>One sprint = 2 weeks</h2>
+          <div class="grid-2" style="grid-template-columns: 1.1fr 1fr; align-items: center">
+            <svg class="diagram" viewBox="0 0 520 480" width="520" role="img"
+              aria-label="Sprint cycle: Sprint Planning, then two weeks of building, then Sprint Review, then Retrospective, then back to Planning">
+              <defs>
+                <marker id="arrow" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+                  <path d="M0,0 L10,5 L0,10 z" fill="#58adc5" />
+                </marker>
+              </defs>
+              <circle cx="260" cy="240" r="165" fill="none" stroke="#e1e9ec" stroke-width="22" />
+              <path d="M 330 91 A 165 165 0 0 1 409 170" fill="none" stroke="#58adc5" stroke-width="6" marker-end="url(#arrow)" />
+              <path d="M 409 310 A 165 165 0 0 1 330 389" fill="none" stroke="#58adc5" stroke-width="6" marker-end="url(#arrow)" />
+              <path d="M 190 389 A 165 165 0 0 1 111 310" fill="none" stroke="#58adc5" stroke-width="6" marker-end="url(#arrow)" />
+              <path d="M 111 170 A 165 165 0 0 1 190 91" fill="none" stroke="#58adc5" stroke-width="6" marker-end="url(#arrow)" />
+
+              <text x="260" y="228" text-anchor="middle" font-size="46" font-weight="900" fill="#22343a">2</text>
+              <text x="260" y="262" text-anchor="middle" font-size="22" font-weight="800" fill="#6b8893">weeks</text>
+
+              <g font-weight="900" font-size="20" text-anchor="middle">
+                <rect x="170" y="48" width="180" height="70" rx="20" fill="#385a65" />
+                <text x="260" y="79" fill="#fff">🗓️ Sprint</text>
+                <text x="260" y="104" fill="#fff">Planning</text>
+
+                <rect x="360" y="205" width="150" height="70" rx="20" fill="#58adc5" />
+                <text x="435" y="236" fill="#fff">🛠️ Build</text>
+                <text x="435" y="261" fill="#fff" font-size="16">tickets &amp; PRs</text>
+
+                <rect x="170" y="362" width="180" height="70" rx="20" fill="#f05a21" />
+                <text x="260" y="393" fill="#fff">🎬 Sprint</text>
+                <text x="260" y="418" fill="#fff">Review</text>
+
+                <rect x="10" y="205" width="150" height="70" rx="20" fill="#7ed3a8" />
+                <text x="85" y="236" fill="#22343a">🔍 Retro-</text>
+                <text x="85" y="261" fill="#22343a">spective</text>
+              </g>
+            </svg>
+            <div>
+              <p><strong>Start:</strong> plan the sprint.</p>
+              <p><strong>During:</strong> build, open PRs, review each other.</p>
+              <p><strong>End:</strong> show what shipped, then talk about how it went.</p>
+              <p><strong>Then:</strong> the next sprint starts. 🔁</p>
+              <div class="callout info">
+                Many companies also do a short <strong>daily standup</strong> meeting. We don't run one.
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 11. Sprint Planning -->
+        <section>
+          <p class="eyebrow">Ceremony 1</p>
+          <h2>🗓️ Sprint Planning</h2>
+          <p class="lead">"What will we build in the next 2 weeks?"</p>
+          <div class="grid-2">
+            <div class="card primary">
+              <h3>What happens</h3>
+              <ul>
+                <li>Look at the top of the backlog together</li>
+                <li>Make sure each ticket is clear — ask questions!</li>
+                <li>Move the tickets for this sprint to <strong>Todo</strong></li>
+              </ul>
+            </div>
+            <div class="card secondary">
+              <h3>What you bring</h3>
+              <ul>
+                <li>Your status: what is still open from last sprint?</li>
+                <li>Honesty about your time this sprint</li>
+                <li>Questions about the tickets you might pick</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- 12. Sprint Review -->
+        <section>
+          <p class="eyebrow">Ceremony 2</p>
+          <h2>🎬 Sprint Review</h2>
+          <p class="lead">"Look what we built!"</p>
+          <div class="grid-2">
+            <div class="card secondary">
+              <h3>What happens</h3>
+              <ul>
+                <li>Each person <strong>demos</strong> what they shipped — in the running app, not in the code</li>
+                <li>The team gives feedback</li>
+                <li>New ideas or bugs become new tickets</li>
+              </ul>
+            </div>
+            <div class="card primary">
+              <h3>Tip</h3>
+              <p>Every pull request gets a <strong>Vercel preview link</strong> — a live copy of the app with your changes. Perfect for a demo.</p>
+              <p class="small muted">Only finished, merged work counts as "shipped".</p>
+            </div>
+          </div>
+        </section>
+
+        <!-- 13. Retrospective -->
+        <section>
+          <p class="eyebrow">Ceremony 3</p>
+          <h2>🔍 Retrospective</h2>
+          <p class="lead">"How did we work together — and what should we change?"</p>
+          <div class="grid-3">
+            <div class="card success fragment fade-up">
+              <span class="emoji">😀</span>
+              <h3>What worked</h3>
+              <p>"Pairing on the header saved me a whole day."</p>
+            </div>
+            <div class="card secondary fragment fade-up">
+              <span class="emoji">😕</span>
+              <h3>What didn't</h3>
+              <p>"My PR waited 4 days for a review."</p>
+            </div>
+            <div class="card primary fragment fade-up">
+              <span class="emoji">💡</span>
+              <h3>What we change</h3>
+              <p>"Check Slack for review requests every day."</p>
+            </div>
+          </div>
+          <p class="small muted" style="margin-top: 0.8em">It is about the process, not about blaming people.</p>
+        </section>
+
+        <!-- 14. Our rules -->
+        <section>
+          <p class="eyebrow">Our working agreement</p>
+          <h2>Our team rules</h2>
+          <div class="grid-2" style="gap: 0.45em">
+            <div class="rule fragment fade-up">
+              <span class="num">1</span>
+              <div><strong>One ticket in progress per person</strong>Finish or hand it off before you pick up the next one.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">2</span>
+              <div><strong>7 days max per ticket</strong>After that it is reassigned. Not a punishment — it keeps the product moving.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">3</span>
+              <div><strong>Open your PR on day one</strong>A draft is fine. Push every day — nothing waits only on your laptop.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">4</span>
+              <div><strong>Stuck? Pair program</strong>Find a teammate. Struggling alone for hours helps no one.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">5</span>
+              <div><strong>Blocked by someone's PR? Say it in Slack</strong>They know you are waiting — and someone else can step in.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">6</span>
+              <div><strong>Be clear and immediate</strong>Need a review or help? Post in Slack right away, in public channels, not DMs.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">7</span>
+              <div><strong>Reviews are peer-to-peer</strong>Ask teammates. Teachers join occasionally — don't wait for them.</div>
+            </div>
+            <div class="rule fragment fade-up">
+              <span class="num">8</span>
+              <div><strong>AI is allowed — carefully</strong>Still learning? Write the code yourself first, use AI to explain and review.</div>
+            </div>
+          </div>
+          <aside class="notes">
+            All from CONTRIBUTING.md. Rule 8: if you are already comfortable developing on your own,
+            AI can help you move faster. If you are still learning the fundamentals, skipping that
+            step now will cost you when you are job-hunting.
+          </aside>
+        </section>
+
+        <!-- 15. Quick reference -->
+        <section>
+          <p class="eyebrow">Cheat sheet</p>
+          <h2>Quick reference</h2>
+          <table>
+            <thead>
+              <tr><th>Rule</th><th>Limit</th></tr>
+            </thead>
+            <tbody>
+              <tr><td>Tickets in progress</td><td><strong>1</strong> per person</td></tr>
+              <tr><td>Time per ticket</td><td><strong>7 days</strong> max</td></tr>
+              <tr><td>PR updates</td><td>Daily commits, keep it current</td></tr>
+              <tr><td>Blocked?</td><td>Post in Slack <strong>immediately</strong></td></tr>
+              <tr><td>Sprint length</td><td><strong>2 weeks</strong></td></tr>
+              <tr><td>End of sprint</td><td>Sprint Review, Sprint Planning, Retrospective</td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <!-- 16. End -->
+        <section class="center">
+          <span class="big-emoji">🙌</span>
+          <h2>Questions?</h2>
+          <p>The full rules live in
+            <a href="https://github.com/ReDI-School/F26-Full-Stack-Circle/blob/main/CONTRIBUTING.md" target="_blank" rel="noopener"><code>CONTRIBUTING.md</code></a>.
+          </p>
+          <p class="muted">Next up: <a href="../github/index.html">Git &amp; GitHub: working together →</a></p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1280,
+        height: 720,
+        margin: 0.06,
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'slide',
+        center: true,
+        plugins: [RevealNotes],
+      });
+    </script>
+  </body>
+</html>
