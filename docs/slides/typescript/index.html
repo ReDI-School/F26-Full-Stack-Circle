@@ -1,0 +1,616 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>TypeScript Basics</title>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reset.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.css" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/monokai.css" />
+    <link rel="stylesheet" href="../theme.css" />
+
+    <style>
+      /* A small mock of the red error message VS Code shows under a line */
+      .ts-error {
+        font-family: var(--font-mono);
+        font-size: 0.55em;
+        background: #fff5f5;
+        border: 1px solid #f5c2c0;
+        border-left: 6px solid #cf222e;
+        border-radius: var(--radius-input);
+        color: #82071e;
+        padding: 0.5em 0.9em;
+        margin-top: 0.3em;
+      }
+
+      .ts-error strong { color: #82071e; }
+
+      /* JS vs TS side by side */
+      .vs {
+        display: grid;
+        grid-template-columns: 1fr auto 1fr;
+        gap: 0.6em;
+        align-items: center;
+      }
+
+      .vs .mid {
+        font-family: var(--font-display);
+        font-weight: 900;
+        font-size: 1.1em;
+        color: var(--muted);
+        text-align: center;
+      }
+
+      .reveal .grid-2 pre { margin-top: 0; }
+    </style>
+  </head>
+  <body>
+    <div class="reveal">
+      <div class="slides">
+        <!-- 1. Title -->
+        <section class="title-slide">
+          <p class="logo">♻️ Re<span>Di</span>Cycle · Full Stack Circle</p>
+          <h1>TypeScript:<br />the basics</h1>
+          <p class="lead">JavaScript that tells you about mistakes before you run it</p>
+          <p>
+            <span class="chip">types</span><span class="chip">type</span><span class="chip">interface</span
+            ><span class="chip">optional ?</span><span class="chip orange">union |</span
+            ><span class="chip orange">extends</span>
+          </p>
+        </section>
+
+        <!-- 2. The problem -->
+        <section>
+          <p class="eyebrow">Why?</p>
+          <h2>A bug JavaScript doesn't see</h2>
+          <div class="grid-2" style="align-items: start">
+            <div>
+              <pre><code class="language-javascript" data-trim>
+// cart.js
+function getTotal(price, quantity) {
+  return price * quantity;
+}
+
+getTotal(10, 2);      // 20 ✅
+getTotal('10', 2);    // 20 😅 (lucky)
+getTotal(10);         // NaN 😱
+              </code></pre>
+            </div>
+            <div>
+              <div class="card secondary">
+                <h3>JavaScript runs it anyway</h3>
+                <p>No warning. You find the bug later, in the browser, or a user finds it for you.</p>
+              </div>
+              <div class="card success fragment fade-up" style="margin-top: 0.5em">
+                <h3>TypeScript stops you here</h3>
+                <p>It <strong>checks your code while you type</strong>, and underlines the mistake in red in VS Code.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 3. What is TS -->
+        <section>
+          <p class="eyebrow">What is it?</p>
+          <h2>TypeScript = JavaScript + types</h2>
+          <div class="vs">
+            <div class="card tertiary">
+              <span class="emoji">📜</span>
+              <h3>JavaScript</h3>
+              <pre><code class="language-javascript" data-trim>
+function getTotal(price, quantity) {
+  return price * quantity;
+}
+              </code></pre>
+              <p class="small muted">A variable can hold anything, and change later.</p>
+            </div>
+            <div class="mid">+</div>
+            <div class="card primary">
+              <span class="emoji">🔷</span>
+              <h3>TypeScript</h3>
+              <pre><code class="language-typescript" data-trim>
+function getTotal(price: number, quantity: number) {
+  return price * quantity;
+}
+              </code></pre>
+              <p class="small muted">We say what each value <strong>is</strong>. Files end in <code>.ts</code> / <code>.tsx</code>.</p>
+            </div>
+          </div>
+          <div class="callout info">
+            Every JavaScript you know is still valid. TypeScript only <strong>adds</strong> the <code>: type</code> parts, and they are
+            <strong>removed</strong> before the code runs.
+          </div>
+        </section>
+
+        <!-- 4. The error -->
+        <section>
+          <p class="eyebrow">What you'll see</p>
+          <h2>Errors show up in your editor</h2>
+          <pre><code class="language-typescript" data-trim>
+getTotal('10', 2);
+          </code></pre>
+          <div class="ts-error">
+            <strong>Argument of type 'string' is not assignable to parameter of type 'number'.</strong>
+          </div>
+          <pre style="margin-top: 1em"><code class="language-typescript" data-trim>
+getTotal(10);
+          </code></pre>
+          <div class="ts-error">
+            <strong>Expected 2 arguments, but got 1.</strong>
+          </div>
+          <p class="small" style="margin-top: 1em">
+            Read the message slowly: it says <strong>what you gave</strong> and <strong>what was expected</strong>.
+            <code>pnpm typecheck</code> shows every error in the project at once.
+          </p>
+        </section>
+
+        <!-- 5. Basic types -->
+        <section>
+          <p class="eyebrow">The building blocks</p>
+          <h2>The basic types</h2>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+let title: string = 'Wooden chair';
+let price: number = 25;         // 25, 9.99, -3 …
+let isSold: boolean = false;
+
+let tags: string[] = ['furniture', 'wood'];
+let prices: number[] = [25, 10, 5];
+
+let seller: string | null = null;  // "or" (later!)
+            </code></pre>
+            <table>
+              <tr><th>Type</th><th>Examples</th></tr>
+              <tr><td><code>string</code></td><td><code>'hi'</code>, <code>"chair"</code></td></tr>
+              <tr><td><code>number</code></td><td><code>1</code>, <code>9.99</code></td></tr>
+              <tr><td><code>boolean</code></td><td><code>true</code>, <code>false</code></td></tr>
+              <tr><td><code>string[]</code></td><td>a list of strings</td></tr>
+              <tr><td><code>null</code> / <code>undefined</code></td><td>"no value"</td></tr>
+            </table>
+          </div>
+          <p class="small">The type goes <strong>after the name</strong>, with a colon: <code>name: type</code>.</p>
+        </section>
+
+        <!-- 6. Inference -->
+        <section>
+          <p class="eyebrow">Good news</p>
+          <h2>You don't have to write every type</h2>
+          <div class="grid-2" style="align-items: start">
+            <pre><code class="language-typescript" data-trim>
+let title = 'Wooden chair';
+// TypeScript already knows: string
+
+title = 42;
+            </code></pre>
+            <div>
+              <div class="ts-error" style="margin-top: 0"><strong>Type 'number' is not assignable to type 'string'.</strong></div>
+              <div class="card primary" style="margin-top: 0.6em">
+                <h3>This is called inference</h3>
+                <p>TypeScript <strong>guesses</strong> the type from the value. Hover a variable in VS Code to see it.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout info">
+            Rule of thumb: <strong>write types for function parameters</strong> and for objects you describe.
+            Let TypeScript figure out the rest.
+          </div>
+        </section>
+
+        <!-- 7. Functions -->
+        <section>
+          <p class="eyebrow">Functions</p>
+          <h2>Typing a function</h2>
+          <pre><code class="language-typescript" data-trim>
+//                       parameters           return type
+function formatPrice(price: number, currency: string): string {
+  return `${price.toFixed(2)} ${currency}`;
+}
+
+formatPrice(25, '€');  // "25.00 €"
+
+// the same thing as an arrow function
+const formatPrice2 = (price: number, currency: string): string =&gt; {
+  return `${price.toFixed(2)} ${currency}`;
+};
+
+// nothing to return? use void
+function logItem(title: string): void {
+  console.log(title);
+}
+          </code></pre>
+          <p class="small muted">The return type is optional — TypeScript can infer it — but writing it makes the intent clear.</p>
+        </section>
+
+        <!-- 8. Objects -->
+        <section>
+          <p class="eyebrow">Objects</p>
+          <h2>Describing the shape of an object</h2>
+          <pre><code class="language-typescript" data-trim>
+let item: { title: string; price: number; isSold: boolean } = {
+  title: 'Wooden chair',
+  price: 25,
+  isSold: false,
+};
+
+item.price = 'cheap';
+          </code></pre>
+          <div class="ts-error"><strong>Type 'string' is not assignable to type 'number'.</strong></div>
+          <p class="small fragment fade-up" style="margin-top: 0.8em">
+            It works… but imagine writing <code>{ title: string; price: number; isSold: boolean }</code> every time you need an item. 😩
+            <strong>Let's give the shape a name.</strong>
+          </p>
+        </section>
+
+        <!-- 9. type alias -->
+        <section>
+          <p class="eyebrow">Naming a shape, option 1</p>
+          <h2><code>type</code></h2>
+          <div class="grid-2" style="grid-template-columns: 1.3fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+type Item = {
+  title: string;
+  price: number;
+  isSold: boolean;
+};
+
+const chair: Item = {
+  title: 'Wooden chair',
+  price: 25,
+  isSold: false,
+};
+
+function markAsSold(item: Item): Item {
+  return { ...item, isSold: true };
+}
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>Write it once, use it everywhere</h3>
+                <p><code>type Name = …</code> gives a name to any type.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3>Naming</h3>
+                <p>Types start with a <strong>capital letter</strong>: <code>Item</code>, <code>User</code>, <code>ButtonProps</code>.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 10. interface -->
+        <section>
+          <p class="eyebrow">Naming a shape, option 2</p>
+          <h2><code>interface</code></h2>
+          <div class="grid-2" style="align-items: start">
+            <div>
+              <p class="small"><strong>type</strong></p>
+              <pre><code class="language-typescript" data-trim>
+type Item = {
+  title: string;
+  price: number;
+  isSold: boolean;
+};
+              </code></pre>
+            </div>
+            <div>
+              <p class="small"><strong>interface</strong></p>
+              <pre><code class="language-typescript" data-trim>
+interface Item {
+  title: string;
+  price: number;
+  isSold: boolean;
+}
+              </code></pre>
+            </div>
+          </div>
+          <p>For <strong>objects</strong>, they do almost the same job. Notice: <code>interface</code> has <strong>no <code>=</code></strong>.</p>
+          <div class="callout info">
+            Simple rule: use <code>interface</code> for <strong>object shapes</strong> (like component props), and <code>type</code> for
+            <strong>everything else</strong> (like unions, coming up next).
+          </div>
+        </section>
+
+        <!-- 11. Optional & readonly -->
+        <section>
+          <p class="eyebrow">Properties</p>
+          <h2>Optional <code>?</code> and <code>readonly</code></h2>
+          <div class="grid-2" style="grid-template-columns: 1.2fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+interface User {
+  readonly id: number;   // can't be changed
+  email: string;
+  name?: string;         // may be missing
+}
+
+const ana: User = { id: 1, email: 'ana@redi.org' };  // ✅ no name
+
+ana.id = 2;       // ❌ read-only
+ana.name.length;  // ❌ name might be undefined
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3><code>name?</code></h3>
+                <p>The property is <strong>optional</strong>. Its type becomes <code>string | undefined</code>.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3><code>readonly</code></h3>
+                <p>You can read it, but not change it after the object is created.</p>
+              </div>
+            </div>
+          </div>
+          <div class="ts-error"><strong>'ana.name' is possibly 'undefined'.</strong></div>
+        </section>
+
+        <!-- 12. Union + literal types -->
+        <section>
+          <p class="eyebrow">"This or that"</p>
+          <h2>Union types <code>|</code></h2>
+          <div class="grid-2" style="grid-template-columns: 1.25fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+// a value can be one type OR another
+let id: string | number;
+id = 42;      // ✅
+id = 'a42';   // ✅
+
+// even better: a list of exact values
+type Condition = 'new' | 'like-new' | 'good' | 'used';
+
+let condition: Condition = 'good';   // ✅
+condition = 'broken';                // ❌
+            </code></pre>
+            <div>
+              <div class="card secondary">
+                <h3>Literal types</h3>
+                <p>Only <strong>these exact strings</strong> are allowed. No typos possible!</p>
+              </div>
+              <div class="card success" style="margin-top: 0.5em">
+                <h3>Bonus: autocomplete</h3>
+                <p>Type <code>'</code> in VS Code and it suggests the allowed values.</p>
+              </div>
+            </div>
+          </div>
+          <div class="ts-error"><strong>Type '"broken"' is not assignable to type 'Condition'.</strong></div>
+        </section>
+
+        <!-- 13. Narrowing -->
+        <section>
+          <p class="eyebrow">Using a union</p>
+          <h2>Check first, then use it</h2>
+          <div class="grid-2" style="grid-template-columns: 1.3fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+function greet(name?: string): string {
+  // here, name is: string | undefined
+  if (!name) {
+    return 'Hello, stranger!';
+  }
+
+  // here, TypeScript knows name is a string ✅
+  return `Hello, ${name.toUpperCase()}!`;
+}
+
+function showId(id: string | number) {
+  if (typeof id === 'number') {
+    return id.toFixed(0);     // number here
+  }
+  return id.toUpperCase();    // string here
+}
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>This is called narrowing</h3>
+                <p>After an <code>if</code> check, TypeScript <strong>knows more</strong> about the value.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3>Handy checks</h3>
+                <p><code>if (value)</code><br /><code>typeof x === 'string'</code><br /><code>Array.isArray(x)</code></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 14. extends -->
+        <section>
+          <p class="eyebrow">Reusing shapes</p>
+          <h2><code>extends</code>: build on another interface</h2>
+          <div class="grid-2" style="grid-template-columns: 1.25fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+interface Item {
+  id: number;
+  title: string;
+  price: number;
+}
+
+// everything in Item, plus more
+interface ClothingItem extends Item {
+  size: 'S' | 'M' | 'L';
+}
+
+const jacket: ClothingItem = {
+  id: 7,
+  title: 'Denim jacket',
+  price: 30,
+  size: 'M',
+};
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>"Is a … with extra"</h3>
+                <p>A <code>ClothingItem</code> <strong>is an</strong> <code>Item</code>, with a <code>size</code> on top.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3>No copy-paste</h3>
+                <p>Change <code>Item</code> once, and <code>ClothingItem</code> gets the change too.</p>
+              </div>
+              <div class="card tinted-primary" style="margin-top: 0.5em">
+                <p class="small">You can extend more than one:<br /><code>interface A extends B, C {}</code></p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 15. extends with type -->
+        <section>
+          <p class="eyebrow">Reusing shapes</p>
+          <h2>The same idea with <code>type</code>: <code>&amp;</code></h2>
+          <div class="grid-2" style="align-items: start">
+            <div>
+              <p class="small"><strong>interface</strong> → <code>extends</code></p>
+              <pre><code class="language-typescript" data-trim>
+interface ClothingItem extends Item {
+  size: 'S' | 'M' | 'L';
+}
+              </code></pre>
+            </div>
+            <div>
+              <p class="small"><strong>type</strong> → <code>&amp;</code> ("and")</p>
+              <pre><code class="language-typescript" data-trim>
+type ClothingItem = Item &amp; {
+  size: 'S' | 'M' | 'L';
+};
+              </code></pre>
+            </div>
+          </div>
+          <table style="margin-top: 0.4em">
+            <tr><th></th><th><code style="background: none; color: #fff">interface</code></th><th><code style="background: none; color: #fff">type</code></th></tr>
+            <tr><td>Describe an object</td><td>✅</td><td>✅</td></tr>
+            <tr><td>Build on another shape</td><td>✅ <code>extends</code></td><td>✅ <code>&amp;</code></td></tr>
+            <tr><td>Unions like <code>'S' | 'M'</code></td><td>❌</td><td>✅</td></tr>
+          </table>
+        </section>
+
+        <!-- 16. React props -->
+        <section>
+          <p class="eyebrow">Where you'll see this most</p>
+          <h2>Typing React component props</h2>
+          <div class="grid-2" style="grid-template-columns: 1.35fr 1fr; align-items: start">
+            <pre><code class="language-typescript" data-trim>
+interface PriceTagProps {
+  price: number;
+  currency?: string;
+  variant: 'normal' | 'sale';
+}
+
+function PriceTag({ price, currency = '€', variant }: PriceTagProps) {
+  return (
+    &lt;span className={variant}&gt;
+      {price} {currency}
+    &lt;/span&gt;
+  );
+}
+
+// using it
+&lt;PriceTag price={25} variant="sale" /&gt;     // ✅
+&lt;PriceTag price="25" variant="cheap" /&gt;   // ❌ ❌
+            </code></pre>
+            <div>
+              <div class="card primary">
+                <h3>Props = an interface</h3>
+                <p>Name it <code>ComponentNameProps</code>. It documents how to use the component.</p>
+              </div>
+              <div class="card success" style="margin-top: 0.5em">
+                <h3>Free help</h3>
+                <p>Forget a required prop, pass the wrong type or misspell a variant — TypeScript tells you right away.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- 17. any -->
+        <section>
+          <p class="eyebrow">Watch out</p>
+          <h2>🚫 Avoid <code>any</code></h2>
+          <div class="grid-2" style="align-items: start">
+            <pre><code class="language-typescript" data-trim>
+let data: any = 'hello';
+
+data.toFixed(2);   // no error… 💥 crashes at runtime
+data.whatever();   // no error… 💥
+            </code></pre>
+            <div>
+              <div class="card secondary">
+                <h3><code>any</code> turns TypeScript off</h3>
+                <p>For that value, you're back to plain JavaScript — and its bugs.</p>
+              </div>
+              <div class="card primary" style="margin-top: 0.5em">
+                <h3>Instead</h3>
+                <p>Write the real type. Don't know it yet? Use <code>unknown</code>: TypeScript makes you <strong>check</strong> before using it.</p>
+              </div>
+            </div>
+          </div>
+          <div class="callout">
+            A red squiggle is TypeScript <strong>helping</strong> you, not blocking you. Fix the cause — don't silence it with <code>any</code>
+            or <code>// @ts-ignore</code>. Stuck? Ask for help!
+          </div>
+        </section>
+
+        <!-- 18. Cheat sheet -->
+        <section>
+          <p class="eyebrow">Cheat sheet</p>
+          <h2>Everything on one slide</h2>
+          <div class="grid-2" style="align-items: start">
+            <pre><code class="language-typescript" data-trim>
+// basic types
+let title: string = 'Chair';
+let price: number = 25;
+let isSold: boolean = false;
+let tags: string[] = ['wood'];
+
+// functions
+function total(price: number, qty: number): number {
+  return price * qty;
+}
+
+// unions + literal types
+type Size = 'S' | 'M' | 'L';
+let id: string | number = 42;
+            </code></pre>
+            <pre><code class="language-typescript" data-trim>
+// object shapes
+interface Item {
+  readonly id: number;
+  title: string;
+  seller?: string;      // optional
+}
+
+// build on a shape
+interface ClothingItem extends Item {
+  size: Size;
+}
+
+type Shoe = Item &amp; { shoeSize: number };
+
+// narrowing
+if (item.seller) {
+  item.seller.toUpperCase();
+}
+            </code></pre>
+          </div>
+        </section>
+
+        <!-- 19. End -->
+        <section class="center">
+          <span class="big-emoji">🔷</span>
+          <h2>Questions?</h2>
+          <p>Want to try things out? The <a href="https://www.typescriptlang.org/play" target="_blank" rel="noopener">TypeScript Playground</a> runs in your browser.</p>
+          <p class="muted"><a href="../github/index.html">← Git &amp; GitHub</a> · <a href="../index.html">All slides</a></p>
+        </section>
+      </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/dist/reveal.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/notes/notes.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/reveal.js@5/plugin/highlight/highlight.js"></script>
+    <script>
+      Reveal.initialize({
+        width: 1280,
+        height: 720,
+        margin: 0.06,
+        hash: true,
+        slideNumber: 'c/t',
+        transition: 'slide',
+        center: true,
+        plugins: [RevealHighlight, RevealNotes],
+      });
+    </script>
+  </body>
+</html>
