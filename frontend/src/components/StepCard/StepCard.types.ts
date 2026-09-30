@@ -3,10 +3,18 @@ interface StepCardProps {
    * The title of the step
    */
   title: string;
-
-  // TODO: add the rest of the props this component needs:
-  // - step (the number in the circle)
-  // - description
+  /**
+   * The number of the step
+   */
+  step?: string;
+  /**
+   * The description of the step
+   */
+  text: string;
+  /**
+   * The type of marker to display in the circle. Can be either a number or a checkmark.
+   */
+  markerType?: 'number' | 'check';
 }
 
 export type { StepCardProps };
