@@ -29,10 +29,10 @@ export const Default: Story = {
 // TODO: as you add props to Toast.types.ts, add a story for each variant and
 // state so you can see them all side by side. Something like:
 //
-// export const Success: Story = {
-//   args: { message: "Item listed! It's live in your shop.", variant: 'success' },
-// };
-//
-// export const Error: Story = {
-//   args: { message: 'Wrong email or password.', variant: 'error' },
-// };
+export const Success: Story = {
+  args: { message: "Item listed! It's live in your shop.", variant: 'success' },
+};
+
+export const Error: Story = {
+  args: { message: 'Wrong email or password.', variant: 'error' },
+};

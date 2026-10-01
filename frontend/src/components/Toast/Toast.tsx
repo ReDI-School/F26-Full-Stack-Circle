@@ -7,8 +7,26 @@ import type { ToastProps } from './Toast.types';
  * dark ink pill, radius 14, white 14px text, with an 8px dot on the left: green for
  * success, secondary for error.
  */
-const Toast = ({ message }: ToastProps) => {
-  return <div className={toastStyles()}>{message}</div>;
-};
+const Toast = ({ message, variant = 'success', onDismiss }: ToastProps) => {
+  const styles = toastStyles({ variant });
 
+  return (
+    <div
+      className={styles.base()}
+      role="status"
+      aria-live={variant === 'error' ? 'assertive' : 'polite'}
+      aria-atomic="true"
+    >
+      {' '}
+      <span className={styles.dot()} aria-hidden="true" />{' '}
+      <span className="break-words">{message}</span>{' '}
+      {onDismiss && (
+        <button type="button" onClick={onDismiss} aria-label="Dismiss notification">
+          {' '}
+          ×{' '}
+        </button>
+      )}{' '}
+    </div>
+  );
+};
 export default Toast;
