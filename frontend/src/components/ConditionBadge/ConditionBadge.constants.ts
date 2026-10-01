@@ -2,7 +2,7 @@ export const CONDITIONS = {
   New: {
     param: 'NEW',
     variant: 'new',
-    label: 'New',
+    label: '✦ New',
   },
   LikeNew: {
     param: 'LIKE_NEW',

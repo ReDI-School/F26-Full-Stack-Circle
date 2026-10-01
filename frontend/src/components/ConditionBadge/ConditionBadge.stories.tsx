@@ -1,7 +1,6 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import ConditionBadge from './ConditionBadge';
-import { CONDITIONS } from './ConditionBadge.constants';
 
 const meta: Meta<typeof ConditionBadge> = {
   title: 'Components/ConditionBadge',
@@ -14,6 +13,13 @@ const meta: Meta<typeof ConditionBadge> = {
           'Tells a buyer what state an item is in. It sits on the top-left corner of the photo in ' +
           'an ItemCard, and again on the item detail page.',
       },
+    },
+  },
+  argTypes: {
+    condition: {
+      control: 'select',
+      options: ['NEW', 'LIKE_NEW', 'GOOD', 'USED'],
+      description: 'The condition of the item',
     },
   },
 };
@@ -33,10 +39,10 @@ export const Default: Story = {
 export const AllConditions: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2.5">
-      <ConditionBadge condition='NEW' />
-      <ConditionBadge condition='LIKE_NEW' />
-      <ConditionBadge condition='GOOD' />
-      <ConditionBadge condition='USED' />
+      <ConditionBadge condition="NEW" />
+      <ConditionBadge condition="LIKE_NEW" />
+      <ConditionBadge condition="GOOD" />
+      <ConditionBadge condition="USED" />
     </div>
   ),
 };

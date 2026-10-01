@@ -10,8 +10,7 @@ import type { ConditionBadgeProps } from './ConditionBadge.types';
  * primary-100/#2e7d96, good = tertiary-100/tertiary, used = bg/muted with a border.
  */
 const getPropByParam = (condition: ConditionBadgeProps['condition']) => {
-  const [_, prop] = Object.entries(CONDITIONS).find(([_, v]) => v.param === condition) || [];
-  return prop;
+  return Object.values(CONDITIONS).find((v) => v.param === condition);
 };
 
 const ConditionBadge = ({ condition }: ConditionBadgeProps) => {

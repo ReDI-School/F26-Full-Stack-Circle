@@ -7,18 +7,25 @@ import { tv } from 'tailwind-variants';
  * small pill, 13px bold. new = secondary-100/danger text, like-new =
  * primary-100/#2e7d96, good = tertiary-100/tertiary, used = bg/muted with a border.
  */
-export const conditionBadgeStyles = tv({
-  base: ['py-1.5', 'px-3.5', 'rounded-pill'],
-  variants: {
-    variant: {
-      new: ['bg-secondary-100', 'text-danger'],
-      'like-new': ['bg-primary-100', 'text-primary-800'],
-      good: ['bg-tertiary-100', 'text-tertiary-800'],
-      used: ['bg-muted', 'border', 'border-muted'],
+export const conditionBadgeStyles = tv(
+  {
+    base: ['py-1.5', 'px-3.5', 'rounded-pill', 'font-bold'],
+    variants: {
+      variant: {
+        new: ['bg-secondary-100', 'text-danger-text'],
+        'like-new': ['bg-primary-100', 'text-primary-200'],
+        good: ['bg-tertiary-100', 'text-tertiary'],
+        used: ['bg-bg', 'text-muted', 'border', 'border-border'],
+      },
+      size: {
+        sm: ['py-1', 'px-2.5'],
+        md: ['py-1.5', 'px-3.5', 'text-caption'],
+      },
     },
-    size: {
-      sm: 'py-1 px-2.5',
-      md: 'py-1.5 px-3.5',
+    defaultVariants: {
+      variant: 'new',
+      size: 'md',
     },
   },
-});
+  { twMerge: false }
+);
