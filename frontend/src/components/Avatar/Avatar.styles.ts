@@ -8,6 +8,12 @@ import { tv } from 'tailwind-variants';
  * 32px, md 44px, lg 64px.
  */
 export const avatarStyles = tv({
-  base: [],
-  variants: {},
+  base: ['rounded-pill', 'bg-primary', 'text-tertiary'],
+  variants: {
+    size: {
+      sm: ['w-8 h-8 text-sm'],
+      md: ['w-11 h-11 text-md'],
+      lg: ['w-16 h-16 text-lg'],
+    },
+  },
 });
