@@ -1,14 +1,34 @@
-import { textFieldStyles } from './TextField.styles';
+import { useId } from 'react';
+
+import { errorStyles, inputStyles, labelStyles, textFieldStyles } from './TextField.styles';
 import type { TextFieldProps } from './TextField.types';
 
-/**
- * TODO: build the TextField.
- *
- * label in bold 14px, then the input: radius-input, 1.5px border-input, focus = primary
- * border + 3px primary-100 ring, error = secondary border with the message underneath.
- */
-const TextField = ({ label }: TextFieldProps) => {
-  return <div className={textFieldStyles()}>{label}</div>;
+const TextField = ({ label, error, id, ...inputProps }: TextFieldProps) => {
+  const generatedId = useId();
+  const inputId = id ?? generatedId;
+  const errorId = `${inputId}-error`;
+
+  return (
+    <div className={textFieldStyles()}>
+      <label htmlFor={inputId} className={labelStyles()}>
+        {label}
+      </label>
+
+      <input
+        id={inputId}
+        className={inputStyles({ hasError: Boolean(error) })}
+        aria-invalid={Boolean(error)}
+        aria-describedby={error ? errorId : undefined}
+        {...inputProps}
+      />
+
+      {error ? (
+        <span id={errorId} className={errorStyles()}>
+          {error}
+        </span>
+      ) : null}
+    </div>
+  );
 };
 
 export default TextField;

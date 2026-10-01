@@ -26,17 +26,29 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to TextField.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const WithPlaceholder: Story = {
-//   args: { label: 'Email', type: 'email', placeholder: 'you@redi-school.org' },
-// };
-//
-// export const WithError: Story = {
-//   args: {
-//     label: 'Password',
-//     type: 'password',
-//     error: 'At least 8 characters, please.',
-//   },
-// };
+export const WithPlaceholder: Story = {
+  args: { label: 'Email', type: 'email', placeholder: 'you@redi-school.org' },
+};
+
+export const WithError: Story = {
+  args: {
+    label: 'Password',
+    type: 'password',
+    error: 'At least 8 characters, please.',
+  },
+};
+
+export const AllStates: Story = {
+  render: () => (
+    <div className="flex w-80 flex-col gap-5">
+      <TextField label="Email" type="email" placeholder="you@redi-school.org" />
+      <TextField label="Email" type="email" defaultValue="lena@redi-school.org" />
+      <TextField
+        label="Password"
+        type="password"
+        defaultValue="abc"
+        error="At least 8 characters, please."
+      />
+    </div>
+  ),
+};
