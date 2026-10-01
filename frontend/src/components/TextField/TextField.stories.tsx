@@ -38,6 +38,15 @@ export const WithError: Story = {
   },
 };
 
+export const Disabled: Story = {
+  args: {
+    label: 'Email',
+    type: 'email',
+    placeholder: 'you@redi-school.org',
+    disabled: true,
+  },
+};
+
 export const AllStates: Story = {
   render: () => (
     <div className="flex w-80 flex-col gap-5">
@@ -49,6 +58,7 @@ export const AllStates: Story = {
         defaultValue="abc"
         error="At least 8 characters, please."
       />
+      <TextField label="Email" type="email" placeholder="you@redi-school.org" disabled />
     </div>
   ),
 };

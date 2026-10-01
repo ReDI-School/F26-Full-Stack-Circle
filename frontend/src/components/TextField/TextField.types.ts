@@ -1,6 +1,8 @@
-import type { InputHTMLAttributes } from 'react';
+import type { ComponentProps } from 'react';
 
-interface TextFieldProps extends InputHTMLAttributes<HTMLInputElement> {
+type TextFieldInputProps = Omit<ComponentProps<'input'>, 'className'>;
+
+interface TextFieldProps extends TextFieldInputProps {
   /**
    * The label shown above the field
    */
