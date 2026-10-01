@@ -7,8 +7,12 @@ import type { CategoryChipProps } from './CategoryChip.types';
  * pill, 14px. Default = white bg, 1.5px border-input, tertiary text. Selected = tertiary
  * bg, white bold text.
  */
-const CategoryChip = ({ label }: CategoryChipProps) => {
-  return <button className={categoryChipStyles()}>{label}</button>;
+const CategoryChip = ({ label, selected = false }: CategoryChipProps) => {
+  return (
+    <button type="button" className={categoryChipStyles({ selected })} aria-pressed={selected}>
+      {label}
+    </button>
+  );
 };
 
 export default CategoryChip;
