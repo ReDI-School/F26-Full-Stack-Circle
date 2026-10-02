@@ -20,11 +20,18 @@ const meta: Meta<typeof ConditionBadge> = {
       control: 'select',
       options: ['NEW', 'LIKE_NEW', 'GOOD', 'USED'],
       description: 'The condition of the item',
+      table: {
+        type: { summary: "'NEW' | 'LIKE_NEW' | 'GOOD' | 'USED'" },
+      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md'],
       description: 'The size of badge',
+      table: {
+        type: { summary: "'sm' | 'md'" },
+        defaultValue: { summary: "'md'" },
+      },
     },
   },
 };
@@ -38,9 +45,6 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to ConditionBadge.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
 export const AllConditions: Story = {
   render: () => (
     <div className="flex flex-wrap gap-2.5">

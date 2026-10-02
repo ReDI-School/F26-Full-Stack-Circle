@@ -1,5 +1,9 @@
-type TConditionBadgeProps = 'NEW' | 'LIKE_NEW' | 'GOOD' | 'USED';
-type TSizeProps = 'sm' | 'md';
+import { CONDITIONS, SIZES } from './ConditionBadge.constants';
+
+type TypeFrom<T> = T[keyof T];
+type TConditionBadgeProps = TypeFrom<typeof CONDITIONS>['param'];
+type TSizeProps = TypeFrom<typeof SIZES>['param'];
+
 interface ConditionBadgeProps {
   /**
    * The condition tier of the item. Determines color scheme and label.
