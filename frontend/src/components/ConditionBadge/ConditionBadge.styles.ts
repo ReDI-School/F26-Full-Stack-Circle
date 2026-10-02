@@ -9,7 +9,15 @@ import { tv } from 'tailwind-variants';
  */
 export const conditionBadgeStyles = tv(
   {
-    base: ['py-1.5', 'px-3.5', 'rounded-pill', 'font-bold'],
+    base: [
+      'inline-flex',
+      'items-center',
+      'justify-center',
+      'py-1.5',
+      'px-3.5',
+      'rounded-pill',
+      'font-bold',
+    ],
     variants: {
       variant: {
         new: ['bg-secondary-100', 'text-danger-text'],
@@ -18,13 +26,13 @@ export const conditionBadgeStyles = tv(
         used: ['bg-bg', 'text-muted', 'border', 'border-border'],
       },
       size: {
-        sm: ['py-1', 'px-2.5'],
-        md: ['py-1.5', 'px-3.5', 'text-caption'],
+        small: ['py-1', 'px-2.5', 'text-2xs', 'leading-[1.308]'],
+        medium: ['py-1.5', 'px-3.5', 'text-caption', 'leading-[1.416]'],
       },
     },
     defaultVariants: {
       variant: 'new',
-      size: 'md',
+      size: 'medium',
     },
   },
   { twMerge: false }

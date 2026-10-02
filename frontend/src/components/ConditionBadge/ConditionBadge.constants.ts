@@ -1,22 +1,27 @@
 export const CONDITIONS = {
-  New: {
+  new: {
     param: 'NEW',
     variant: 'new',
     label: '✦ New',
   },
-  LikeNew: {
+  likeNew: {
     param: 'LIKE_NEW',
     variant: 'like-new',
     label: 'Like New',
   },
-  Good: {
+  good: {
     param: 'GOOD',
     variant: 'good',
     label: 'Good',
   },
-  Used: {
+  used: {
     param: 'USED',
     variant: 'used',
     label: 'Used',
   },
+} as const;
+
+export const SIZES = {
+  sm: { param: 'sm', size: 'small' },
+  md: { param: 'md', size: 'medium' },
 } as const;

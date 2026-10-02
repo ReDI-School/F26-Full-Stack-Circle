@@ -21,6 +21,11 @@ const meta: Meta<typeof ConditionBadge> = {
       options: ['NEW', 'LIKE_NEW', 'GOOD', 'USED'],
       description: 'The condition of the item',
     },
+    size: {
+      control: 'select',
+      options: ['sm', 'md'],
+      description: 'The size of badge',
+    },
   },
 };
 
@@ -43,6 +48,17 @@ export const AllConditions: Story = {
       <ConditionBadge condition="LIKE_NEW" />
       <ConditionBadge condition="GOOD" />
       <ConditionBadge condition="USED" />
+    </div>
+  ),
+};
+
+export const Small: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-2.5">
+      <ConditionBadge condition="NEW" size="sm" />
+      <ConditionBadge condition="LIKE_NEW" size="sm" />
+      <ConditionBadge condition="GOOD" size="sm" />
+      <ConditionBadge condition="USED" size="sm" />
     </div>
   ),
 };
