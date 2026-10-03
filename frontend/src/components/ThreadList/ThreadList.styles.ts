@@ -9,7 +9,7 @@ export const threadListStyles = tv({
     headerRow: 'flex flex-row justify-between items-center w-full',
     itemTitle: 'min-w-0 text-[12px] font-bold text-[var(--color-title)] ',
     withName: 'font-display text-[14px] font-extrabold',
-    unreaddot: '',
+   unreaddot: 'sr-only',
     time: 'ml-auto text-placeholder text-[11px] shrink-0',
     lastMessage: 'min-w-0 truncate text-left w-full text-muted text-[13px]',
   },
