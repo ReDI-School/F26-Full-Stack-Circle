@@ -17,7 +17,7 @@ const ThreadList = ({ activeId, threads, onSelect }: ThreadListProps) => {
               <div className={styles.headerRow()}>
                 <span className={styles.withName()}>
                   {thread.withName}
-                  {thread.unread && <span className={styles.unreaddot({ unread: true })}></span>}
+                  {thread.unread && <span className={styles.unreaddot({ unread: true })}>unread</span>}
                 </span>
                 <span className={styles.time()}>{thread.time}</span>
               </div>
