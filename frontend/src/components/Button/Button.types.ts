@@ -6,14 +6,9 @@ type ButtonSize = 'sm' | 'md';
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   /**
-   * The label of the button
+   * The label/icon of the button
    */
   children?: React.ReactNode;
-
-  /**
-   * For extra classes on the button
-   */
-  className?: string;
 
   /**
    * The variant of the button

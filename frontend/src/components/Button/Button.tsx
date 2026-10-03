@@ -10,13 +10,12 @@ import type { ButtonProps } from './Button.types';
  */
 const Button = ({
   children,
-  className,
   variant = 'primary',
   size = 'md',
   stretch = false,
   ...props
 }: ButtonProps) => {
-  const classes = buttonStyles({ className, variant, size, stretch });
+  const classes = buttonStyles({ variant, size, stretch });
   return (
     <button className={classes} {...props}>
       {children}
