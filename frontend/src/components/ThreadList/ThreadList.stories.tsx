@@ -30,8 +30,9 @@ const meta: Meta<typeof ThreadList> = {
     docs: {
       description: {
         component:
-        'The conversation list down the left side of the inbox — one row per conversation, showing who it' + ' ' +
-        'is with, which item it is about, and the last message.',
+          'The conversation list down the left side of the inbox — one row per conversation, showing who it' +
+          ' ' +
+          'is with, which item it is about, and the last message.',
       },
     },
   },
@@ -73,7 +74,6 @@ const meta: Meta<typeof ThreadList> = {
       description: 'Called with the id of the clicked row',
     },
   },
- 
 };
 export default meta;
 type Story = StoryObj<typeof ThreadList>;
