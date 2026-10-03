@@ -1,0 +1,35 @@
+import { tv } from 'tailwind-variants';
+
+export const threadListStyles = tv({
+slots: {
+    empty:'hidden',
+    root: 'border border-border rounded-[20px] overflow-hidden w-[340px] bg-surface',
+    row: 'last:border-b-0 border-b border-bg hover:bg-[#f2f7f9] aria-current:bg-[#f2f5f9]',
+    button: 'flex cursor-pointer px-4.5 py-4 flex-col w-full h-full gap-[3px] items-start',
+    headerRow: 'flex flex-row justify-between items-center w-full',
+    itemTitle: 'min-w-0 text-[12px] font-bold text-[#2e7d96]',
+    withName:'font-display text-[14px] font-extrabold',
+    unreaddot:'',
+    time:'ml-auto text-placeholder text-[11px] shrink-0',
+    lastMessage: 'min-w-0 truncate text-left w-full text-muted text-[13px]',
+},
+variants: {
+    unread: {
+        true: {
+            unreaddot: 'w-[8px] h-[8px] rounded-full bg-secondary inline-block ml-1',
+        },
+       
+    },
+    active: {
+        true: {
+            row: 'bg-[#f2f7f9]',
+        },
+    },
+},
+
+    defaultVariants: {
+        unread: false,
+        active: false,
+    },
+   
+});
