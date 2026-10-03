@@ -48,21 +48,30 @@
   /* Colors -- Hover / state */
   --color-primary-hover: #4699b1;
   --color-secondary-hover: #d84c16;
+  --color-secondary-100-hover: #fbd0bd;
   --color-tertiary-hover: #2b4750;
   --color-danger-text: #c2410c;
   --color-success: #7ed3a8;
 
   /* Font Sizes -- the scale used across the design */
-  --text-caption: 0.8125rem; /* 13px */
-  --text-body: 0.9375rem; /* 15px */
-  --text-h2: 1.375rem; /* 22px */
-  --text-h1: 1.875rem; /* 30px */
-  --text-display: 2.75rem; /* 44px */
+  --text-caption: 0.8125rem;
+  /* 13px */
+  --text-body: 0.9375rem;
+  /* 15px */
+  --text-h2: 1.375rem;
+  /* 22px */
+  --text-h1: 1.875rem;
+  /* 30px */
+  --text-display: 2.75rem;
+  /* 44px */
 
   /* Border Radius */
-  --radius-input: 0.75rem; /* 12px -- inputs, small surfaces */
-  --radius-card: 1.25rem; /* 20px -- cards, panels */
-  --radius-pill: 999px; /* buttons, chips, badges, avatars */
+  --radius-input: 0.75rem;
+  /* 12px -- inputs, small surfaces */
+  --radius-card: 1.25rem;
+  /* 20px -- cards, panels */
+  --radius-pill: 999px;
+  /* buttons, chips, badges, avatars */
 
   /* Shadows */
   --shadow-nav: 0 4px 16px rgba(56, 90, 101, 0.06);
@@ -74,6 +83,7 @@
    Base Layer -- Global element styles
    ============================================================ */
 @layer base {
+
   *,
   *::before,
   *::after {
@@ -105,6 +115,7 @@
   h1 {
     font-size: var(--text-h1);
   }
+
   h2 {
     font-size: var(--text-h2);
   }
