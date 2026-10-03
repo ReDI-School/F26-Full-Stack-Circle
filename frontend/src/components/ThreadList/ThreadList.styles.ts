@@ -2,7 +2,6 @@ import { tv } from 'tailwind-variants';
 
 export const threadListStyles = tv({
   slots: {
-    empty: 'hidden',
     root: 'border border-border rounded-[20px] overflow-hidden w-[340px] bg-surface',
     row: 'last:border-b-0 border-b border-bg hover:bg-[var(--color-bg)] aria-current:bg-[var(--color-bg)]',
     button: 'flex cursor-pointer px-4.5 py-4 flex-col w-full h-full gap-[3px] items-start',
