@@ -10,9 +10,9 @@ interface CategoryChipProps {
   selected?: boolean;
 
    /**
-   * Chip event handler when clicked.
+   * Chip event handler when clicked, including deselecting a selected chip.
    */
-  onClick?: ()=> void;
+  onClick?: () => void;
 
   // TODO: add the rest of the props this component needs:
   // - selected
