@@ -1,27 +1,13 @@
-export const CONDITIONS = {
-  new: {
-    param: 'NEW',
-    variant: 'new',
-    label: '✦ New',
-  },
-  likeNew: {
-    param: 'LIKE_NEW',
-    variant: 'like-new',
-    label: 'Like New',
-  },
-  good: {
-    param: 'GOOD',
-    variant: 'good',
-    label: 'Good',
-  },
-  used: {
-    param: 'USED',
-    variant: 'used',
-    label: 'Used',
-  },
-} as const;
+export const VARIANTS = {
+  condition: ['NEW', 'LIKE_NEW', 'GOOD', 'USED'] as const,
+  size: ['sm', 'md'] as const,
+};
+export type TCondition = (typeof VARIANTS.condition)[number];
+export const LABELS: Record<TCondition, string> = {
+  NEW: '✦ New',
+  LIKE_NEW: 'Like new',
+  GOOD: 'Good',
+  USED: 'Used',
+};
 
-export const SIZES = {
-  sm: { param: 'sm', size: 'small' },
-  md: { param: 'md', size: 'medium' },
-} as const;
+export type TSize = (typeof VARIANTS.size)[number];

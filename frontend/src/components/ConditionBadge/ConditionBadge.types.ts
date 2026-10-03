@@ -1,21 +1,17 @@
-import { CONDITIONS, SIZES } from './ConditionBadge.constants';
-
-type TypeFrom<T> = T[keyof T];
-type TConditionBadgeProps = TypeFrom<typeof CONDITIONS>['param'];
-type TSizeProps = TypeFrom<typeof SIZES>['param'];
+import type { TCondition, TSize } from './ConditionBadge.constants';
 
 interface ConditionBadgeProps {
   /**
    * The condition tier of the item. Determines color scheme and label.
    */
-  condition: TConditionBadgeProps;
+  condition: TCondition;
   /**
    * The size of the badge.
-   * - `SM`: Compact size for dense card layouts.
-   * - `MD`: Standard size for item details and hero cards.
-   * @default 'MD'
+   * - `sm`: Compact size for dense card layouts.
+   * - `md`: Standard size for item details and hero cards.
+   * @default 'md'
    */
-  size?: TSizeProps;
+  size?: TSize;
 }
 
-export type { ConditionBadgeProps };
+export type { ConditionBadgeProps, TCondition, TSize };

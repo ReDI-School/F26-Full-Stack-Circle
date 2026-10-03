@@ -13,20 +13,27 @@ export const conditionBadgeStyles = tv(
     ],
     variants: {
       variant: {
-        new: ['bg-secondary-100', 'text-danger-text'],
-        'like-new': ['bg-primary-100', 'text-primary-200'],
-        good: ['bg-tertiary-100', 'text-tertiary'],
-        used: ['bg-bg', 'text-muted', 'border', 'border-border'],
+        NEW: ['bg-secondary-100', 'text-danger-text'],
+        LIKE_NEW: ['bg-primary-100', 'text-primary-700'],
+        GOOD: ['bg-tertiary-100', 'text-tertiary'],
+        USED: ['bg-bg', 'text-muted', 'border', 'border-border'],
       },
       size: {
-        small: ['py-1', 'px-2.5', 'text-2xs', 'leading-[1.308]'],
-        medium: ['py-1.5', 'px-3.5', 'text-caption', 'leading-[1.416]'],
+        sm: ['py-1', 'px-2.5', 'text-2xs'],
+        md: ['py-1.5', 'px-3.5', 'text-caption'],
       },
     },
     defaultVariants: {
-      variant: 'new',
-      size: 'medium',
+      size: 'md',
     },
   },
-  { twMerge: false }
+  {
+    twMergeConfig: {
+      classGroups: {
+        // Register custom font-size tokens so tailwind-merge knows they belong
+        // to the fontSize group and won't conflict with text-color utilities.
+        'font-size': [{ text: ['2xs', 'caption', 'body', 'h1', 'h2', 'display'] }],
+      },
+    },
+  }
 );

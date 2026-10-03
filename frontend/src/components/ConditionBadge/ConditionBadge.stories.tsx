@@ -27,7 +27,7 @@ const meta: Meta<typeof ConditionBadge> = {
     size: {
       control: 'select',
       options: ['sm', 'md'],
-      description: 'The size of badge',
+      description: 'The size of the badge',
       table: {
         type: { summary: "'sm' | 'md'" },
         defaultValue: { summary: "'md'" },
