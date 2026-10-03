@@ -4,12 +4,12 @@ interface CategoryChipProps {
    */
   label: string;
 
-   /**
+  /**
    * Indication whether the chip is selected.
    */
   selected?: boolean;
 
-   /**
+  /**
    * Chip event handler when clicked, including deselecting a selected chip.
    */
   onClick?: () => void;
