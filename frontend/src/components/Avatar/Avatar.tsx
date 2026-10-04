@@ -1,6 +1,6 @@
 import { avatarStyles } from './Avatar.styles';
 import type { AvatarProps } from './Avatar.types';
-import {getInitials} from "./AvatarHelpers"
+import { getInitials } from './AvatarHelpers';
 import { colourFor } from './AvatarHelpers';
 
 /**

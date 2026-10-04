@@ -19,12 +19,11 @@ export const avatarStyles = tv({
       lg: ['w-16', 'h-16', 'text-h2'],
     },
 
-  colours: {
+    colours: {
       'bg-primary': 'bg-primary',
       'bg-secondary': 'bg-secondary',
       'bg-tertiary': 'bg-tertiary',
-},
-
+    },
   },
 
   defaultVariants: {
