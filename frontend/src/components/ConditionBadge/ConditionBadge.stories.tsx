@@ -20,16 +20,12 @@ const meta: Meta<typeof ConditionBadge> = {
       control: 'select',
       options: ['NEW', 'LIKE_NEW', 'GOOD', 'USED'],
       description: 'The condition of the item',
-      table: {
-        type: { summary: "'NEW' | 'LIKE_NEW' | 'GOOD' | 'USED'" },
-      },
     },
     size: {
       control: 'select',
       options: ['sm', 'md'],
       description: 'The size of the badge',
       table: {
-        type: { summary: "'sm' | 'md'" },
         defaultValue: { summary: "'md'" },
       },
     },
