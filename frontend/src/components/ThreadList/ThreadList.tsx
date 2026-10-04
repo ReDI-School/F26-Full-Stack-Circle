@@ -7,18 +7,25 @@ const ThreadList = ({ activeId, threads, onSelect }: ThreadListProps) => {
       {threads.map((thread: Thread) => {
         const isActive = activeId === thread.id;
         const itemStyles = threadListStyles({
-          unread: thread.unread,
           active: isActive,
         });
 
         return (
-          <li className={itemStyles.row()} key={thread.id} >
-            <button aria-current={isActive ? 'true' : undefined} className={itemStyles.button()} onClick={() => onSelect(thread.id)}>
+          <li className={itemStyles.row()} key={thread.id}>
+            <button
+              aria-current={isActive ? 'true' : undefined}
+              className={itemStyles.button()}
+              onClick={() => onSelect(thread.id)}
+            >
               <div className={itemStyles.headerRow()}>
                 <span className={itemStyles.withName()}>
                   {thread.withName}
-                  {thread.unread && <span className={itemStyles.unreaddot({ unread: true })}></span>}
-                  {thread.unread && <span className={itemStyles.unreaddot({ unread: true })}>unread</span>}
+                  {thread.unread && (
+                    <>
+                      <span className={itemStyles.unreaddot()} aria-hidden="true" />
+                      <span className="sr-only">unread</span>
+                    </>
+                  )}
                 </span>
                 <span className={itemStyles.time()}>{thread.time}</span>
               </div>
