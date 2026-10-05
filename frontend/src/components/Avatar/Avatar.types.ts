@@ -17,4 +17,4 @@ interface AvatarProps {
 
 type AvatarColour = 'bg-primary' | 'bg-secondary' | 'bg-tertiary';
 
-export type { AvatarProps , AvatarColour};
+export type { AvatarProps, AvatarColour };
