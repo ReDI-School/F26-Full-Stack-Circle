@@ -44,8 +44,7 @@ export const LongUnbrokenString: Story = {
 export const LongUrl: Story = {
   args: {
     own: true,
-    text:
-      'https://example.com/' + 'very-long-path-segment-'.repeat(8) + '?q=' + 'x'.repeat(60),
+    text: 'https://example.com/' + 'very-long-path-segment-'.repeat(8) + '?q=' + 'x'.repeat(60),
   },
 };
 
