@@ -27,10 +27,6 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to CategoryChip.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-
 export const Selected: Story = {
   args: { label: 'Books', selected: true },
 };
