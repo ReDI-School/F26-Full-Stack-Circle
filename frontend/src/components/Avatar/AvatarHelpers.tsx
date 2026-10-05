@@ -3,6 +3,8 @@
     be capitals 
     ex John to JN*/
 }
+import  {AvatarColour} from "./Avatar.types"
+
 export const getInitials = (name: string): string => {
   // Split over any whitespace, one character or more
   const words = name.trim().split(/\s+/);
@@ -18,7 +20,7 @@ export const getInitials = (name: string): string => {
   /* this functioon determine each name which color belongs to*/
 }
 
-type AvatarColour = 'bg-primary' | 'bg-secondary' | 'bg-tertiary';
+
 
 export const colourFor = (name: string): AvatarColour => {
   const colours: AvatarColour[] = ['bg-primary', 'bg-secondary', 'bg-tertiary'];
