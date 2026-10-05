@@ -31,7 +31,6 @@ export const toastStyles = tv({
       'leading-snug',
       'text-white',
       'shadow-[0_10px_30px_rgba(34,52,58,.3)]',
-      'break-words',
     ],
     dot: ['h-2', 'w-2', 'min-w-2', 'shrink-0', 'rounded-full'],
   },

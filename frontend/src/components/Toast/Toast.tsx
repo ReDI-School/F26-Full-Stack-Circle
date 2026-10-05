@@ -18,12 +18,11 @@ const Toast = ({ message, variant = 'success', onDismiss }: ToastProps) => {
       aria-atomic="true"
     >
       {' '}
-      <span className={styles.dot()} aria-hidden="true" />{' '}
-      <span className="break-words">{message}</span>{' '}
+      <span className={styles.dot()} aria-hidden="true" />
+      <span className="break-words">{message}</span>
       {onDismiss && (
         <button type="button" onClick={onDismiss} aria-label="Dismiss notification">
-          {' '}
-          ×{' '}
+          ×
         </button>
       )}{' '}
     </div>

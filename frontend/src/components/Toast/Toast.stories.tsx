@@ -36,3 +36,10 @@ export const Success: Story = {
 export const Error: Story = {
   args: { message: 'Wrong email or password.', variant: 'error' },
 };
+
+export const LongMessage: Story = {
+  args: {
+    message:  "This is a really long toast message that should wrap onto multiple lines instead of running off the edge of the screen.",
+    variant: 'success',
+  },
+};
