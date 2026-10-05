@@ -13,7 +13,6 @@ interface CategoryChipProps {
    * Chip event handler when clicked, including deselecting a selected chip.
    */
   onClick?: () => void;
-
 }
 
 export type { CategoryChipProps };
