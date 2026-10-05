@@ -39,7 +39,8 @@ export const Error: Story = {
 
 export const LongMessage: Story = {
   args: {
-    message:  "This is a really long toast message that should wrap onto multiple lines instead of running off the edge of the screen.",
+    message:
+      'This is a really long toast message that should wrap onto multiple lines instead of running off the edge of the screen.',
     variant: 'success',
   },
 };
