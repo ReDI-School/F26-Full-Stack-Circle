@@ -22,7 +22,7 @@ export const avatarStyles = tv({
     colours: {
       'bg-primary': 'bg-primary',
       'bg-secondary': 'bg-secondary',
-      'bg-tertiary': 'bg-tertiary',
+      'bg-tertiary': 'bg-tertiary'
     },
   },
 
