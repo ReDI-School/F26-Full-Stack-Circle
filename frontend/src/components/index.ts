@@ -6,6 +6,7 @@ export * from './CategoryChip';
 export * from './CategoryTile';
 export * from './ConditionBadge';
 export * from './ConfirmDialog';
+export * from './ImageSlot';
 export * from './ItemCard';
 export * from './Layout';
 export * from './Logo';
