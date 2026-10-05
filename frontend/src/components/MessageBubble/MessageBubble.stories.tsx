@@ -1,13 +1,12 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
-import  MessageBubble  from './MessageBubble';
-
+import MessageBubble from './MessageBubble';
 
 const meta: Meta<typeof MessageBubble> = {
   title: 'Components/MessageBubble',
   component: MessageBubble,
   decorators: [
     (Story) => (
-      <div className="flex flex-col gap-2 w-[400px] p-4 bg-gray-50">
+      <div className="flex flex-col gap-2 w-100 p-4 bg-gray-50">
         <Story />
       </div>
     ),

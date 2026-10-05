@@ -1,41 +1,21 @@
-import { MessageBubbleProps } from "./MessageBubble.types";
-export type { MessageBubbleProps } from "./MessageBubble.types";
-import { messageBubbleStyles } from "./MessageBubble.style";
-
-const MessageBubble = ({ text, own, timestamp }: MessageBubbleProps) => {
-  return (
-
-    <div className={messageBubbleStyles({ own })}>
-    
-      <p>{text}</p>
-    
-      {timestamp && <span className="timestamp">{timestamp}</span>}
-    
-    </div>
-  
-);
-
-};
-
-export default MessageBubble;
-
-/**
-
 import type { MessageBubbleProps } from './MessageBubble.types';
-import {
-  messageBubbleStyles,
-  messageBubbleTimestampStyles,
-} from './MessageBubble.styles';
+import { messageBubbleStyles, messageBubbleTimestampStyles, } from './MessageBubble.style';
 
-export function MessageBubble({ text, own, timestamp }: MessageBubbleProps) {
+function MessageBubble({ text, own, timestamp }: MessageBubbleProps) {
   return (
     <div className={messageBubbleStyles({ own })}>
-      {text}
+      <p>{text}</p>
       {timestamp && (
-        <time className={messageBubbleTimestampStyles({ own })}>{timestamp}</time>
+        <time className={messageBubbleTimestampStyles({ own })}>
+          {timestamp}
+        </time>
       )}
     </div>
   );
 }
 
-**/
+export default MessageBubble;
+
+
+
+
