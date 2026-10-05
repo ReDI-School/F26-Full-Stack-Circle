@@ -9,6 +9,6 @@ export const footerStyles = tv({
     description: 'max-w-[240px] text-caption leading-relaxed text-muted',
     heading: 'mb-3 font-display text-sm font-extrabold text-ink',
     list: 'flex flex-col gap-2',
-    link: 'text-sm text-primary-hover transition-colors hover:text-secondary',
+    link: 'text-sm text-footer-link transition-colors hover:text-secondary',
   },
 });

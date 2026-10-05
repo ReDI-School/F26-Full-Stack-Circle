@@ -31,9 +31,9 @@ const meta: Meta<typeof Footer> = {
       { label: 'FAQ', href: '/faq' },
     ],
     accountLinks: [
-      { label: 'my shop', href: '/my-shop' },
-      { label: 'account settings', href: '/settings' },
-      { label: 'sell an item', href: '/sell' },
+      { label: 'my shop', href: '/login' },
+      { label: 'account settings', href: '/login' },
+      { label: 'sell an item', href: '/login' },
     ],
   },
 };
