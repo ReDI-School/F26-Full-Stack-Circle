@@ -15,4 +15,6 @@ interface AvatarProps {
   size?: 'sm' | 'md' | 'lg';
 }
 
-export type { AvatarProps };
+type AvatarColour = 'bg-primary' | 'bg-secondary' | 'bg-tertiary';
+
+export type { AvatarProps , AvatarColour};
