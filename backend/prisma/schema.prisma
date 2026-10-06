@@ -49,29 +49,47 @@ enum ItemStatus {
 // People
 // ============================================================
 
-/// One account, and the shop that comes with it. The homepage
-/// promises "your shop is created the moment you register", and
-/// account settings edits the name, the email and the shop name on
-/// one form, so the shop lives here rather than in a table of its
-/// own.
+/// One account. The profile picture lives here rather than on the
+/// shop because it is the person's own avatar: it appears in the
+/// navbar, in the AvatarMenu and on every message thread, not only
+/// on their shop page.
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        Int     @id @default(autoincrement())
+  email     String  @unique
   name      String?
   avatarUrl String?
-  role      Role     @default(USER)
-
-  /// "Lena's shop" - the title of this person's shop page.
-  shopName String?
-  /// "Sells & ships from Berlin" - shown under the shop name.
-  shopLocation String?
+  role      Role    @default(USER)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 
-  items         Item[]
-  buyerThreads  Thread[]  @relation("ThreadBuyer")
-  sentMessages  Message[]
+  shop         Shop?
+  buyerThreads Thread[]  @relation("ThreadBuyer")
+  sentMessages Message[]
+}
+
+/// A person's shop. The homepage promises "your shop is created the
+/// moment you register", so every account has exactly one - the
+/// unique ownerId is what makes this one-to-one rather than
+/// one-to-many.
+model Shop {
+  id Int @id @default(autoincrement())
+
+  /// Used in URLs: /shops/lenas-shop
+  slug     String  @unique
+  /// "Lena's shop" - the heading of the shop page.
+  name     String
+  /// "Sells & ships from Berlin" - shown under the shop name.
+  location String?
+
+  /// Unique, so one account can never end up with two shops.
+  ownerId Int  @unique
+  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  items Item[]
 }
 
 // ============================================================
@@ -121,8 +139,11 @@ model Item {
   categoryId Int
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
-  sellerId Int
-  seller   User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  /// An item belongs to a shop, not directly to a person - the card
+  /// and the detail page both credit "Lena's shop". The seller as a
+  /// user is still one hop away, through shop.owner.
+  shopId Int
+  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -132,9 +153,9 @@ model Item {
   homepageRows HomepageRowItem[]
 
   /// Browse filters by category and by status, and every shop page
-  /// lists one seller's items, so those three columns are indexed.
+  /// lists one shop's items, so those three columns are indexed.
   @@index([categoryId])
-  @@index([sellerId])
+  @@index([shopId])
   @@index([status])
 }
 
@@ -161,7 +182,7 @@ model ItemImage {
 
 /// One conversation about one item, started when a buyer taps
 /// "I'm interested". The seller is not stored here because it is
-/// always item.sellerId - duplicating it would let the two drift
+/// always item.shop.owner - duplicating it would let the two drift
 /// apart.
 model Thread {
   id Int @id @default(autoincrement())
@@ -214,14 +235,14 @@ model Message {
 /// slots by hand on the admin page, so the contents are data and
 /// not a query.
 model HomepageRow {
-  id    Int    @id @default(autoincrement())
-  slug  String @unique
-  title String
+  id        Int    @id @default(autoincrement())
+  slug      String @unique
+  title     String
   /// The emoji after the title, e.g. the sparkles on "fresh finds".
-  emoji String
+  emoji     String
   /// The grey line next to the title, e.g. "just listed by the
   /// community".
-  subtitle String
+  subtitle  String
   /// The link on the right, e.g. "see everything".
   linkLabel String
   /// The href that link points at, e.g. "/browse".

@@ -38,6 +38,7 @@ async function main() {
   await prisma.thread.deleteMany();
   await prisma.itemImage.deleteMany();
   await prisma.item.deleteMany();
+  await prisma.shop.deleteMany();
 
   // ----------------------------------------------------------
   // 2. Categories - the five on the homepage and in the footer.
@@ -62,37 +63,13 @@ async function main() {
   console.log(`✅ ${categorySeed.length} categories`);
 
   // ----------------------------------------------------------
-  // 3. People. Each account owns one shop, created with it.
+  // 3. People.
   // ----------------------------------------------------------
   const userSeed = [
-    {
-      email: 'lena@redi-school.org',
-      name: 'Lena K.',
-      shopName: "Lena's shop",
-      shopLocation: 'Sells & ships from Hamburg',
-      role: 'ADMIN' as const,
-    },
-    {
-      email: 'omar@redi-school.org',
-      name: 'Omar M.',
-      shopName: "Omar's shop",
-      shopLocation: 'Sells & ships from Munich',
-      role: 'USER' as const,
-    },
-    {
-      email: 'mira@redi-school.org',
-      name: 'Mira S.',
-      shopName: "Mira's shop",
-      shopLocation: 'Sells & ships from Berlin',
-      role: 'USER' as const,
-    },
-    {
-      email: 'jonas@redi-school.org',
-      name: 'Jonas B.',
-      shopName: "Jonas' shop",
-      shopLocation: 'Sells & ships from Cologne',
-      role: 'USER' as const,
-    },
+    { email: 'lena@redi-school.org', name: 'Lena K.', role: 'ADMIN' as const },
+    { email: 'omar@redi-school.org', name: 'Omar M.', role: 'USER' as const },
+    { email: 'mira@redi-school.org', name: 'Mira S.', role: 'USER' as const },
+    { email: 'jonas@redi-school.org', name: 'Jonas B.', role: 'USER' as const },
   ];
 
   const users: Record<string, number> = {};
@@ -104,10 +81,50 @@ async function main() {
     });
     users[row.email] = row.id;
   }
-  console.log(`✅ ${userSeed.length} accounts, one shop each`);
+  console.log(`✅ ${userSeed.length} accounts`);
 
   // ----------------------------------------------------------
-  // 4. Items.
+  // 4. Shops - one per account, as the homepage promises.
+  // ----------------------------------------------------------
+  const shopSeed = [
+    {
+      slug: 'lenas-shop',
+      name: "Lena's shop",
+      location: 'Sells & ships from Hamburg',
+      owner: 'lena@redi-school.org',
+    },
+    {
+      slug: 'omars-shop',
+      name: "Omar's shop",
+      location: 'Sells & ships from Munich',
+      owner: 'omar@redi-school.org',
+    },
+    {
+      slug: 'miras-shop',
+      name: "Mira's shop",
+      location: 'Sells & ships from Berlin',
+      owner: 'mira@redi-school.org',
+    },
+    {
+      slug: 'jonas-shop',
+      name: "Jonas' shop",
+      location: 'Sells & ships from Cologne',
+      owner: 'jonas@redi-school.org',
+    },
+  ];
+
+  const shops: Record<string, number> = {};
+  for (const shop of shopSeed) {
+    const { owner, ...shopData } = shop;
+    const row = await prisma.shop.create({
+      data: { ...shopData, ownerId: users[owner] },
+    });
+    shops[row.slug] = row.id;
+  }
+  console.log(`✅ ${shopSeed.length} shops, one per account`);
+
+  // ----------------------------------------------------------
+  // 5. Items.
   //
   // `was` is the price before the seller discounted it, and becomes
   // the struck-through number on the item detail page.
@@ -122,7 +139,7 @@ async function main() {
     was?: number;
     condition: 'NEW' | 'LIKE_NEW' | 'GOOD' | 'USED';
     category: string;
-    seller: string;
+    shop: string;
   };
 
   const itemSeed: ItemSeed[] = [
@@ -133,7 +150,7 @@ async function main() {
       price: 18,
       condition: 'LIKE_NEW',
       category: 'clothing',
-      seller: 'lena@redi-school.org',
+      shop: 'lenas-shop',
       description: 'Classic mid-wash denim, boxy fit. Worn a handful of times.',
     },
     {
@@ -143,7 +160,7 @@ async function main() {
       was: 22,
       condition: 'LIKE_NEW',
       category: 'electronics',
-      seller: 'lena@redi-school.org',
+      shop: 'lenas-shop',
       description: 'Low-profile keys, USB-C charging. Dongle included.',
     },
     {
@@ -152,7 +169,7 @@ async function main() {
       price: 9,
       condition: 'LIKE_NEW',
       category: 'home',
-      seller: 'lena@redi-school.org',
+      shop: 'lenas-shop',
       description: 'Three matte pots in cream, 12cm each. No drainage holes.',
     },
     {
@@ -161,7 +178,7 @@ async function main() {
       price: 15,
       condition: 'GOOD',
       category: 'books',
-      seller: 'lena@redi-school.org',
+      shop: 'lenas-shop',
       description: 'Complete trilogy, paperback. Spines a little creased.',
     },
 
@@ -172,7 +189,7 @@ async function main() {
       price: 6,
       condition: 'GOOD',
       category: 'books',
-      seller: 'omar@redi-school.org',
+      shop: 'omars-shop',
       description: 'Crockford classic. A few pencil notes in the margins.',
     },
     {
@@ -182,7 +199,7 @@ async function main() {
       was: 30,
       condition: 'GOOD',
       category: 'electronics',
-      seller: 'omar@redi-school.org',
+      shop: 'omars-shop',
       description: 'Battery still holds about six hours. Charger included.',
     },
     {
@@ -191,7 +208,7 @@ async function main() {
       price: 25,
       condition: 'LIKE_NEW',
       category: 'home',
-      seller: 'omar@redi-school.org',
+      shop: 'omars-shop',
       description: 'Adjustable height, mesh back. Pickup only.',
     },
     {
@@ -200,7 +217,7 @@ async function main() {
       price: 16,
       condition: 'GOOD',
       category: 'sports',
-      seller: 'omar@redi-school.org',
+      shop: 'omars-shop',
       description: 'Maybe 80km on them. Soles still have plenty of grip.',
     },
 
@@ -211,7 +228,7 @@ async function main() {
       price: 12,
       condition: 'GOOD',
       category: 'home',
-      seller: 'mira@redi-school.org',
+      shop: 'miras-shop',
       description: 'Brass-coloured arm, warm bulb included.',
     },
     {
@@ -220,7 +237,7 @@ async function main() {
       price: 5,
       condition: 'USED',
       category: 'books',
-      seller: 'mira@redi-school.org',
+      shop: 'miras-shop',
       description: 'Four well-loved books. Some pages have cooking stains.',
     },
     {
@@ -230,7 +247,7 @@ async function main() {
       was: 20,
       condition: 'NEW',
       category: 'clothing',
-      seller: 'mira@redi-school.org',
+      shop: 'miras-shop',
       description:
         'Gift that never fit, tags still on. Size L, cream wool blend. Very cozy, very warm.',
     },
@@ -241,7 +258,7 @@ async function main() {
       was: 25,
       condition: 'LIKE_NEW',
       category: 'sports',
-      seller: 'mira@redi-school.org',
+      shop: 'miras-shop',
       description: 'Firm ground studs. Used for one indoor season.',
     },
 
@@ -252,7 +269,7 @@ async function main() {
       price: 8,
       condition: 'USED',
       category: 'sports',
-      seller: 'jonas@redi-school.org',
+      shop: 'jonas-shop',
       description: '6mm mat with a carry strap. Slightly worn at the corners.',
     },
     {
@@ -262,7 +279,7 @@ async function main() {
       was: 12,
       condition: 'GOOD',
       category: 'clothing',
-      seller: 'jonas@redi-school.org',
+      shop: 'jonas-shop',
       description: 'Tour shirt, print still crisp. Washed cold only.',
     },
     {
@@ -271,7 +288,7 @@ async function main() {
       price: 35,
       condition: 'GOOD',
       category: 'electronics',
-      seller: 'jonas@redi-school.org',
+      shop: 'jonas-shop',
       description: 'Works great. Takes i-Type film, not included.',
     },
     {
@@ -280,7 +297,7 @@ async function main() {
       price: 6,
       condition: 'GOOD',
       category: 'clothing',
-      seller: 'jonas@redi-school.org',
+      shop: 'jonas-shop',
       description: 'Charcoal lambswool, nice and long. No moth holes.',
     },
   ];
@@ -295,7 +312,7 @@ async function main() {
         originalPriceCents: item.was ? eur(item.was) : null,
         condition: item.condition,
         categoryId: categories[item.category],
-        sellerId: users[item.seller],
+        shopId: shops[item.shop],
         images: {
           create: [{ url: `/seed/${item.key}.jpg`, position: 0 }],
         },
@@ -306,7 +323,7 @@ async function main() {
   console.log(`✅ ${itemSeed.length} items, four per shop`);
 
   // ----------------------------------------------------------
-  // 5. The curated homepage rows an admin fills on the admin page.
+  // 6. The curated homepage rows an admin fills on the admin page.
   // ----------------------------------------------------------
   const rowSeed = [
     {
@@ -368,7 +385,7 @@ async function main() {
   console.log(`✅ ${rowSeed.length} curated homepage rows`);
 
   // ----------------------------------------------------------
-  // 6. Two conversations, so the inbox is not empty on first run.
+  // 7. Two conversations, so the inbox is not empty on first run.
   //    Both are the ones drawn on the Inbox screen.
   // ----------------------------------------------------------
 

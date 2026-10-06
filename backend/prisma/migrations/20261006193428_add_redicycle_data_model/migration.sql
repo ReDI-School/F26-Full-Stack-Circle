@@ -9,9 +9,20 @@ CREATE TYPE "ItemStatus" AS ENUM ('AVAILABLE', 'SOLD', 'REMOVED');
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "avatarUrl" TEXT,
-ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'USER',
-ADD COLUMN     "shopLocation" TEXT,
-ADD COLUMN     "shopName" TEXT;
+ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'USER';
+
+-- CreateTable
+CREATE TABLE "Shop" (
+    "id" SERIAL NOT NULL,
+    "slug" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "location" TEXT,
+    "ownerId" INTEGER NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "Shop_pkey" PRIMARY KEY ("id")
+);
 
 -- CreateTable
 CREATE TABLE "Category" (
@@ -35,7 +46,7 @@ CREATE TABLE "Item" (
     "condition" "Condition" NOT NULL,
     "status" "ItemStatus" NOT NULL DEFAULT 'AVAILABLE',
     "categoryId" INTEGER NOT NULL,
-    "sellerId" INTEGER NOT NULL,
+    "shopId" INTEGER NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -100,13 +111,19 @@ CREATE TABLE "HomepageRowItem" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "Shop_slug_key" ON "Shop"("slug");
+
+-- CreateIndex
+CREATE UNIQUE INDEX "Shop_ownerId_key" ON "Shop"("ownerId");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "Category_slug_key" ON "Category"("slug");
 
 -- CreateIndex
 CREATE INDEX "Item_categoryId_idx" ON "Item"("categoryId");
 
 -- CreateIndex
-CREATE INDEX "Item_sellerId_idx" ON "Item"("sellerId");
+CREATE INDEX "Item_shopId_idx" ON "Item"("shopId");
 
 -- CreateIndex
 CREATE INDEX "Item_status_idx" ON "Item"("status");
@@ -136,10 +153,13 @@ CREATE UNIQUE INDEX "HomepageRowItem_rowId_itemId_key" ON "HomepageRowItem"("row
 CREATE UNIQUE INDEX "HomepageRowItem_rowId_position_key" ON "HomepageRowItem"("rowId", "position");
 
 -- AddForeignKey
+ALTER TABLE "Shop" ADD CONSTRAINT "Shop_ownerId_fkey" FOREIGN KEY ("ownerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+
+-- AddForeignKey
 ALTER TABLE "Item" ADD CONSTRAINT "Item_categoryId_fkey" FOREIGN KEY ("categoryId") REFERENCES "Category"("id") ON DELETE RESTRICT ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "Item" ADD CONSTRAINT "Item_sellerId_fkey" FOREIGN KEY ("sellerId") REFERENCES "User"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "Item" ADD CONSTRAINT "Item_shopId_fkey" FOREIGN KEY ("shopId") REFERENCES "Shop"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
 ALTER TABLE "ItemImage" ADD CONSTRAINT "ItemImage_itemId_fkey" FOREIGN KEY ("itemId") REFERENCES "Item"("id") ON DELETE CASCADE ON UPDATE CASCADE;
