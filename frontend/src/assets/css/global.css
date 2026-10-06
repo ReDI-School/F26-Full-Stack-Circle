@@ -30,6 +30,7 @@
   /* Colors -- Brand */
   --color-primary: #58adc5;
   --color-primary-100: #e3f1f5;
+  --color-primary-700: #2e7d96;
   --color-secondary: #f05a21;
   --color-secondary-100: #fde5db;
   --color-tertiary: #385a65;
@@ -54,6 +55,8 @@
   --color-success: #7ed3a8;
 
   /* Font Sizes -- the scale used across the design */
+  --text-2xs: 0.6875rem;
+  /* 11px */
   --text-caption: 0.8125rem;
   /* 13px */
   --text-body: 0.9375rem;
@@ -83,6 +86,7 @@
    Base Layer -- Global element styles
    ============================================================ */
 @layer base {
+
   *,
   *::before,
   *::after {
