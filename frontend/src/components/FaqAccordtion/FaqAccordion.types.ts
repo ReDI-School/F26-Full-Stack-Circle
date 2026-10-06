@@ -1,4 +1,4 @@
 export type FaqItem = {
-    question: string;
-    answer: string
-   }; 
+  question: string;
+  answer: string;
+};
