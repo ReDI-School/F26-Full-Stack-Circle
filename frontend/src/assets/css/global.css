@@ -86,7 +86,6 @@
    Base Layer -- Global element styles
    ============================================================ */
 @layer base {
-
   *,
   *::before,
   *::after {
