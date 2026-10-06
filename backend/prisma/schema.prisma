@@ -12,14 +12,240 @@ datasource db {
   provider = "postgresql"
 }
 
+// ============================================================
+// Enums
+//
+// A value belongs here when it is a fixed label the code knows
+// about. Anything that also carries data of its own - a name, an
+// emoji, a colour - is a table instead, see Category below.
+// ============================================================
+
+/// Who the account belongs to. Admins can curate the homepage rows.
+enum Role {
+  USER
+  ADMIN
+}
+
+/// How worn an item is. Shown by the ConditionBadge on every card.
+/// Prisma enum values cannot contain a hyphen, so the API maps
+/// LIKE_NEW to the 'like-new' the frontend expects.
+enum Condition {
+  NEW
+  LIKE_NEW
+  GOOD
+  USED
+}
+
+/// Where an item is in its life. REMOVED is a soft delete: the row
+/// stays so the message threads that point at it survive, but the
+/// item disappears from browse.
+enum ItemStatus {
+  AVAILABLE
+  SOLD
+  REMOVED
+}
+
+// ============================================================
+// People
+// ============================================================
+
+/// One account, and the shop that comes with it. The homepage
+/// promises "your shop is created the moment you register", and
+/// account settings edits the name, the email and the shop name on
+/// one form, so the shop lives here rather than in a table of its
+/// own.
 model User {
   id        Int      @id @default(autoincrement())
   email     String   @unique
   name      String?
+  avatarUrl String?
+  role      Role     @default(USER)
+
+  /// "Lena's shop" - the title of this person's shop page.
+  shopName String?
+  /// "Sells & ships from Berlin" - shown under the shop name.
+  shopLocation String?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
+
+  items         Item[]
+  buyerThreads  Thread[]  @relation("ThreadBuyer")
+  sentMessages  Message[]
 }
 
-// TODO: this is where the ReDiCycle data model goes.
-// Think about what the shop needs: items, categories, conditions,
-// messages between buyer and seller... and how they relate to a User.
+// ============================================================
+// Catalogue
+// ============================================================
+
+/// A browsable category. This is a table and not an enum because
+/// CategoryTile needs an emoji and a tint per category, and the
+/// homepage and footer render them in a fixed order.
+model Category {
+  id        Int    @id @default(autoincrement())
+  /// Used in URLs: /browse?category=clothing
+  slug      String @unique
+  name      String
+  /// Rendered inside the white circle of a CategoryTile.
+  emoji     String
+  /// Which of the three pale brand tints the tile uses:
+  /// "primary" | "secondary" | "tertiary".
+  tint      String
+  /// Lets the team reorder the row without a migration.
+  sortOrder Int    @default(0)
+
+  items Item[]
+}
+
+/// One thing for sale.
+model Item {
+  id          Int    @id @default(autoincrement())
+  title       String
+  description String
+
+  /// Money is stored in whole cents, never as a float: 0.1 + 0.2 is
+  /// not 0.3 in binary floating point, which is not something a
+  /// marketplace can afford. EUR 18.00 is 1800 here, and the
+  /// frontend divides by 100 to display it.
+  /// 0 is allowed - the add-item form says "0 = give away".
+  priceCents Int
+
+  /// The price before the seller discounted it, or null when there
+  /// is no discount. ItemDetail shows it struck through next to the
+  /// current price.
+  originalPriceCents Int?
+
+  condition Condition
+  status    ItemStatus @default(AVAILABLE)
+
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
+
+  sellerId Int
+  seller   User @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  images       ItemImage[]
+  threads      Thread[]
+  homepageRows HomepageRowItem[]
+
+  /// Browse filters by category and by status, and every shop page
+  /// lists one seller's items, so those three columns are indexed.
+  @@index([categoryId])
+  @@index([sellerId])
+  @@index([status])
+}
+
+/// A photo of an item. The add-item form offers three slots and the
+/// detail page shows a main photo plus thumbnails, so images are
+/// their own ordered table rather than a column on Item.
+model ItemImage {
+  id       Int    @id @default(autoincrement())
+  url      String
+  /// 0 is the main photo shown on the card and at the top of the
+  /// detail page.
+  position Int    @default(0)
+
+  itemId Int
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  @@unique([itemId, position])
+  @@index([itemId])
+}
+
+// ============================================================
+// Messaging
+// ============================================================
+
+/// One conversation about one item, started when a buyer taps
+/// "I'm interested". The seller is not stored here because it is
+/// always item.sellerId - duplicating it would let the two drift
+/// apart.
+model Thread {
+  id Int @id @default(autoincrement())
+
+  itemId Int
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  buyerId Int
+  buyer   User @relation("ThreadBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  /// Bumped on every new message so the inbox can sort by most
+  /// recent without counting messages.
+  updatedAt DateTime @updatedAt
+
+  messages Message[]
+
+  /// Tapping "I'm interested" twice must reopen the same thread
+  /// rather than create a second one. The database enforces that,
+  /// so no API bug can get around it.
+  @@unique([itemId, buyerId])
+  @@index([buyerId])
+}
+
+/// One message inside a thread.
+model Message {
+  id   Int    @id @default(autoincrement())
+  body String
+
+  threadId Int
+  thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
+
+  senderId Int
+  sender   User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+
+  /// null means unread - that is the orange dot in the inbox list.
+  readAt DateTime?
+
+  createdAt DateTime @default(now())
+
+  @@index([threadId, createdAt])
+}
+
+// ============================================================
+// Homepage curation
+// ============================================================
+
+/// One of the curated rows on the homepage: "fresh finds",
+/// "under EUR 10", "good deals", "tech corner". An admin fills the
+/// slots by hand on the admin page, so the contents are data and
+/// not a query.
+model HomepageRow {
+  id    Int    @id @default(autoincrement())
+  slug  String @unique
+  title String
+  /// The emoji after the title, e.g. the sparkles on "fresh finds".
+  emoji String
+  /// The grey line next to the title, e.g. "just listed by the
+  /// community".
+  subtitle String
+  /// The link on the right, e.g. "see everything".
+  linkLabel String
+  /// The href that link points at, e.g. "/browse".
+  linkHref  String
+  sortOrder Int    @default(0)
+
+  items HomepageRowItem[]
+}
+
+/// One slot in a curated row. This join table exists rather than a
+/// plain many-to-many because the slots are ordered - the admin page
+/// shows "5 of 5 slots filled" in a fixed sequence.
+model HomepageRowItem {
+  id       Int @id @default(autoincrement())
+  position Int
+
+  rowId Int
+  row   HomepageRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
+
+  itemId Int
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+
+  /// The same item cannot sit in one row twice, and two items cannot
+  /// claim the same slot.
+  @@unique([rowId, itemId])
+  @@unique([rowId, position])
+}
