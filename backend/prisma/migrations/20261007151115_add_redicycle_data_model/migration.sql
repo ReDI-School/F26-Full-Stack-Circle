@@ -1,9 +1,3 @@
-/*
-  Warnings:
-
-  - Added the required column `passwordHash` to the `User` table without a default value. This is not possible if the table is not empty.
-
-*/
 -- CreateEnum
 CREATE TYPE "Role" AS ENUM ('USER', 'ADMIN');
 
@@ -15,8 +9,15 @@ CREATE TYPE "ItemStatus" AS ENUM ('AVAILABLE', 'SOLD', 'REMOVED');
 
 -- AlterTable
 ALTER TABLE "User" ADD COLUMN     "avatarUrl" TEXT,
-ADD COLUMN     "passwordHash" TEXT NOT NULL,
 ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'USER';
+
+-- passwordHash is added in three steps so the column can end up NOT NULL
+-- even though the shared preview database already has User rows.
+-- '!' is not a valid bcrypt hash, so bcrypt.compare always fails against
+-- it: any pre-existing account is locked until it sets a real password.
+ALTER TABLE "User" ADD COLUMN "passwordHash" TEXT;
+UPDATE "User" SET "passwordHash" = '!' WHERE "passwordHash" IS NULL;
+ALTER TABLE "User" ALTER COLUMN "passwordHash" SET NOT NULL;
 
 -- CreateTable
 CREATE TABLE "Shop" (
