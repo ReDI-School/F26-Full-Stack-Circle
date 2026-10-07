@@ -13,10 +13,15 @@ ADD COLUMN     "role" "Role" NOT NULL DEFAULT 'USER';
 
 -- passwordHash is added in three steps so the column can end up NOT NULL
 -- even though the shared preview database already has User rows.
--- '!' is not a valid bcrypt hash, so bcrypt.compare always fails against
--- it: any pre-existing account is locked until it sets a real password.
+-- The backfilled value is a bcrypt hash of the same password the seed
+-- uses (`redicycle123`, documented in backend/README.md), so an account
+-- that predates this migration can still be logged into. This is a
+-- teaching project with no real accounts; a production migration would
+-- lock those rows instead.
 ALTER TABLE "User" ADD COLUMN "passwordHash" TEXT;
-UPDATE "User" SET "passwordHash" = '!' WHERE "passwordHash" IS NULL;
+UPDATE "User"
+SET "passwordHash" = '$2b$10$wWQE7nK3ZZOG.TezbhEDB.mYFzo3FLgUqy2yYW/rJ3GIOpHvvrLyG'
+WHERE "passwordHash" IS NULL;
 ALTER TABLE "User" ALTER COLUMN "passwordHash" SET NOT NULL;
 
 -- CreateTable
