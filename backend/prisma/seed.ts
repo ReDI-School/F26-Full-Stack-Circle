@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import dotenv from 'dotenv';
 
 import { PrismaPg } from '@prisma/adapter-pg';
@@ -17,6 +18,14 @@ const prisma = new PrismaClient({ adapter });
 
 /** Prices are written in euros here and stored in whole cents. */
 const eur = (amount: number) => Math.round(amount * 100);
+
+/**
+ * The password every seeded account shares. It is only ever used on
+ * a local or preview database, and it is written down in
+ * backend/README.md so the team can log in. Real accounts set their
+ * own password at registration.
+ */
+const SEED_PASSWORD = 'redicycle123';
 
 async function main() {
   console.log('🌱 Starting seed...');
@@ -64,7 +73,14 @@ async function main() {
 
   // ----------------------------------------------------------
   // 3. People.
+  //
+  // Every account gets a real bcrypt hash of SEED_PASSWORD, so the
+  // login form works against seeded users exactly as it will against
+  // registered ones. Hashing once and reusing the result keeps the
+  // seed fast - bcrypt is deliberately slow.
   // ----------------------------------------------------------
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
+
   const userSeed = [
     { email: 'lena@redi-school.org', name: 'Lena K.', role: 'ADMIN' as const },
     { email: 'omar@redi-school.org', name: 'Omar M.', role: 'USER' as const },
@@ -76,12 +92,12 @@ async function main() {
   for (const user of userSeed) {
     const row = await prisma.user.upsert({
       where: { email: user.email },
-      update: user,
-      create: user,
+      update: { ...user, passwordHash },
+      create: { ...user, passwordHash },
     });
     users[row.email] = row.id;
   }
-  console.log(`✅ ${userSeed.length} accounts`);
+  console.log(`✅ ${userSeed.length} accounts (password: ${SEED_PASSWORD}, see backend/README.md)`);
 
   // ----------------------------------------------------------
   // 4. Shops - one per account, as the homepage promises.

@@ -54,11 +54,16 @@ enum ItemStatus {
 /// navbar, in the AvatarMenu and on every message thread, not only
 /// on their shop page.
 model User {
-  id        Int     @id @default(autoincrement())
-  email     String  @unique
+  id        Int      @id @default(autoincrement())
+  email     String   @unique
   name      String?
   avatarUrl String?
-  role      Role    @default(USER)
+  role      Role     @default(USER)
+
+  /// A bcrypt hash, never the password itself. Nothing outside the
+  /// auth code should ever read this column, and no API response
+  /// should ever carry it.
+  passwordHash String
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -76,9 +81,9 @@ model Shop {
   id Int @id @default(autoincrement())
 
   /// Used in URLs: /shops/lenas-shop
-  slug     String  @unique
+  slug String @unique
   /// "Lena's shop" - the heading of the shop page.
-  name     String
+  name String
   /// "Sells & ships from Berlin" - shown under the shop name.
   location String?
 
@@ -235,14 +240,14 @@ model Message {
 /// slots by hand on the admin page, so the contents are data and
 /// not a query.
 model HomepageRow {
-  id        Int    @id @default(autoincrement())
-  slug      String @unique
-  title     String
+  id    Int    @id @default(autoincrement())
+  slug  String @unique
+  title String
   /// The emoji after the title, e.g. the sparkles on "fresh finds".
-  emoji     String
+  emoji String
   /// The grey line next to the title, e.g. "just listed by the
   /// community".
-  subtitle  String
+  subtitle String
   /// The link on the right, e.g. "see everything".
   linkLabel String
   /// The href that link points at, e.g. "/browse".

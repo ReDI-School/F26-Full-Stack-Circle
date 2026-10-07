@@ -1,3 +1,4 @@
+import bcrypt from 'bcryptjs';
 import prisma from '../libs/prisma';
 
 export class UserService {
@@ -11,9 +12,15 @@ export class UserService {
     });
   }
 
-  async createUser(data: { email: string; name?: string }) {
+  async createUser(data: { email: string; name?: string; password: string }) {
     return await prisma.user.create({
-      data,
+      data: {
+        email: data.email,
+        name: data.name,
+        // Hashed here so a plain password can never reach the database,
+        // whichever route calls this.
+        passwordHash: await bcrypt.hash(data.password, 10),
+      },
     });
   }
 
