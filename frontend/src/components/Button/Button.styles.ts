@@ -42,8 +42,8 @@ export const buttonStyles = tv({
       ],
     },
     size: {
-      sm: ['py-2.5', 'px-4.5', 'text-[.8125rem]'],
-      md: ['py-3.5', 'px-6.5', 'text-[.9375rem]'],
+      sm: ['py-2.5', 'px-4.5', 'text-[length:var(--text-caption)]'],
+      md: ['py-3.5', 'px-6.5', 'text-[length:var(--text-body)]'],
     },
     stretch: {
       true: ['w-full'],
