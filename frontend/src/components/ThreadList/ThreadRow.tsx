@@ -31,4 +31,5 @@ const ThreadRow = React.memo(({ thread, isActive, onSelect }: ThreadRowProps) =>
     </li>
   );
 });
+ThreadRow.displayName = 'ThreadRow';
 export default ThreadRow;

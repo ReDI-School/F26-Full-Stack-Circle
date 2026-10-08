@@ -17,4 +17,4 @@ interface ThreadListProps {
   onSelect: (id: string) => void;
 }
 
-export type { ThreadListProps, Thread,ThreadRowProps };
+export type { ThreadListProps, Thread, ThreadRowProps };
