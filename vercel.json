@@ -8,7 +8,7 @@
     "backend": {
       "root": "backend",
       "entrypoint": "src/index.ts",
-      "buildCommand": "pnpm exec prisma migrate deploy && pnpm exec prisma generate"
+      "buildCommand": "bash scripts/vercel-build.sh"
     },
     "storybook": {
       "root": "frontend",
