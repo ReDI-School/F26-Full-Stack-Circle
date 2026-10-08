@@ -1,12 +1,6 @@
 import { toastStyles } from './Toast.styles';
 import type { ToastProps } from './Toast.types';
 
-/**
- * TODO: build the Toast.
- *
- * dark ink pill, radius 14, white 14px text, with an 8px dot on the left: green for
- * success, secondary for error.
- */
 const Toast = ({ message, variant = 'success', onDismiss }: ToastProps) => {
   const styles = toastStyles({ variant });
 
