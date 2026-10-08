@@ -121,15 +121,15 @@ See the [README](./README.md#continuous-integration) for what each CI job checks
 ## Deployments
 
 Every push deploys: pull requests get a Vercel preview you can open straight from the PR, and
-`main` goes to production. Every PR gets **its own preview database** (a Supabase branch), and
-the backend build runs `prisma migrate deploy` and the seed against it, so **the migrations in
+`main` goes to production. Previews use a **separate preview database, shared by every PR**.
+The backend build runs `prisma migrate deploy` and the seed against it, so **the migrations in
 your PR are applied automatically** — nobody runs anything by hand against a deployed database.
 Production is migrated only when a PR is merged, and it is never seeded.
 
 **Never edit, rename or regenerate a migration once it has been pushed — add a new one
-instead.** Your preview database already ran the old one, so the new version fails and blocks
-your preview until a teacher resets it. Flag destructive migrations (dropping or renaming a
-column that has data in it) in Slack before you merge, because production does have data.
+instead.** The preview database already ran the old one, so the new version fails and blocks
+**everyone's** preview until a teacher resets it. Flag destructive migrations (dropping or
+renaming a column that has data in it) in Slack before you merge.
 
 [**ARCHITECTURE.md**](./ARCHITECTURE.md) has the whole picture — what runs where, which
 failures CI catches and which only show up on Vercel, and what to do when a check goes red

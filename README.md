@@ -159,8 +159,9 @@ migration, do not edit or regenerate it — add a new one instead.
 Locally you run three things — the Next.js app on port 3000, the Express API on port 4000 and a
 PostgreSQL container on port 5434. Deployed, they become **one Vercel deployment on one
 domain**: `/` is the frontend, `/api` is the backend, `/storybook/` is the component library.
-Every push builds a preview you can open from the pull request, with its own seeded database,
-and the backend build applies your migrations to that database before the API starts.
+Every push builds a preview you can open from the pull request, backed by a seeded preview
+database (never the production one), and the backend build applies your migrations to it
+before the API starts.
 
 [**ARCHITECTURE.md**](./ARCHITECTURE.md) explains all of it: the routing, the environment
 variables and who sets them, what happens on every push, and what to do when a check on your PR
