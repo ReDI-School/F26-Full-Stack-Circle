@@ -11,6 +11,7 @@ import { tv } from 'tailwind-variants';
 export const buttonStyles = tv({
   base: [
     'rounded-pill',
+    'font-display',
     'font-extrabold',
     'cursor-pointer',
     'focus-visible:outline-offset-2',
