@@ -49,11 +49,11 @@ Two independent things react to your push: **GitHub Actions** (which checks your
 The whole product is a **single Vercel deployment** made of three services, described in
 [`vercel.json`](./vercel.json). Requests are routed by path:
 
-| Path             | Service     | What it is            | Built with                                 |
-| ---------------- | ----------- | --------------------- | ------------------------------------------ |
-| `/storybook/*`   | `storybook` | The component library | `pnpm build-storybook` in `frontend/`      |
-| `/api`, `/api/*` | `backend`   | The Express REST API  | `prisma migrate deploy && prisma generate` |
-| everything else  | `frontend`  | The Next.js app       | `next build`                               |
+| Path             | Service     | What it is            | Built with                            |
+| ---------------- | ----------- | --------------------- | ------------------------------------- |
+| `/storybook/*`   | `storybook` | The component library | `pnpm build-storybook` in `frontend/` |
+| `/api`, `/api/*` | `backend`   | The Express REST API  | `backend/scripts/vercel-build.sh`     |
+| everything else  | `frontend`  | The Next.js app       | `next build`                          |
 
 Two details that surprise people:
 
@@ -71,7 +71,7 @@ Two details that surprise people:
 | Frontend  | `http://localhost:3000`                    | `/` on the deployment domain     |
 | API       | `http://localhost:4000/api`                | `/api` on the same domain        |
 | Storybook | `http://localhost:6006` (`pnpm storybook`) | `/storybook/` on the same domain |
-| Database  | PostgreSQL in Docker, host port **5434**   | Supabase PostgreSQL              |
+| Database  | PostgreSQL in Docker, host port **5434**   | Supabase (one branch DB per PR)  |
 | Processes | Two dev servers you start yourself         | One deployment, three services   |
 
 Locally they are three separate servers on three ports; deployed they are one domain. The
@@ -94,6 +94,11 @@ needs no environment file at all.
 the database variables into the Vercel project, and Vercel adds its own system variables
 (`VERCEL_ENV`, `VERCEL_GIT_COMMIT_SHA`, …). The variable _names_ are deliberately the same in
 all three environments, so the same code works everywhere.
+
+Production and previews never share a database. The project-level database variables are set
+for **Production only**. Every pull request gets its own **Supabase preview branch**, a separate
+database, and Supabase adds that branch's variables to Vercel, scoped to your git branch, when
+the PR is opened.
 
 | Variable                   | Used for                                                     | Where it comes from                                   |
 | -------------------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
@@ -120,24 +125,38 @@ Supabase they are genuinely different endpoints. The runtime one is wired up in
 2. **GitHub Actions** starts three jobs in parallel — Frontend, Backend, Formatting — described
    in [Continuous Integration](./README.md#continuous-integration).
 3. **Vercel** starts a build for the same commit and builds all three services.
-4. The backend build runs **`prisma migrate deploy`** first: every migration file in
-   `backend/prisma/migrations/` that has not been applied yet is applied to the database. Then
-   the API is compiled.
-5. Vercel comments on your pull request with the status and a **preview URL** — a complete,
+4. **Supabase** creates a preview branch database for your PR (the first time only) and hands
+   its connection details to Vercel.
+5. The backend build ([`backend/scripts/vercel-build.sh`](./backend/scripts/vercel-build.sh))
+   runs **`prisma migrate deploy`** against your PR's own database: every migration file in
+   `backend/prisma/migrations/` that has not been applied there yet is applied. A preview then
+   runs the seed, so it always has data to show. Then the API is compiled.
+6. Vercel comments on your pull request with the status and a **preview URL** — a complete,
    live copy of the product running your branch. If opening it asks you to log in to Vercel,
    say so in Slack: that is a project setting a teacher can turn off.
-6. When the PR is merged into `main`, the same sequence runs again against production.
+7. When the PR is merged into `main`, the build migrates the production database. Production
+   is **never seeded**.
 
 You never run anything by hand against the deployed database. If your change needs a schema
 change, the migration file in your PR _is_ the deployment step — see
 [Changing the database schema](./README.md#changing-the-database-schema).
 
 > [!WARNING]
-> Preview deployments talk to a real, shared database. A migration that drops or renames a
-> column with data in it affects everyone's preview as soon as it is deployed. Say so in Slack
-> before you merge one. A migration that fails halfway is recorded as failed and **blocks every
-> later deployment** until someone clears it with `prisma migrate resolve` — so test it against
-> a fresh local database first (`pnpm db:reset && pnpm db:deploy`).
+> **Never edit, rename or regenerate a migration once it has been deployed — add a new one
+> instead.** Your PR's database still remembers the old version. Re-creating the same tables
+> under a new migration name fails with errors like `type "Role" already exists`, and a failed
+> migration is recorded as failed and **blocks every later deployment of that database** until
+> someone clears it. CI cannot catch this, because it always starts from an empty database.
+>
+> If your PR's preview database gets stuck this way, ask in Slack: a teacher can delete the
+> Supabase preview branch and the next push recreates it from scratch. Other PRs are not
+> affected — each has its own database. Production is only touched after a merge, so test a
+> migration against a fresh local database first (`pnpm db:reset && pnpm db:deploy`).
+
+> [!NOTE]
+> If a preview build fails with `POSTGRES_URL_NON_POOLING / POSTGRES_PRISMA_URL are not set`,
+> Vercel started building before Supabase finished creating your branch database. Supabase
+> redeploys the PR on its own once the branch is ready.
 
 ## 6. CI and Vercel: who catches what
 
@@ -157,7 +176,7 @@ throwaway PostgreSQL container — so it fails **fast, safely, and with logs you
 | A migration that does not apply cleanly                 | ✅                   | ✅                    |
 | A schema change with **no migration file**              | ❌ (silently passes) | ❌ (nothing to apply) |
 | A missing or wrong environment variable in Vercel       | ❌                   | ✅                    |
-| A migration that conflicts with the **real** data       | ❌                   | ✅                    |
+| A migration that conflicts with the seed or real data   | ❌                   | ✅                    |
 | Errors that only happen at runtime, after a green build | ❌                   | ✅ (as a broken page) |
 
 In practice: **if CI is green and Vercel is red, the cause is almost always one of the bottom
