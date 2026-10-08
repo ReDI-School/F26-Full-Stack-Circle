@@ -1,4 +1,4 @@
-import { tv } from 'tailwind-variants';
+import { tv } from '../../config/tv';
 
 export const avatarStyles = tv({
   base: [
