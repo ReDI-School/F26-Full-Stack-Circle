@@ -25,12 +25,6 @@ interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
    * Checking whether the button is stretched
    */
   stretch?: boolean;
-
-  // TODO: add the rest of the props this component needs:
-  // - variant: 'primary' | 'secondary' | 'ghost' | 'danger' | 'outlineLight'
-  // - size: 'md' | 'sm'
-  // - stretch
-  // - disabled
 }
 
 export type { ButtonProps };
