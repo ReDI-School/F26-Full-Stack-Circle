@@ -147,7 +147,8 @@ pnpm db:migrate --name add_item_table
 
 This writes a new folder under `backend/prisma/migrations/`. **Commit it with your PR** — it is
 part of the change, not a local artifact. On every deployment Vercel runs `prisma migrate
-deploy` before starting the backend, which applies exactly those files.
+deploy` before starting the backend, which applies exactly those files. Once you have pushed a
+migration, do not edit or regenerate it — add a new one instead.
 
 > [!TIP]
 > `pnpm db:reset` returns before PostgreSQL has finished starting. If the next command fails
@@ -158,8 +159,9 @@ deploy` before starting the backend, which applies exactly those files.
 Locally you run three things — the Next.js app on port 3000, the Express API on port 4000 and a
 PostgreSQL container on port 5434. Deployed, they become **one Vercel deployment on one
 domain**: `/` is the frontend, `/api` is the backend, `/storybook/` is the component library.
-Every push builds a preview you can open from the pull request, and the backend build applies
-your migrations to the database before the API starts.
+Every push builds a preview you can open from the pull request, backed by a seeded preview
+database (never the production one), and the backend build applies your migrations to it
+before the API starts.
 
 [**ARCHITECTURE.md**](./ARCHITECTURE.md) explains all of it: the routing, the environment
 variables and who sets them, what happens on every push, and what to do when a check on your PR
