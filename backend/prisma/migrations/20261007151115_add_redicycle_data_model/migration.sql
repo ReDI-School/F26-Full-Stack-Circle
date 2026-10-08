@@ -22,7 +22,7 @@ ALTER TABLE "User" ADD COLUMN "passwordHash" TEXT;
 UPDATE "User"
 SET "passwordHash" = '$2b$10$wWQE7nK3ZZOG.TezbhEDB.mYFzo3FLgUqy2yYW/rJ3GIOpHvvrLyG'
 WHERE "passwordHash" IS NULL;
-ALTER TABLE "User" ALTER COLUMN "passwordHash" SET NOT NULL;
+ALTER TABLE "User" ALTER COLUMN "passwordHash" SET NOT NULL;    
 
 -- CreateTable
 CREATE TABLE "Shop" (

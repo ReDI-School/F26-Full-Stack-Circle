@@ -54,11 +54,11 @@ enum ItemStatus {
 /// navbar, in the AvatarMenu and on every message thread, not only
 /// on their shop page.
 model User {
-  id        Int      @id @default(autoincrement())
-  email     String   @unique
+  id        String  @id @default(uuid())
+  email     String  @unique
   name      String?
   avatarUrl String?
-  role      Role     @default(USER)
+  role      Role    @default(USER)
 
   /// A bcrypt hash, never the password itself. Nothing outside the
   /// auth code should ever read this column, and no API response
@@ -78,18 +78,18 @@ model User {
 /// unique ownerId is what makes this one-to-one rather than
 /// one-to-many.
 model Shop {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
   /// Used in URLs: /shops/lenas-shop
-  slug String @unique
+  slug     String  @unique
   /// "Lena's shop" - the heading of the shop page.
-  name String
+  name     String
   /// "Sells & ships from Berlin" - shown under the shop name.
   location String?
 
   /// Unique, so one account can never end up with two shops.
-  ownerId Int  @unique
-  owner   User @relation(fields: [ownerId], references: [id], onDelete: Cascade)
+  ownerId String @unique
+  owner   User   @relation(fields: [ownerId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -105,7 +105,7 @@ model Shop {
 /// CategoryTile needs an emoji and a tint per category, and the
 /// homepage and footer render them in a fixed order.
 model Category {
-  id        Int    @id @default(autoincrement())
+  id        String @id @default(uuid())
   /// Used in URLs: /browse?category=clothing
   slug      String @unique
   name      String
@@ -122,7 +122,7 @@ model Category {
 
 /// One thing for sale.
 model Item {
-  id          Int    @id @default(autoincrement())
+  id          String @id @default(uuid())
   title       String
   description String
 
@@ -141,14 +141,14 @@ model Item {
   condition Condition
   status    ItemStatus @default(AVAILABLE)
 
-  categoryId Int
+  categoryId String
   category   Category @relation(fields: [categoryId], references: [id], onDelete: Restrict)
 
   /// An item belongs to a shop, not directly to a person - the card
   /// and the detail page both credit "Lena's shop". The seller as a
   /// user is still one hop away, through shop.owner.
-  shopId Int
-  shop   Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  shopId String
+  shop   Shop   @relation(fields: [shopId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
@@ -168,14 +168,14 @@ model Item {
 /// detail page shows a main photo plus thumbnails, so images are
 /// their own ordered table rather than a column on Item.
 model ItemImage {
-  id       Int    @id @default(autoincrement())
+  id       String @id @default(uuid())
   url      String
   /// 0 is the main photo shown on the card and at the top of the
   /// detail page.
   position Int    @default(0)
 
-  itemId Int
-  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   @@unique([itemId, position])
   @@index([itemId])
@@ -190,13 +190,13 @@ model ItemImage {
 /// always item.shop.owner - duplicating it would let the two drift
 /// apart.
 model Thread {
-  id Int @id @default(autoincrement())
+  id String @id @default(uuid())
 
-  itemId Int
-  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
-  buyerId Int
-  buyer   User @relation("ThreadBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
+  buyerId String
+  buyer   User   @relation("ThreadBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   /// Bumped on every new message so the inbox can sort by most
@@ -214,14 +214,14 @@ model Thread {
 
 /// One message inside a thread.
 model Message {
-  id   Int    @id @default(autoincrement())
+  id   String @id @default(uuid())
   body String
 
-  threadId Int
+  threadId String
   thread   Thread @relation(fields: [threadId], references: [id], onDelete: Cascade)
 
-  senderId Int
-  sender   User @relation(fields: [senderId], references: [id], onDelete: Cascade)
+  senderId String
+  sender   User   @relation(fields: [senderId], references: [id], onDelete: Cascade)
 
   /// null means unread - that is the orange dot in the inbox list.
   readAt DateTime?
@@ -240,14 +240,14 @@ model Message {
 /// slots by hand on the admin page, so the contents are data and
 /// not a query.
 model HomepageRow {
-  id    Int    @id @default(autoincrement())
-  slug  String @unique
-  title String
+  id        String @id @default(uuid())
+  slug      String @unique
+  title     String
   /// The emoji after the title, e.g. the sparkles on "fresh finds".
-  emoji String
+  emoji     String
   /// The grey line next to the title, e.g. "just listed by the
   /// community".
-  subtitle String
+  subtitle  String
   /// The link on the right, e.g. "see everything".
   linkLabel String
   /// The href that link points at, e.g. "/browse".
@@ -261,14 +261,14 @@ model HomepageRow {
 /// plain many-to-many because the slots are ordered - the admin page
 /// shows "5 of 5 slots filled" in a fixed sequence.
 model HomepageRowItem {
-  id       Int @id @default(autoincrement())
+  id       String @id @default(uuid())
   position Int
 
-  rowId Int
+  rowId String
   row   HomepageRow @relation(fields: [rowId], references: [id], onDelete: Cascade)
 
-  itemId Int
-  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
+  itemId String
+  item   Item   @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   /// The same item cannot sit in one row twice, and two items cannot
   /// claim the same slot.

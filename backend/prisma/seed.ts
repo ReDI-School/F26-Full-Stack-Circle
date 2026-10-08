@@ -60,7 +60,7 @@ async function main() {
     { slug: 'sports', name: 'Sports', emoji: '⚽', tint: 'secondary', sortOrder: 5 },
   ];
 
-  const categories: Record<string, number> = {};
+  const categories: Record<string, string> = {};
   for (const category of categorySeed) {
     const row = await prisma.category.upsert({
       where: { slug: category.slug },
@@ -88,7 +88,7 @@ async function main() {
     { email: 'jonas@redi-school.org', name: 'Jonas B.', role: 'USER' as const },
   ];
 
-  const users: Record<string, number> = {};
+  const users: Record<string, string> = {};
   for (const user of userSeed) {
     const row = await prisma.user.upsert({
       where: { email: user.email },
@@ -129,7 +129,7 @@ async function main() {
     },
   ];
 
-  const shops: Record<string, number> = {};
+  const shops: Record<string, string> = {};
   for (const shop of shopSeed) {
     const { owner, ...shopData } = shop;
     const row = await prisma.shop.create({
@@ -318,7 +318,7 @@ async function main() {
     },
   ];
 
-  const items: Record<string, number> = {};
+  const items: Record<string, string> = {};
   for (const item of itemSeed) {
     const row = await prisma.item.create({
       data: {
