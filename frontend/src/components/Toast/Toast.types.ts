@@ -1,11 +1,8 @@
 interface ToastProps {
-  /**
-   * The message shown in the toast
-   */
   message: string;
+  variant?: 'success' | 'error';
 
-  // TODO: add the rest of the props this component needs:
-  // - variant: 'success' | 'error' (only changes the colour of the dot)
+  onDismiss?: () => void;
 }
 
 export type { ToastProps };
