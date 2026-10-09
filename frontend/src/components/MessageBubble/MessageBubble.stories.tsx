@@ -4,6 +4,14 @@ import MessageBubble from './MessageBubble';
 const meta: Meta<typeof MessageBubble> = {
   title: 'Components/MessageBubble',
   component: MessageBubble,
+  parameters: {
+    docs: {
+      description: {
+        component:
+          'A chat message bubble styled differently depending on whether the message was sent by the user or received from someone else.',
+      },
+    },
+  },
   decorators: [
     (Story) => (
       <div className="flex flex-col gap-2 w-100 p-4 bg-gray-50">
