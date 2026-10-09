@@ -1,6 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import CategoryChip from './CategoryChip';
+import { useState } from 'react';
 
 const meta: Meta<typeof CategoryChip> = {
   title: 'Components/CategoryChip',
@@ -26,21 +27,36 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to CategoryChip.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const Selected: Story = {
-//   args: { label: 'Books', selected: true },
-// };
-//
-// export const ChipRow: Story = {
-//   render: () => (
-//     <div className="flex flex-wrap gap-2.5">
-//       <CategoryChip label="Clothing" />
-//       <CategoryChip label="Books" selected />
-//       <CategoryChip label="Electronics" />
-//       <CategoryChip label="Home" />
-//       <CategoryChip label="Sports" />
-//     </div>
-//   ),
-// };
+export const Selected: Story = {
+  args: { label: 'Books', selected: true },
+};
+
+export const OnClicked: Story = {
+  args: {
+    label: 'Books',
+    onClick: () => console.log('Books chip clicked'),
+  },
+
+  render: function Render(args) {
+    const [selected, setSelected] = useState(args.selected ?? false);
+
+    const handleClick = () => {
+      setSelected((previous) => !previous);
+      args.onClick?.();
+    };
+
+    return <CategoryChip {...args} selected={selected} onClick={handleClick} />;
+  },
+};
+
+export const ChipRow: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-2.5">
+      <CategoryChip label="Clothing" />
+      <CategoryChip label="Books" selected />
+      <CategoryChip label="Electronics" />
+      <CategoryChip label="Home" />
+      <CategoryChip label="Sports" />
+    </div>
+  ),
+};
