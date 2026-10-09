@@ -1,3 +1,5 @@
+import bcrypt from 'bcryptjs';
+
 import prisma from '../libs/prisma';
 
 export class UserService {
@@ -5,26 +7,32 @@ export class UserService {
     return await prisma.user.findMany();
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     return await prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async createUser(data: { email: string; name?: string }) {
+  async createUser(data: { email: string; name?: string; password: string }) {
     return await prisma.user.create({
-      data,
+      data: {
+        email: data.email,
+        name: data.name,
+        // Hashed here so a plain password can never reach the database,
+        // whichever route calls this.
+        passwordHash: await bcrypt.hash(data.password, 10),
+      },
     });
   }
 
-  async updateUser(id: number, data: { email?: string; name?: string }) {
+  async updateUser(id: string, data: { email?: string; name?: string }) {
     return await prisma.user.update({
       where: { id },
       data,
     });
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     return await prisma.user.delete({
       where: { id },
     });
