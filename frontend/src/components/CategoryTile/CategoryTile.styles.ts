@@ -8,6 +8,20 @@ import { tv } from 'tailwind-variants';
  * Background cycles the 100-tints. Selected = tertiary bg, white text. Hover lifts 2px.
  */
 export const categoryTileStyles = tv({
-  base: [],
-  variants: {},
+  base: 'inline-flex items-center gap-3 rounded-pill px-4 py-2 font-display font-extrabold text-tertiary transition-transform hover:-translate-y-0.5 hover:shadow-card transition-[transform,box-shadow]',
+  variants: {
+    tint: {
+      primary: 'bg-primary-100',
+      secondary: 'bg-secondary-100',
+      tertiary: 'bg-tertiary-100',
+    },
+    selected: {
+      true: 'bg-tertiary text-white',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    tint: 'primary',
+    selected: false,
+  },
 });
