@@ -20,27 +20,27 @@ const ImageSlot = ({
   const isEmpty = hasError || !value;
   const revealOnHover =
     'pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 focus-visible:opacity-100';
-  const buttonStyle = 'cursor-pointer bg-surface text-ink shadow-menu'
+  const buttonStyle = 'cursor-pointer bg-surface text-ink shadow-menu';
 
   useEffect(() => {
-  if (!isOpen) return;
+    if (!isOpen) return;
 
-  const handleKeyDown = (event: KeyboardEvent) => {
-    if (event.key === 'Escape') setIsOpen(false);
-  };
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.key === 'Escape') setIsOpen(false);
+    };
 
-  const handlePointerDown = (event: PointerEvent) => {
-    if (!menuRef.current?.contains(event.target as Node)) setIsOpen(false);
-  };
+    const handlePointerDown = (event: PointerEvent) => {
+      if (!menuRef.current?.contains(event.target as Node)) setIsOpen(false);
+    };
 
-  document.addEventListener('keydown', handleKeyDown);
-  document.addEventListener('pointerdown', handlePointerDown);
+    document.addEventListener('keydown', handleKeyDown);
+    document.addEventListener('pointerdown', handlePointerDown);
 
-  return () => {
-    document.removeEventListener('keydown', handleKeyDown);
-    document.removeEventListener('pointerdown', handlePointerDown);
-  };
-}, [isOpen]);
+    return () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      document.removeEventListener('pointerdown', handlePointerDown);
+    };
+  }, [isOpen]);
 
   return (
     <div className={imageSlotStyles({ shape, empty: isEmpty, className })}>
@@ -77,25 +77,45 @@ const ImageSlot = ({
           {shape === 'circle' ? (
             <div ref={menuRef}>
               <button
-              type="button"
-              aria-label="Reframe, change or delete the image"
-              className={`${isOpen ? 'opacity-100' : revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-[6%] bottom-[6%]`}
-              title="Reframe, change or delete the image"
-              onClick={() => setIsOpen(!isOpen)}
+                type="button"
+                aria-label="Reframe, change or delete the image"
+                className={`${isOpen ? 'opacity-100' : revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-[6%] bottom-[6%]`}
+                title="Reframe, change or delete the image"
+                onClick={() => setIsOpen(!isOpen)}
               >
-                  <svg width="15" height="15" fill="currentColor" viewBox="0 0 256 256">
-                    <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
-                  </svg>
+                <svg width="15" height="15" fill="currentColor" viewBox="0 0 256 256">
+                  <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+                </svg>
               </button>
-              <div className={`${buttonStyle} absolute top-[70%] left-[90%] w-full flex flex-col gap-2 p-2 rounded-input ${isOpen ? 'block' : 'hidden'}`}>
+              <div
+                className={`${buttonStyle} absolute top-[70%] left-[90%] w-full flex flex-col gap-2 p-2 rounded-input ${isOpen ? 'block' : 'hidden'}`}
+              >
                 {onScale && (
-                  <button className='cursor-pointer' aria-label='Rescale image' onClick={() => onScale()}>Rescale image</button>
+                  <button
+                    className="cursor-pointer"
+                    aria-label="Rescale image"
+                    onClick={() => onScale()}
+                  >
+                    Rescale image
+                  </button>
                 )}
                 {onUpload && (
-                  <button className='cursor-pointer ' aria-label='Load a new image' onClick={() => onUpload()}>Load image</button>
+                  <button
+                    className="cursor-pointer "
+                    aria-label="Load a new image"
+                    onClick={() => onUpload()}
+                  >
+                    Load image
+                  </button>
                 )}
                 {onChange && (
-                  <button className='cursor-pointer ' aria-label='Delete image' onClick={() => onChange(null)}>Delete</button>
+                  <button
+                    className="cursor-pointer "
+                    aria-label="Delete image"
+                    onClick={() => onChange(null)}
+                  >
+                    Delete
+                  </button>
                 )}
               </div>
             </div>
