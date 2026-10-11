@@ -1,3 +1,5 @@
+import Link from 'next/link';
+
 import { Logo } from '../Logo';
 import { footerStyles } from './Footer.styles';
 import type { FooterLink, FooterProps } from './Footer.types';
@@ -15,10 +17,10 @@ const FooterColumn = ({ title, links }: FooterColumnProps) => {
       <h3 className={heading()}>{title}</h3>
       <ul className={list()}>
         {links.map((item) => (
-          <li key={item.href}>
-            <a href={item.href} className={link()}>
+          <li key={item.label}>
+            <Link href={item.href} className={link()}>
               {item.label}
-            </a>
+            </Link>
           </li>
         ))}
       </ul>
