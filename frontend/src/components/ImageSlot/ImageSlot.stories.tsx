@@ -54,6 +54,8 @@ export const Circle: Story = {
     shape: 'circle',
     className: 'size-[140px]',
     onChange: fn(),
+    onScale: fn(),
+    onUpload: fn(),
   },
 };
 
