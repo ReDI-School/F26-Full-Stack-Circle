@@ -4,7 +4,8 @@ interface ImageSlotProps {
   alt?: string;
   shape?: 'rounded' | 'circle';
   className?: string;
-  onChange: (url: string | null) => void;
+  /** Called with `null` when the image is removed. Omit it for read-only display: no remove button is shown. */
+  onChange?: (url: string | null) => void;
 }
 
 export type { ImageSlotProps };

@@ -1,7 +1,7 @@
 import { tv } from 'tailwind-variants';
 
 export const imageSlotStyles = tv({
-  base: 'relative font-mono text-placeholder',
+  base: 'group relative font-mono text-placeholder',
   variants: {
     shape: {
       circle: 'rounded-pill aspect-square !h-auto',

@@ -18,10 +18,11 @@ const ImageSlot = ({
     'pointer-fine:opacity-0 pointer-fine:group-hover:opacity-100 focus-visible:opacity-100';
 
   return (
-    <div className={`group ${imageSlotStyles({ shape, empty: isEmpty, className })}`}>
+    <div className={imageSlotStyles({ shape, empty: isEmpty, className })}>
       {isEmpty ? (
         <>
           <svg
+            aria-hidden="true"
             width="28"
             height="28"
             viewBox="0 0 24 24"
@@ -39,6 +40,7 @@ const ImageSlot = ({
         </>
       ) : (
         <>
+          {/* eslint-disable-next-line @next/next/no-img-element -- users paste URLs from any host, and next/image only loads allow-listed domains */}
           <img
             className="object-cover w-full h-full rounded-[inherit]"
             src={value}

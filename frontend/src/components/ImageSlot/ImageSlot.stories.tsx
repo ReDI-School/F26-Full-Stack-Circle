@@ -10,7 +10,8 @@ const meta: Meta<typeof ImageSlot> = {
   parameters: {
     docs: {
       description: {
-        component: 'size can be set by className,',
+        component:
+          'Shows an item or profile photo from a URL, or a dashed placeholder. The parent sets the size with className. Leave out onChange for read-only display.',
       },
     },
   },
