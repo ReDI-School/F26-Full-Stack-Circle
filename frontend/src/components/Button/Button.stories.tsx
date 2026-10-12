@@ -27,24 +27,33 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to Button.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const Variants: Story = {
-//   render: () => (
-//     <div className="flex flex-wrap items-center gap-3.5">
-//       <Button variant="primary">Add item</Button>
-//       <Button variant="secondary">Contact seller</Button>
-//       <Button variant="ghost">Cancel</Button>
-//       <Button variant="danger">Delete account</Button>
-//     </div>
-//   ),
-// };
-//
-// export const Small: Story = {
-//   args: { children: 'Start selling', size: 'sm' },
-// };
-//
-// export const Disabled: Story = {
-//   args: { children: 'Add item', disabled: true },
-// };
+export const Variants: Story = {
+  render: () => (
+    <div className="flex flex-wrap items-center gap-3.5">
+      <Button variant="primary">Add item</Button>
+      <Button variant="secondary">Contact seller</Button>
+      <Button variant="ghost">Cancel</Button>
+      <Button variant="danger">Delete account</Button>
+    </div>
+  ),
+};
+
+export const OutlineLight: Story = {
+  render: () => (
+    <div className="bg-muted flex flex-wrap items-center gap-3.5 py-2 px-1">
+      <Button variant="outlineLight">Edit Account</Button>
+    </div>
+  ),
+};
+
+export const Small: Story = {
+  args: { children: 'Start selling', size: 'sm' },
+};
+
+export const Stretch: Story = {
+  args: { children: 'Register Now', stretch: true },
+};
+
+export const Disabled: Story = {
+  args: { children: 'Add item', disabled: true },
+};
