@@ -17,6 +17,9 @@ const config: StorybookConfig = {
     name: '@storybook/react-vite',
     options: {},
   },
+  typescript: {
+    reactDocgen: 'react-docgen-typescript',
+  },
   viteFinal: async (config) => {
     const tailwindcss = await import('@tailwindcss/vite');
     config.plugins = [...(config.plugins || []), tailwindcss.default()];
