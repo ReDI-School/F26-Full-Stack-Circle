@@ -1,12 +1,20 @@
 interface AvatarProps {
   /**
-   * The name of the person, used for the initials
+   * The name of the person, used for the initials and colour
    */
   name: string;
 
-  // TODO: add the rest of the props this component needs:
-  // - src (optional profile picture)
-  // - size: 'sm' | 'md' | 'lg'
+  /**
+   * Optional profile picture
+   */
+  src?: string;
+
+  /**
+   * Avatar size
+   */
+  size?: 'sm' | 'md' | 'lg';
 }
 
-export type { AvatarProps };
+type AvatarColour = 'bg-primary' | 'bg-secondary' | 'bg-tertiary';
+
+export type { AvatarProps, AvatarColour };

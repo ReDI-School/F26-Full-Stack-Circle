@@ -248,36 +248,105 @@ The flow of a request is:
 
 The project uses Prisma as its ORM, and all database models are defined in the `prisma/schema.prisma` file. Here's how to work with models:
 
+### The ReDiCycle data model
+
+Nine models, all defined in `prisma/schema.prisma`.
+
+| Model             | What it holds                                                   |
+| ----------------- | --------------------------------------------------------------- |
+| `User`            | An account: email, name, avatar, role, bcrypt password hash     |
+| `Shop`            | One person's shop. Exactly one per account, with a URL `slug`   |
+| `Category`        | A browsable category, with the emoji and tint the tiles need    |
+| `Item`            | One thing for sale, belonging to a shop                         |
+| `ItemImage`       | A photo of an item, ordered by `position` (0 is the main one)   |
+| `Thread`          | One conversation about one item, between a buyer and the seller |
+| `Message`         | One message inside a thread                                     |
+| `HomepageRow`     | A curated row on the homepage, e.g. "fresh finds"               |
+| `HomepageRowItem` | One ordered slot in such a row                                  |
+
+And three enums: `Role` (`USER` / `ADMIN`), `Condition`
+(`NEW` / `LIKE_NEW` / `GOOD` / `USED`) and `ItemStatus`
+(`AVAILABLE` / `SOLD` / `REMOVED`).
+
+#### How the pieces connect
+
+```text
+User 1───1 Shop 1───* Item *───1 Category
+                       │
+                       ├──* ItemImage
+                       ├──* Thread *───1 User            (the buyer)
+                       │        └──* Message *───1 User  (the sender)
+                       └──* HomepageRowItem *───1 HomepageRow
+```
+
+#### Things worth knowing before you query
+
+- **Prices are whole cents, in `Int`.** `priceCents: 1800` is €18 — divide by 100 to display
+  it. Floats are not safe for money: `0.1 + 0.2` is not `0.3` in binary floating point.
+  `originalPriceCents` holds the price before a discount, or `null`; the item detail page
+  shows it struck through next to the current one.
+- **Items belong to a shop, not to a person.** The seller is one hop further:
+  `item.shop.owner`. Cards credit "Lena's shop", which is why it is modelled this way.
+- **`REMOVED` is a soft delete.** Deleting an item for real would cascade into the threads
+  that reference it and wipe someone's message history, so browse filters on
+  `status = AVAILABLE` instead.
+- **One thread per buyer per item**, enforced by `@@unique([itemId, buyerId])` on `Thread`.
+  Tapping "I'm interested" twice reopens the same conversation rather than starting a
+  second one.
+- **An unread message has `readAt = null`** — that is the orange dot in the inbox list.
+- **Categories are rows, not an enum**, because each one carries an emoji, a tint and a sort
+  order, and an admin should be able to add one without a migration. `Condition` and
+  `ItemStatus` are enums, because they are fixed labels the code branches on.
+
+### Seeded data and logins
+
+`pnpm db:seed` fills the database with the content drawn in `docs/design/screens`:
+5 categories, 4 accounts, 4 shops, 16 items, 4 curated homepage rows and 2 conversations.
+
+Every seeded account shares the same password, hashed with bcrypt exactly as a real
+registration will be — so the login form works against them with no special case.
+
+| Email                   | Name     | Shop        | Role    |
+| ----------------------- | -------- | ----------- | ------- |
+| `lena@redi-school.org`  | Lena K.  | Lena's shop | `ADMIN` |
+| `omar@redi-school.org`  | Omar M.  | Omar's shop | `USER`  |
+| `mira@redi-school.org`  | Mira S.  | Mira's shop | `USER`  |
+| `jonas@redi-school.org` | Jonas B. | Jonas' shop | `USER`  |
+
+**The password for all four is `redicycle123`.**
+
+Log in as `lena@redi-school.org` to reach the admin page — she is the only seeded admin.
+
+> [!WARNING]
+> These credentials are for local and preview databases only. Never seed them into anything
+> that holds real accounts.
+
+Re-running the seed is safe. Accounts and categories are upserted on their natural keys
+(`email`, `slug`), so an account you registered while testing survives; shops, items, rows
+and conversations are rebuilt from scratch.
+
 ### Creating New Models
 
 Open `prisma/schema.prisma` and add your new model. Here's an example:
 
 ```prisma
 // prisma/schema.prisma
-model User {
+model Review {
   id        Int      @id @default(autoincrement())
-  email     String   @unique
-  name      String?
+  body      String
+  rating    Int
+  itemId    Int
+  item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  items     Item[]   // Relation to Item model
-}
 
-model Item {
-  id          Int      @id @default(autoincrement())
-  title       String
-  description String?
-  published   Boolean  @default(false)
-  seller      User     @relation(fields: [sellerId], references: [id])
-  sellerId    Int
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  @@index([itemId])
 }
 ```
 
 > [!NOTE]
-> This is an example of the kind of model ReDiCycle needs — `Item` does not exist yet. The
-> real `schema.prisma` currently has only `User`, and the data model is yours to design.
+> `Review` is only an illustration — it is not part of the schema. The models ReDiCycle
+> actually has are listed under
+> [The ReDiCycle data model](#the-redicycle-data-model) above.
 
 ### Model Features
 
@@ -341,7 +410,8 @@ export class UserService {
     return await prisma.user.findUnique({
       where: { id },
       include: {
-        items: true, // Include related items — once the Item model exists
+        // Items hang off the shop, not off the user directly
+        shop: { include: { items: true } },
       },
     });
   }
@@ -360,7 +430,9 @@ export class UserService {
 
 - `pnpm db:generate` - Generate Prisma Client
 - `pnpm db:migrate` - Create and apply a migration (the normal way to change the schema)
-- `pnpm db:deploy` - Apply the existing migrations (what CI and Vercel run)
+- `pnpm db:deploy` - Apply the existing migrations (what CI and Vercel run). Note that this
+  does **not** regenerate the Prisma Client: after pulling a branch that changed the schema,
+  run `pnpm db:generate` as well, or TypeScript will not see the new models.
 - `pnpm db:push` - Push schema changes without a migration file (throwaway databases only)
 - `pnpm db:studio` - Open Prisma Studio for database management
 
