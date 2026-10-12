@@ -19,6 +19,7 @@ const meta: Meta<typeof Avatar> = {
 };
 
 export default meta;
+
 type Story = StoryObj<typeof Avatar>;
 
 export const Default: Story = {
@@ -27,19 +28,32 @@ export const Default: Story = {
   },
 };
 
-// TODO: as you add props to Avatar.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const Sizes: Story = {
-//   render: () => (
-//     <div className="flex items-center gap-4">
-//       <Avatar name="Lena Koch" size="sm" />
-//       <Avatar name="Omar Mansour" size="md" />
-//       <Avatar name="Priya Raman" size="lg" />
-//     </div>
-//   ),
-// };
-//
-// export const WithPicture: Story = {
-//   args: { name: 'Lena Koch', src: '/lena.jpg' },
-// };
+export const Sizes: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Avatar name="Lena Koch" size="sm" />
+      <Avatar name="Omar Mansour" size="md" />
+      <Avatar name="Priya Raman" size="lg" />
+    </div>
+  ),
+};
+
+export const WithPicture: Story = {
+  args: {
+    name: 'Lena Koch',
+    src: 'https://i.pravatar.cc/150?img=47',
+  },
+};
+
+export const Colours: Story = {
+  render: () => (
+    <div className="flex items-center gap-4">
+      <Avatar name="Lena Koch" />
+      <Avatar name="Omar Mansour" />
+      <Avatar name="Priya Raman" />
+      <Avatar name="David Smith" />
+      <Avatar name="Sarah Miller" />
+      <Avatar name="Ahmed Hassan" />
+    </div>
+  ),
+};
