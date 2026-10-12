@@ -9,7 +9,7 @@ export const cardStyles = tv({
 });
 
 export const buttonStyles = tv({
-  base: 'w-full flex items-center justify-between py-4 px-6 cursor-pointer select-none hover:bg-bg',
+  base: 'w-full flex items-center justify-between py-4.5 px-6 cursor-pointer select-none hover:bg-bg',
 });
 
 export const questionStyles = tv({
