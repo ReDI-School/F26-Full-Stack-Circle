@@ -323,7 +323,9 @@ Log in as `lena@redi-school.org` to reach the admin page — she is the only see
 
 Re-running the seed is safe. Accounts and categories are upserted on their natural keys
 (`email`, `slug`), so an account you registered while testing survives; shops, items, rows
-and conversations are rebuilt from scratch.
+and conversations are rebuilt from scratch. Running it twice at the same time is safe too, which
+happens on the shared preview database when two PRs deploy together: the seed runs in one
+transaction behind a lock, so the second run waits for the first to finish.
 
 ### Creating New Models
 
