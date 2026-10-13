@@ -1,4 +1,4 @@
-import type { StorybookConfig } from '@storybook/react-vite';
+import type { StorybookConfig } from '@storybook/nextjs-vite';
 
 // Storybook is deployed under /storybook, so its bundled assets have to be
 // requested from there rather than from the site root. Vercel sets this in
@@ -14,7 +14,7 @@ const config: StorybookConfig = {
     '@storybook/addon-vitest',
   ],
   framework: {
-    name: '@storybook/react-vite',
+    name: '@storybook/nextjs-vite',
     options: {},
   },
   typescript: {
