@@ -20,7 +20,7 @@ const Textarea = ({
   const message = error || helperText;
   const messageId = message ? `${textareaId}-${error ? 'error' : 'helper'}` : undefined;
   const descriptionIds = [describedBy, messageId].filter(Boolean).join(' ') || undefined;
-  const styles = textareaStyles({ hasError: Boolean(error) });
+  const styles = textareaStyles({ hasError: Boolean(error), disabled: textareaProps.disabled });
 
   return (
     <div className={styles.root()}>

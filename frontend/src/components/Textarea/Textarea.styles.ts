@@ -8,4 +8,11 @@ export const textareaStyles = tv({
     input: ['py-3', 'resize-y'],
     helper: ['font-sans', 'text-[length:var(--text-caption)]', 'text-muted'],
   },
+  variants: {
+    disabled: {
+      true: {
+        input: ['opacity-50', 'cursor-not-allowed'],
+      },
+    },
+  },
 });
