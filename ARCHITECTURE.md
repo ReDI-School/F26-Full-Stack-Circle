@@ -201,10 +201,13 @@ log is right there, and every step maps to a command you can run locally:
 | Apply the migrations    | `pnpm db:reset`, then `pnpm db:deploy`                  |
 | Run the seed            | `pnpm db:seed`                                          |
 
-**If the Vercel check is red**, its PR comment tells you _which_ service failed. Start by
-reproducing it locally — the build commands above are the same ones Vercel runs, so most build
-failures show up on your machine immediately. Then check the rows in the table above that CI
-cannot catch:
+**If the Vercel check is red**, a comment titled **❌ The Vercel build failed** appears on your
+PR within a minute or so, with the end of the build log. You do not need a Vercel account to
+read it. The error is usually in the last few lines. The comment updates on every push, and
+turns into **✅ Fixed** once a build passes. (A build that failed before you opened the PR has
+nowhere to post — push again and the comment follows.) Then reproduce the failure locally — the
+build commands above are the same ones Vercel runs, so most build failures show up on your
+machine immediately. Then check the rows in the table above that CI cannot catch:
 
 - Did you add a new environment variable that only exists in your local `.env`? It has to be
   added to the Vercel project too — ask in Slack.
@@ -227,9 +230,8 @@ GRANT ALL ON SCHEMA public TO postgres, anon, authenticated, service_role;
 then redeploys any preview. Its build re-applies every migration and the seed from scratch. The
 PR that broke it has to fix its migration first, or it will break the database again.
 
-**If you still cannot tell why**, post the PR link in Slack. The full Vercel build log needs a
-Vercel account, so a teacher will read it and paste the relevant part into your PR. Do not sit
-on it — this is a two-minute favour for whoever has access.
+**If you still cannot tell why**, or the comment says the log could not be fetched, post the PR
+link in Slack. Do not sit on it.
 
 ## 8. Things that will trip you up
 
