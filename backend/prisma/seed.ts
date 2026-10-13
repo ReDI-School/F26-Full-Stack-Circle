@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import { PrismaClient } from '../generated/prisma/client';
+import { Prisma, PrismaClient } from '../generated/prisma/client';
 
 dotenv.config();
 
@@ -27,7 +27,7 @@ const eur = (amount: number) => Math.round(amount * 100);
  */
 const SEED_PASSWORD = 'redicycle123';
 
-async function main() {
+async function seed(tx: Prisma.TransactionClient) {
   console.log('🌱 Starting seed...');
 
   // ----------------------------------------------------------
@@ -41,13 +41,13 @@ async function main() {
   //
   // The order matters: children first, parents after.
   // ----------------------------------------------------------
-  await prisma.homepageRowItem.deleteMany();
-  await prisma.homepageRow.deleteMany();
-  await prisma.message.deleteMany();
-  await prisma.thread.deleteMany();
-  await prisma.itemImage.deleteMany();
-  await prisma.item.deleteMany();
-  await prisma.shop.deleteMany();
+  await tx.homepageRowItem.deleteMany();
+  await tx.homepageRow.deleteMany();
+  await tx.message.deleteMany();
+  await tx.thread.deleteMany();
+  await tx.itemImage.deleteMany();
+  await tx.item.deleteMany();
+  await tx.shop.deleteMany();
 
   // ----------------------------------------------------------
   // 2. Categories - the five on the homepage and in the footer.
@@ -62,7 +62,7 @@ async function main() {
 
   const categories: Record<string, string> = {};
   for (const category of categorySeed) {
-    const row = await prisma.category.upsert({
+    const row = await tx.category.upsert({
       where: { slug: category.slug },
       update: category,
       create: category,
@@ -90,7 +90,7 @@ async function main() {
 
   const users: Record<string, string> = {};
   for (const user of userSeed) {
-    const row = await prisma.user.upsert({
+    const row = await tx.user.upsert({
       where: { email: user.email },
       update: { ...user, passwordHash },
       create: { ...user, passwordHash },
@@ -132,7 +132,7 @@ async function main() {
   const shops: Record<string, string> = {};
   for (const shop of shopSeed) {
     const { owner, ...shopData } = shop;
-    const row = await prisma.shop.create({
+    const row = await tx.shop.create({
       data: { ...shopData, ownerId: users[owner] },
     });
     shops[row.slug] = row.id;
@@ -320,7 +320,7 @@ async function main() {
 
   const items: Record<string, string> = {};
   for (const item of itemSeed) {
-    const row = await prisma.item.create({
+    const row = await tx.item.create({
       data: {
         title: item.title,
         description: item.description,
@@ -386,7 +386,7 @@ async function main() {
 
   for (const row of rowSeed) {
     const { itemKeys, ...rowData } = row;
-    await prisma.homepageRow.create({
+    await tx.homepageRow.create({
       data: {
         ...rowData,
         items: {
@@ -407,7 +407,7 @@ async function main() {
 
   // Omar asks Lena about her denim jacket, and she has not read it
   // yet - that is the orange dot in the inbox list.
-  await prisma.thread.create({
+  await tx.thread.create({
     data: {
       itemId: items['denim-jacket'],
       buyerId: users['omar@redi-school.org'],
@@ -423,7 +423,7 @@ async function main() {
   });
 
   // Lena asks Jonas about his camera, and he has replied.
-  await prisma.thread.create({
+  await tx.thread.create({
     data: {
       itemId: items['polaroid'],
       buyerId: users['lena@redi-school.org'],
@@ -446,6 +446,28 @@ async function main() {
   console.log('✅ 2 conversations');
 
   console.log('🎉 Seed completed successfully!');
+}
+
+/**
+ * Runs the seed in one transaction, holding a lock for its duration.
+ *
+ * Every PR's preview build seeds the same shared preview database, and
+ * two pushes close together run two seeds at once. Without the lock,
+ * one seed's deletes and creates interleave with the other's, and a
+ * create fails on a unique key the other seed has just written (e.g.
+ * `HomepageRow_slug_key`). With it, the second seed waits for the first
+ * to commit and then rebuilds the data from scratch. The transaction
+ * also means a seed that fails halfway leaves the old data in place.
+ */
+async function main() {
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('redicycle-seed'))`;
+      await seed(tx);
+    },
+    // Waiting for another build's seed counts towards the timeout.
+    { maxWait: 10_000, timeout: 120_000 }
+  );
 }
 
 main()
