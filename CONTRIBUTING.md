@@ -133,9 +133,11 @@ breaks **everyone else's** preview until they redeploy. On production nothing is
 deploy just fails. Flag destructive migrations (dropping or renaming a column that has data in
 it) in Slack before you merge.
 
+If a Vercel build fails, the end of its build log is posted as a comment on your PR, so you do
+not need a Vercel account to see what went wrong.
+
 [**ARCHITECTURE.md**](./ARCHITECTURE.md) has the whole picture — what runs where, which
-failures CI catches and which only show up on Vercel, and what to do when a check goes red
-(including how to get at a Vercel build log without a Vercel account).
+failures CI catches and which only show up on Vercel, and what to do when a check goes red.
 
 ---
 
