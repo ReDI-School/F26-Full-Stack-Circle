@@ -11,7 +11,7 @@ const ToastDemo = ({ message, variant, duration = 4000 }: ToastProps) => {
   return (
     <>
       <button
-      className="rounded bg-ink px-4 py-2 text-white hover:bg-ink/80"
+        className="rounded bg-ink px-4 py-2 text-white hover:bg-ink/80"
         type="button"
         onClick={() => {
           setToastKey((current) => current + 1);
@@ -80,4 +80,3 @@ export const LongMessage: Story = {
     variant: 'success',
   },
 };
-

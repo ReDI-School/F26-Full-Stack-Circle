@@ -2,8 +2,8 @@ interface ToastProps {
   message: string;
   variant?: 'success' | 'error';
   open: boolean;
-  duration?: number,
-  
+  duration?: number;
+
   onDismiss?: () => void;
 }
 
