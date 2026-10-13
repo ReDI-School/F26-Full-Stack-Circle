@@ -121,18 +121,23 @@ See the [README](./README.md#continuous-integration) for what each CI job checks
 ## Deployments
 
 Every push deploys: pull requests get a Vercel preview you can open straight from the PR, and
-`main` goes to production. The backend build runs `prisma migrate deploy` first, so **the
-migrations in your PR are applied automatically** — nobody runs anything by hand against the
-deployed database. A migration that fails fails that build, so the broken migration is never
-live — but it is recorded as failed and blocks later deployments until a teacher clears it, so
-test it against a fresh database first.
+`main` goes to production. Previews use a **separate preview database, shared by every PR**.
+The backend build runs `prisma migrate deploy` and the seed against it, so **the migrations in
+your PR are applied automatically** — nobody runs anything by hand against a deployed database.
+Production is migrated only when a PR is merged, and it is never seeded.
 
-Previews share a real database, so flag destructive migrations (dropping or renaming a column
-that has data in it) in Slack before you merge.
+**Never edit, rename or regenerate a migration once it has been pushed — add a new one
+instead.** The preview database already ran the old one, so the new version fails. Your
+preview build then wipes the shared preview database and rebuilds it from your branch, which
+breaks **everyone else's** preview until they redeploy. On production nothing is wiped: the
+deploy just fails. Flag destructive migrations (dropping or renaming a column that has data in
+it) in Slack before you merge.
+
+If a Vercel build fails, the end of its build log is posted as a comment on your PR, so you do
+not need a Vercel account to see what went wrong.
 
 [**ARCHITECTURE.md**](./ARCHITECTURE.md) has the whole picture — what runs where, which
-failures CI catches and which only show up on Vercel, and what to do when a check goes red
-(including how to get at a Vercel build log without a Vercel account).
+failures CI catches and which only show up on Vercel, and what to do when a check goes red.
 
 ---
 

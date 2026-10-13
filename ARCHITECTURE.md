@@ -49,11 +49,11 @@ Two independent things react to your push: **GitHub Actions** (which checks your
 The whole product is a **single Vercel deployment** made of three services, described in
 [`vercel.json`](./vercel.json). Requests are routed by path:
 
-| Path             | Service     | What it is            | Built with                                 |
-| ---------------- | ----------- | --------------------- | ------------------------------------------ |
-| `/storybook/*`   | `storybook` | The component library | `pnpm build-storybook` in `frontend/`      |
-| `/api`, `/api/*` | `backend`   | The Express REST API  | `prisma migrate deploy && prisma generate` |
-| everything else  | `frontend`  | The Next.js app       | `next build`                               |
+| Path             | Service     | What it is            | Built with                            |
+| ---------------- | ----------- | --------------------- | ------------------------------------- |
+| `/storybook/*`   | `storybook` | The component library | `pnpm build-storybook` in `frontend/` |
+| `/api`, `/api/*` | `backend`   | The Express REST API  | `backend/scripts/vercel-build.sh`     |
+| everything else  | `frontend`  | The Next.js app       | `next build`                          |
 
 Two details that surprise people:
 
@@ -71,7 +71,7 @@ Two details that surprise people:
 | Frontend  | `http://localhost:3000`                    | `/` on the deployment domain     |
 | API       | `http://localhost:4000/api`                | `/api` on the same domain        |
 | Storybook | `http://localhost:6006` (`pnpm storybook`) | `/storybook/` on the same domain |
-| Database  | PostgreSQL in Docker, host port **5434**   | Supabase PostgreSQL              |
+| Database  | PostgreSQL in Docker, host port **5434**   | Supabase (preview DB ≠ prod DB)  |
 | Processes | Two dev servers you start yourself         | One deployment, three services   |
 
 Locally they are three separate servers on three ports; deployed they are one domain. The
@@ -94,6 +94,12 @@ needs no environment file at all.
 the database variables into the Vercel project, and Vercel adds its own system variables
 (`VERCEL_ENV`, `VERCEL_GIT_COMMIT_SHA`, …). The variable _names_ are deliberately the same in
 all three environments, so the same code works everywhere.
+
+Production and previews never share a database. There are two Supabase projects: the
+production one, whose variables are set for **Production only**, and a separate **preview
+database**, whose variables are set for **Preview only**. All pull requests share the preview
+database. As a safety net, the backend build refuses to run a preview against the production
+project.
 
 | Variable                   | Used for                                                     | Where it comes from                                   |
 | -------------------------- | ------------------------------------------------------------ | ----------------------------------------------------- |
@@ -120,24 +126,42 @@ Supabase they are genuinely different endpoints. The runtime one is wired up in
 2. **GitHub Actions** starts three jobs in parallel — Frontend, Backend, Formatting — described
    in [Continuous Integration](./README.md#continuous-integration).
 3. **Vercel** starts a build for the same commit and builds all three services.
-4. The backend build runs **`prisma migrate deploy`** first: every migration file in
-   `backend/prisma/migrations/` that has not been applied yet is applied to the database. Then
-   the API is compiled.
+4. The backend build ([`backend/scripts/vercel-build.sh`](./backend/scripts/vercel-build.sh))
+   runs **`prisma migrate deploy`** against the shared preview database: every migration file in
+   `backend/prisma/migrations/` that has not been applied there yet is applied. A preview then
+   runs the seed, so it always has data to show. Then the API is compiled.
 5. Vercel comments on your pull request with the status and a **preview URL** — a complete,
    live copy of the product running your branch. If opening it asks you to log in to Vercel,
    say so in Slack: that is a project setting a teacher can turn off.
-6. When the PR is merged into `main`, the same sequence runs again against production.
+6. When the PR is merged into `main`, the build migrates the production database. Production
+   is **never seeded**.
 
 You never run anything by hand against the deployed database. If your change needs a schema
 change, the migration file in your PR _is_ the deployment step — see
 [Changing the database schema](./README.md#changing-the-database-schema).
 
 > [!WARNING]
-> Preview deployments talk to a real, shared database. A migration that drops or renames a
-> column with data in it affects everyone's preview as soon as it is deployed. Say so in Slack
-> before you merge one. A migration that fails halfway is recorded as failed and **blocks every
-> later deployment** until someone clears it with `prisma migrate resolve` — so test it against
-> a fresh local database first (`pnpm db:reset && pnpm db:deploy`).
+> **The preview database is shared by every pull request.** Your PR's migrations are applied to
+> it as soon as your preview builds, so everyone's preview sees them — even if your PR is never
+> merged.
+>
+> **Never edit, rename or regenerate a migration once it has been pushed — add a new one
+> instead.** The preview database still remembers the old version. Re-creating the same tables
+> under a new migration name fails with errors like `type "Role" already exists`, and the
+> migration is recorded as failed.
+>
+> When `prisma migrate deploy` fails on a preview, the build **wipes the preview database and
+> rebuilds it** from your branch's migrations, then seeds it. Your preview works, but every
+> other PR's preview now runs against your schema, and breaks if theirs differs, until it is
+> redeployed. If two branches keep disagreeing, they wipe the database back and forth on every
+> push. If your migrations fail on an empty database too, your build fails: the migration
+> itself is broken. CI cannot catch any of this, because it always starts from an empty
+> database. Test a migration against a fresh local database first
+> (`pnpm db:reset && pnpm db:deploy`).
+>
+> Production is never reset. It is only migrated after a merge, and only by `main`, and a
+> failed migration there stops the build. The same rule matters even more on production: a
+> migration that was rewritten after it reached production cannot be applied there at all.
 
 ## 6. CI and Vercel: who catches what
 
@@ -157,7 +181,7 @@ throwaway PostgreSQL container — so it fails **fast, safely, and with logs you
 | A migration that does not apply cleanly                 | ✅                   | ✅                    |
 | A schema change with **no migration file**              | ❌ (silently passes) | ❌ (nothing to apply) |
 | A missing or wrong environment variable in Vercel       | ❌                   | ✅                    |
-| A migration that conflicts with the **real** data       | ❌                   | ✅                    |
+| A migration that conflicts with the preview DB's state  | ❌                   | ✅                    |
 | Errors that only happen at runtime, after a green build | ❌                   | ✅ (as a broken page) |
 
 In practice: **if CI is green and Vercel is red, the cause is almost always one of the bottom
@@ -177,19 +201,37 @@ log is right there, and every step maps to a command you can run locally:
 | Apply the migrations    | `pnpm db:reset`, then `pnpm db:deploy`                  |
 | Run the seed            | `pnpm db:seed`                                          |
 
-**If the Vercel check is red**, its PR comment tells you _which_ service failed. Start by
-reproducing it locally — the build commands above are the same ones Vercel runs, so most build
-failures show up on your machine immediately. Then check the rows in the table above that CI
-cannot catch:
+**If the Vercel check is red**, a comment titled **❌ The Vercel build failed** appears on your
+PR within a minute or so, with the end of the build log. You do not need a Vercel account to
+read it. The error is usually in the last few lines. The comment updates on every push, and
+turns into **✅ Fixed** once a build passes. (A build that failed before you opened the PR has
+nowhere to post — push again and the comment follows.) Then reproduce the failure locally — the
+build commands above are the same ones Vercel runs, so most build failures show up on your
+machine immediately. Then check the rows in the table above that CI cannot catch:
 
 - Did you add a new environment variable that only exists in your local `.env`? It has to be
   added to the Vercel project too — ask in Slack.
 - Did your migration succeed locally against an empty database, but the real one already has
   data? Rows that violate a new constraint will fail there and only there.
 
-**If you still cannot tell why**, post the PR link in Slack. The full Vercel build log needs a
-Vercel account, so a teacher will read it and paste the relevant part into your PR. Do not sit
-on it — this is a two-minute favour for whoever has access.
+**If your preview fails with `P3009` ("found failed migrations in the target database")**,
+another branch's migration broke the shared preview database, and your branch is older than
+the build that repairs it. Merge `main` into your branch and push: the build then resets the
+preview database by itself (see [What happens when you push](#5-what-happens-when-you-push)).
+If that is not an option, a teacher resets it by hand: in the Supabase dashboard of the
+**preview** project (never the production one), open the SQL editor and run
+
+```sql
+DROP SCHEMA public CASCADE;
+CREATE SCHEMA public;
+GRANT ALL ON SCHEMA public TO postgres, anon, authenticated, service_role;
+```
+
+then redeploys any preview. Its build re-applies every migration and the seed from scratch. The
+PR that broke it has to fix its migration first, or it will break the database again.
+
+**If you still cannot tell why**, or the comment says the log could not be fetched, post the PR
+link in Slack. Do not sit on it.
 
 ## 8. Things that will trip you up
 

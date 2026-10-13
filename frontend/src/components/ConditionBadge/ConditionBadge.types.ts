@@ -1,12 +1,17 @@
+import type { TCondition, TSize } from './ConditionBadge.constants';
+
 interface ConditionBadgeProps {
   /**
-   * The condition of the item
+   * The condition tier of the item. Determines color scheme and label.
    */
-  condition: string;
-
-  // TODO: add the rest of the props this component needs:
-  // - type the condition as 'new' | 'like-new' | 'good' | 'used'
-  // - a label and colour pair per condition
+  condition: TCondition;
+  /**
+   * The size of the badge.
+   * - `sm`: Compact size for dense card layouts.
+   * - `md`: Standard size for item details and hero cards.
+   * @default 'md'
+   */
+  size?: TSize;
 }
 
-export type { ConditionBadgeProps };
+export type { ConditionBadgeProps, TCondition, TSize };
