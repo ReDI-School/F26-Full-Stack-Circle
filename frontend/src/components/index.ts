@@ -16,3 +16,4 @@ export * from './StepCard';
 export * from './TextField';
 export * from './Textarea';
 export * from './Toast';
+export * from './Footer';
