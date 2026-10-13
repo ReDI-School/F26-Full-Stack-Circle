@@ -1,0 +1,3 @@
+# Workflows can read the repository's secrets, so a teacher reviews every
+# change under .github/ before it reaches main.
+/.github/ @fabiorodriguesdev
