@@ -204,9 +204,10 @@ log is right there, and every step maps to a command you can run locally:
 **If the Vercel check is red**, a comment titled **❌ The Vercel build failed** appears on your
 PR within a minute or so, with the end of the build log. You do not need a Vercel account to
 read it. The error is usually in the last few lines. The comment updates on every push, and
-turns into **✅ Fixed** once a build passes. Then reproduce the failure locally — the build
-commands above are the same ones Vercel runs, so most build failures show up on your machine
-immediately. Then check the rows in the table above that CI cannot catch:
+turns into **✅ Fixed** once a build passes. (A build that failed before you opened the PR has
+nowhere to post — push again and the comment follows.) Then reproduce the failure locally — the
+build commands above are the same ones Vercel runs, so most build failures show up on your
+machine immediately. Then check the rows in the table above that CI cannot catch:
 
 - Did you add a new environment variable that only exists in your local `.env`? It has to be
   added to the Vercel project too — ask in Slack.
