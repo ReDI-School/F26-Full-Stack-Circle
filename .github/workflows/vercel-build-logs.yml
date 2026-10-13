@@ -1,0 +1,60 @@
+name: Vercel build logs
+
+# Vercel reports every deployment back as a commit status named "Vercel".
+# GitHub only ever runs `status` workflows from the default branch, so a
+# branch cannot change what this workflow does with the Vercel token.
+on:
+  status:
+
+jobs:
+  report:
+    name: Post the build log
+    if: github.event.context == 'Vercel' && (github.event.state == 'failure' || github.event.state == 'error')
+    runs-on: ubuntu-latest
+    # VERCEL_TOKEN lives in this environment, which only main may use, so a
+    # workflow pushed on another branch cannot read it. No deployment is
+    # recorded: this job only reads a log.
+    environment:
+      name: vercel-build-logs
+      deployment: false
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
+      - name: Comment on the pull request
+        uses: actions/github-script@v7
+        env:
+          VERCEL_TOKEN: ${{ secrets.VERCEL_TOKEN }}
+        with:
+          script: |
+            const { report } = require('./.github/scripts/vercel-build-log.cjs');
+            await report({ github, context, core });
+
+  resolve:
+    name: Mark the build log as fixed
+    if: github.event.context == 'Vercel' && github.event.state == 'success'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      issues: write
+      pull-requests: write
+
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          sparse-checkout: .github/scripts
+          persist-credentials: false
+
+      - name: Update the comment on the pull request
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const { resolve } = require('./.github/scripts/vercel-build-log.cjs');
+            await resolve({ github, context, core });
