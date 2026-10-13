@@ -22,7 +22,7 @@ const CategoryTile = ({
       onClick={onClick}
     >
       {emoji ? (
-        <span className="grid size-[34px] place-items-center rounded-pill bg-white text-lg">
+        <span className="grid size-[34px] place-items-center rounded-pill bg-white text-[17px]">
           {emoji}
         </span>
       ) : null}
