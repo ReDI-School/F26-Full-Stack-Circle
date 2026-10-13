@@ -1,13 +1,14 @@
-interface TextareaProps {
-  /**
-   * The label shown above the textarea
-   */
-  label: string;
+import type { ComponentProps } from 'react';
 
-  // TODO: add the rest of the props this component needs:
-  // - error
-  // - rows
-  // - the usual textarea attributes
+type TextareaInputProps = Omit<ComponentProps<'textarea'>, 'className'>;
+
+interface TextareaProps extends TextareaInputProps {
+  /** The label shown above the textarea. */
+  label: string;
+  /** The error message, which takes precedence over helperText. */
+  error?: string;
+  /** Additional guidance shown when there is no error. */
+  helperText?: string;
 }
 
 export type { TextareaProps };
