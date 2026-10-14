@@ -3,7 +3,7 @@ import dotenv from 'dotenv';
 
 import { PrismaPg } from '@prisma/adapter-pg';
 
-import { PrismaClient } from '../generated/prisma/client';
+import { Prisma, PrismaClient } from '../generated/prisma/client';
 
 dotenv.config();
 
@@ -20,35 +20,49 @@ const prisma = new PrismaClient({ adapter });
 const eur = (amount: number) => Math.round(amount * 100);
 
 /**
- * The password every seeded account shares, admin included. It only
- * ever reaches a local or preview database, and it is written down in
+ * The password every seeded account shares. It is only ever used on
+ * a local or preview database, and it is written down in
  * backend/README.md so the team can log in. Real accounts set their
  * own password at registration.
  */
 const SEED_PASSWORD = 'redicycle123';
 
-async function main() {
+async function seed(tx: Prisma.TransactionClient) {
   console.log('🌱 Starting seed...');
 
-  // Hashing once and reusing the result keeps the seed fast - bcrypt
-  // is deliberately slow, which is the whole point of it.
-  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
+  // ----------------------------------------------------------
+  // 1. Clear the curated content, listings and conversations.
+  //
+  // Accounts and categories are upserted further down instead of
+  // deleted, so running the seed twice never throws away a account
+  // someone registered while testing. Everything else is sample
+  // data and is rebuilt from scratch, which keeps the seed
+  // repeatable without inventing fake unique keys for items.
+  //
+  // The order matters: children first, parents after.
+  // ----------------------------------------------------------
+  await tx.homepageRowItem.deleteMany();
+  await tx.homepageRow.deleteMany();
+  await tx.message.deleteMany();
+  await tx.thread.deleteMany();
+  await tx.itemImage.deleteMany();
+  await tx.item.deleteMany();
+  await tx.shop.deleteMany();
 
   // ----------------------------------------------------------
-  // 1. Categories - the five on the homepage and in the footer.
-  //    `slug` is unique, so a plain upsert works.
+  // 2. Categories - the five on the homepage and in the footer.
   // ----------------------------------------------------------
   const categorySeed = [
-    { slug: 'clothing', name: 'Clothing', emoji: '👕', tint: 0 },
-    { slug: 'books', name: 'Books', emoji: '📚', tint: 1 },
-    { slug: 'electronics', name: 'Electronics', emoji: '🔌', tint: 2 },
-    { slug: 'home', name: 'Home', emoji: '🪴', tint: 0 },
-    { slug: 'sports', name: 'Sports', emoji: '⚽', tint: 1 },
+    { slug: 'clothing', name: 'Clothing', emoji: '👕', tint: 'primary', sortOrder: 1 },
+    { slug: 'books', name: 'Books', emoji: '📚', tint: 'secondary', sortOrder: 2 },
+    { slug: 'electronics', name: 'Electronics', emoji: '🔌', tint: 'tertiary', sortOrder: 3 },
+    { slug: 'home', name: 'Home', emoji: '🪴', tint: 'primary', sortOrder: 4 },
+    { slug: 'sports', name: 'Sports', emoji: '⚽', tint: 'secondary', sortOrder: 5 },
   ];
 
   const categories: Record<string, string> = {};
   for (const category of categorySeed) {
-    const row = await prisma.category.upsert({
+    const row = await tx.category.upsert({
       where: { slug: category.slug },
       update: category,
       create: category,
@@ -58,117 +72,86 @@ async function main() {
   console.log(`✅ ${categorySeed.length} categories`);
 
   // ----------------------------------------------------------
-  // 2. People and their shops. Registering creates a shop, so the
-  //    seed does the same: every account here owns exactly one.
-  //    `email` is unique on User and `ownerId` is unique on Shop,
-  //    so both upsert cleanly.
+  // 3. People.
+  //
+  // Every account gets a real bcrypt hash of SEED_PASSWORD, so the
+  // login form works against seeded users exactly as it will against
+  // registered ones. Hashing once and reusing the result keeps the
+  // seed fast - bcrypt is deliberately slow.
   // ----------------------------------------------------------
+  const passwordHash = await bcrypt.hash(SEED_PASSWORD, 10);
+
   const userSeed = [
-    {
-      key: 'lena',
-      email: 'lena@redi-school.org',
-      name: 'Lena K.',
-      isAdmin: false,
-      shopName: "Lena's shop",
-      shopSubline: 'Sells & ships from Hamburg',
-    },
-    {
-      key: 'omar',
-      email: 'omar@redi-school.org',
-      name: 'Omar M.',
-      isAdmin: false,
-      shopName: "Omar's shop",
-      shopSubline: 'Sells & ships from Munich',
-    },
-    {
-      key: 'mira',
-      email: 'mira@redi-school.org',
-      name: 'Mira S.',
-      isAdmin: false,
-      shopName: "Mira's shop",
-      shopSubline: 'Sells & ships from Berlin',
-    },
-    {
-      key: 'jonas',
-      email: 'jonas@redi-school.org',
-      name: 'Jonas B.',
-      isAdmin: false,
-      shopName: "Jonas' shop",
-      shopSubline: 'Sells & ships from Cologne',
-    },
-    {
-      key: 'sara',
-      email: 'sara@redi-school.org',
-      name: 'Sara T.',
-      isAdmin: false,
-      shopName: "Sara's shop",
-      shopSubline: 'Sells & ships from Leipzig',
-    },
-    {
-      key: 'admin',
-      email: 'admin@redi-school.org',
-      name: 'ReDiCycle Admin',
-      isAdmin: true,
-      shopName: 'ReDiCycle HQ',
-      shopSubline: 'Sells & ships from Berlin',
-    },
+    { email: 'lena@redi-school.org', name: 'Lena K.', role: 'ADMIN' as const },
+    { email: 'omar@redi-school.org', name: 'Omar M.', role: 'USER' as const },
+    { email: 'mira@redi-school.org', name: 'Mira S.', role: 'USER' as const },
+    { email: 'jonas@redi-school.org', name: 'Jonas B.', role: 'USER' as const },
   ];
 
   const users: Record<string, string> = {};
-  const shops: Record<string, string> = {};
-
   for (const user of userSeed) {
-    const account = await prisma.user.upsert({
+    const row = await tx.user.upsert({
       where: { email: user.email },
-      update: {
-        name: user.name,
-        isAdmin: user.isAdmin,
-        passwordHash,
-      },
-      create: {
-        email: user.email,
-        name: user.name,
-        isAdmin: user.isAdmin,
-        passwordHash,
-      },
+      update: { ...user, passwordHash },
+      create: { ...user, passwordHash },
     });
-    users[user.key] = account.id;
-
-    const shop = await prisma.shop.upsert({
-      where: { ownerId: account.id },
-      update: { name: user.shopName, subline: user.shopSubline },
-      create: {
-        name: user.shopName,
-        subline: user.shopSubline,
-        ownerId: account.id,
-      },
-    });
-    shops[user.key] = shop.id;
+    users[row.email] = row.id;
   }
-  console.log(
-    `✅ ${userSeed.length} accounts with a shop each ` +
-      `(password: ${SEED_PASSWORD}, admin: admin@redi-school.org)`
-  );
+  console.log(`✅ ${userSeed.length} accounts (password: ${SEED_PASSWORD}, see backend/README.md)`);
 
   // ----------------------------------------------------------
-  // 3. Items.
-  //
-  // Item has no unique column to upsert on, and giving the rows
-  // explicit ids would leave the autoincrement sequence behind, so
-  // the first real registration would collide. Instead each item is
-  // matched on title + shop, which is unique in this data, and
-  // updated or created from there. The result is the same: running
-  // the seed twice changes nothing and duplicates nothing.
+  // 4. Shops - one per account, as the homepage promises.
+  // ----------------------------------------------------------
+  const shopSeed = [
+    {
+      slug: 'lenas-shop',
+      name: "Lena's shop",
+      location: 'Sells & ships from Hamburg',
+      owner: 'lena@redi-school.org',
+    },
+    {
+      slug: 'omars-shop',
+      name: "Omar's shop",
+      location: 'Sells & ships from Munich',
+      owner: 'omar@redi-school.org',
+    },
+    {
+      slug: 'miras-shop',
+      name: "Mira's shop",
+      location: 'Sells & ships from Berlin',
+      owner: 'mira@redi-school.org',
+    },
+    {
+      slug: 'jonas-shop',
+      name: "Jonas' shop",
+      location: 'Sells & ships from Cologne',
+      owner: 'jonas@redi-school.org',
+    },
+  ];
+
+  const shops: Record<string, string> = {};
+  for (const shop of shopSeed) {
+    const { owner, ...shopData } = shop;
+    const row = await tx.shop.create({
+      data: { ...shopData, ownerId: users[owner] },
+    });
+    shops[row.slug] = row.id;
+  }
+  console.log(`✅ ${shopSeed.length} shops, one per account`);
+
+  // ----------------------------------------------------------
+  // 5. Items.
   //
   // `was` is the price before the seller discounted it, and becomes
   // the struck-through number on the item detail page.
   // ----------------------------------------------------------
   type ItemSeed = {
-    /** Only used inside this file, to wire home rows and threads up. */
+    /** Only used inside this file, to wire rows and threads to items. */
     key: string;
     title: string;
     description: string;
     price: number;
+    /** The price before the seller discounted it. */
     was?: number;
     condition: 'NEW' | 'LIKE_NEW' | 'GOOD' | 'USED';
     category: string;
@@ -183,7 +166,7 @@ async function main() {
       price: 18,
       condition: 'LIKE_NEW',
       category: 'clothing',
-      shop: 'lena',
+      shop: 'lenas-shop',
       description: 'Classic mid-wash denim, boxy fit. Worn a handful of times.',
     },
     {
@@ -193,7 +176,7 @@ async function main() {
       was: 22,
       condition: 'LIKE_NEW',
       category: 'electronics',
-      shop: 'lena',
+      shop: 'lenas-shop',
       description: 'Low-profile keys, USB-C charging. Dongle included.',
     },
     {
@@ -202,7 +185,7 @@ async function main() {
       price: 9,
       condition: 'LIKE_NEW',
       category: 'home',
-      shop: 'lena',
+      shop: 'lenas-shop',
       description: 'Three matte pots in cream, 12cm each. No drainage holes.',
     },
     {
@@ -211,7 +194,7 @@ async function main() {
       price: 15,
       condition: 'GOOD',
       category: 'books',
-      shop: 'lena',
+      shop: 'lenas-shop',
       description: 'Complete trilogy, paperback. Spines a little creased.',
     },
 
@@ -222,7 +205,7 @@ async function main() {
       price: 6,
       condition: 'GOOD',
       category: 'books',
-      shop: 'omar',
+      shop: 'omars-shop',
       description: 'Crockford classic. A few pencil notes in the margins.',
     },
     {
@@ -232,7 +215,7 @@ async function main() {
       was: 30,
       condition: 'GOOD',
       category: 'electronics',
-      shop: 'omar',
+      shop: 'omars-shop',
       description: 'Battery still holds about six hours. Charger included.',
     },
     {
@@ -241,8 +224,17 @@ async function main() {
       price: 25,
       condition: 'LIKE_NEW',
       category: 'home',
-      shop: 'omar',
+      shop: 'omars-shop',
       description: 'Adjustable height, mesh back. Pickup only.',
+    },
+    {
+      key: 'running-shoes',
+      title: 'Running shoes, size 44',
+      price: 16,
+      condition: 'GOOD',
+      category: 'sports',
+      shop: 'omars-shop',
+      description: 'Maybe 80km on them. Soles still have plenty of grip.',
     },
 
     // Mira's shop
@@ -252,7 +244,7 @@ async function main() {
       price: 12,
       condition: 'GOOD',
       category: 'home',
-      shop: 'mira',
+      shop: 'miras-shop',
       description: 'Brass-coloured arm, warm bulb included.',
     },
     {
@@ -261,7 +253,7 @@ async function main() {
       price: 5,
       condition: 'USED',
       category: 'books',
-      shop: 'mira',
+      shop: 'miras-shop',
       description: 'Four well-loved books. Some pages have cooking stains.',
     },
     {
@@ -271,9 +263,9 @@ async function main() {
       was: 20,
       condition: 'NEW',
       category: 'clothing',
-      shop: 'mira',
+      shop: 'miras-shop',
       description:
-        'Gift that never fit, tags still on. Size L, cream wool blend. ' + 'Very cozy, very warm.',
+        'Gift that never fit, tags still on. Size L, cream wool blend. Very cozy, very warm.',
     },
     {
       key: 'football-boots',
@@ -282,7 +274,7 @@ async function main() {
       was: 25,
       condition: 'LIKE_NEW',
       category: 'sports',
-      shop: 'mira',
+      shop: 'miras-shop',
       description: 'Firm ground studs. Used for one indoor season.',
     },
 
@@ -293,7 +285,7 @@ async function main() {
       price: 8,
       condition: 'USED',
       category: 'sports',
-      shop: 'jonas',
+      shop: 'jonas-shop',
       description: '6mm mat with a carry strap. Slightly worn at the corners.',
     },
     {
@@ -303,7 +295,7 @@ async function main() {
       was: 12,
       condition: 'GOOD',
       category: 'clothing',
-      shop: 'jonas',
+      shop: 'jonas-shop',
       description: 'Tour shirt, print still crisp. Washed cold only.',
     },
     {
@@ -312,191 +304,170 @@ async function main() {
       price: 35,
       condition: 'GOOD',
       category: 'electronics',
-      shop: 'jonas',
+      shop: 'jonas-shop',
       description: 'Works great. Takes i-Type film, not included.',
     },
-
-    // Sara's shop
     {
-      key: 'moving-boxes',
-      title: 'Moving boxes (x8)',
-      price: 0,
-      condition: 'USED',
-      category: 'home',
-      shop: 'sara',
-      description: 'Free to a good home. Folded flat, a couple have soft corners.',
-    },
-    {
-      key: 'tennis-racket',
-      title: 'Tennis racket',
-      price: 13,
+      key: 'wool-scarf',
+      title: 'Wool scarf',
+      price: 6,
       condition: 'GOOD',
-      category: 'sports',
-      shop: 'sara',
-      description: 'Grip re-wrapped last summer. Cover included.',
+      category: 'clothing',
+      shop: 'jonas-shop',
+      description: 'Charcoal lambswool, nice and long. No moth holes.',
     },
   ];
 
   const items: Record<string, string> = {};
   for (const item of itemSeed) {
-    const shopId = shops[item.shop];
-    const data = {
-      title: item.title,
-      description: item.description,
-      priceCents: eur(item.price),
-      oldPriceCents: item.was ? eur(item.was) : null,
-      condition: item.condition,
-      categoryId: categories[item.category],
-      shopId,
-    };
-
-    const existing = await prisma.item.findFirst({
-      where: { title: item.title, shopId },
-      select: { id: true },
+    const row = await tx.item.create({
+      data: {
+        title: item.title,
+        description: item.description,
+        priceCents: eur(item.price),
+        originalPriceCents: item.was ? eur(item.was) : null,
+        condition: item.condition,
+        categoryId: categories[item.category],
+        shopId: shops[item.shop],
+        images: {
+          create: [{ url: `/seed/${item.key}.jpg`, position: 0 }],
+        },
+      },
     });
-
-    const row = existing
-      ? await prisma.item.update({ where: { id: existing.id }, data })
-      : await prisma.item.create({ data });
-
     items[item.key] = row.id;
-
-    // One photo per item. Upserting on (itemId, position) keeps a
-    // second run from stacking duplicates.
-    await prisma.itemPhoto.upsert({
-      where: { itemId_position: { itemId: row.id, position: 0 } },
-      update: { url: `/seed/${item.key}.jpg` },
-      create: { itemId: row.id, position: 0, url: `/seed/${item.key}.jpg` },
-    });
   }
-  console.log(`✅ ${itemSeed.length} items with a photo each`);
+  console.log(`✅ ${itemSeed.length} items, four per shop`);
 
   // ----------------------------------------------------------
-  // 4. The curated homepage rows an admin fills on /admin.
-  //    `key` is unique on HomeRow and (homeRowId, itemId) is unique
-  //    on HomeRowItem, so both upsert.
+  // 6. The curated homepage rows an admin fills on the admin page.
   // ----------------------------------------------------------
   const rowSeed = [
     {
-      key: 'fresh',
-      title: 'fresh finds ✨',
-      position: 0,
+      slug: 'fresh-finds',
+      title: 'fresh finds',
+      emoji: '✨',
+      subtitle: 'just listed by the community',
+      linkLabel: 'see everything',
+      linkHref: '/browse',
+      sortOrder: 1,
       itemKeys: ['denim-jacket', 'js-good-parts', 'desk-lamp', 'keyboard', 'yoga-mat'],
     },
     {
-      key: 'cheap',
-      title: 'under €10 💸',
-      position: 1,
+      slug: 'under-10',
+      title: 'under €10',
+      emoji: '💸',
+      subtitle: 'broke, but make it fashion',
+      linkLabel: 'more bargains',
+      linkHref: '/browse?maxPrice=10',
+      sortOrder: 2,
       itemKeys: ['js-good-parts', 'yoga-mat', 'plant-pots', 'band-tshirt', 'cookbooks'],
     },
     {
-      key: 'deals',
-      title: 'good deals 🔥',
-      position: 2,
+      slug: 'good-deals',
+      title: 'good deals',
+      emoji: '🔥',
+      subtitle: 'prices dropped by the sellers',
+      linkLabel: 'see all deals',
+      linkHref: '/browse?discounted=true',
+      sortOrder: 3,
       itemKeys: ['keyboard', 'knit-sweater', 'band-tshirt', 'speaker', 'football-boots'],
     },
     {
-      key: 'tech',
-      title: 'tech corner 🔌',
-      position: 3,
+      slug: 'tech-corner',
+      title: 'tech corner',
+      emoji: '🔌',
+      subtitle: 'pre-loved gadgets that still go beep',
+      linkLabel: 'all electronics',
+      linkHref: '/browse?category=electronics',
+      sortOrder: 4,
       itemKeys: ['keyboard', 'polaroid', 'speaker'],
     },
   ];
 
   for (const row of rowSeed) {
     const { itemKeys, ...rowData } = row;
-
-    const homeRow = await prisma.homeRow.upsert({
-      where: { key: row.key },
-      update: { title: rowData.title, position: rowData.position },
-      create: rowData,
-    });
-
-    for (const [position, key] of itemKeys.entries()) {
-      await prisma.homeRowItem.upsert({
-        where: {
-          homeRowId_itemId: { homeRowId: homeRow.id, itemId: items[key] },
-        },
-        update: { position },
-        create: { homeRowId: homeRow.id, itemId: items[key], position },
-      });
-    }
-  }
-  console.log(`✅ ${rowSeed.length} curated home rows`);
-
-  // ----------------------------------------------------------
-  // 5. Two conversations, so the inbox is not empty on first run.
-  //    (itemId, buyerId) is unique on Thread, so these upsert; the
-  //    messages inside are only created the first time round.
-  // ----------------------------------------------------------
-  const threadSeed = [
-    {
-      itemKey: 'denim-jacket',
-      buyer: 'omar',
-      seller: 'lena',
-      messages: [
-        {
-          sender: 'omar',
-          body: 'Hi! Is the denim jacket still available? Could I pick it up this week?',
-          // Unread - this is the orange dot in the inbox list.
-          read: false,
-        },
-      ],
-    },
-    {
-      itemKey: 'polaroid',
-      buyer: 'lena',
-      seller: 'jonas',
-      messages: [
-        {
-          sender: 'lena',
-          body: 'Hi! I\'m interested in "Polaroid camera". Is it still available?',
-          read: true,
-        },
-        {
-          sender: 'jonas',
-          body: 'Sure! It works great — when could you pick it up?',
-          read: true,
-        },
-      ],
-    },
-  ];
-
-  for (const thread of threadSeed) {
-    const row = await prisma.thread.upsert({
-      where: {
-        itemId_buyerId: {
-          itemId: items[thread.itemKey],
-          buyerId: users[thread.buyer],
+    await tx.homepageRow.create({
+      data: {
+        ...rowData,
+        items: {
+          create: itemKeys.map((key, index) => ({
+            itemId: items[key],
+            position: index,
+          })),
         },
       },
-      update: {},
-      create: {
-        itemId: items[thread.itemKey],
-        buyerId: users[thread.buyer],
-        sellerId: users[thread.seller],
-      },
     });
-
-    // Messages have no natural unique key, so they are only written
-    // when the thread is still empty.
-    const existing = await prisma.message.count({
-      where: { threadId: row.id },
-    });
-    if (existing === 0) {
-      await prisma.message.createMany({
-        data: thread.messages.map((message) => ({
-          threadId: row.id,
-          senderId: users[message.sender],
-          body: message.body,
-          readAt: message.read ? new Date() : null,
-        })),
-      });
-    }
   }
-  console.log(`✅ ${threadSeed.length} conversations`);
+  console.log(`✅ ${rowSeed.length} curated homepage rows`);
+
+  // ----------------------------------------------------------
+  // 7. Two conversations, so the inbox is not empty on first run.
+  //    Both are the ones drawn on the Inbox screen.
+  // ----------------------------------------------------------
+
+  // Omar asks Lena about her denim jacket, and she has not read it
+  // yet - that is the orange dot in the inbox list.
+  await tx.thread.create({
+    data: {
+      itemId: items['denim-jacket'],
+      buyerId: users['omar@redi-school.org'],
+      messages: {
+        create: [
+          {
+            senderId: users['omar@redi-school.org'],
+            body: 'Hi! Is the denim jacket still available? Could I pick it up this week?',
+          },
+        ],
+      },
+    },
+  });
+
+  // Lena asks Jonas about his camera, and he has replied.
+  await tx.thread.create({
+    data: {
+      itemId: items['polaroid'],
+      buyerId: users['lena@redi-school.org'],
+      messages: {
+        create: [
+          {
+            senderId: users['lena@redi-school.org'],
+            body: 'Hi! I\'m interested in "Polaroid camera". Is it still available?',
+            readAt: new Date(),
+          },
+          {
+            senderId: users['jonas@redi-school.org'],
+            body: 'Sure! It works great — when could you pick it up?',
+            readAt: new Date(),
+          },
+        ],
+      },
+    },
+  });
+  console.log('✅ 2 conversations');
 
   console.log('🎉 Seed completed successfully!');
+}
+
+/**
+ * Runs the seed in one transaction, holding a lock for its duration.
+ *
+ * Every PR's preview build seeds the same shared preview database, and
+ * two pushes close together run two seeds at once. Without the lock,
+ * one seed's deletes and creates interleave with the other's, and a
+ * create fails on a unique key the other seed has just written (e.g.
+ * `HomepageRow_slug_key`). With it, the second seed waits for the first
+ * to commit and then rebuilds the data from scratch. The transaction
+ * also means a seed that fails halfway leaves the old data in place.
+ */
+async function main() {
+  await prisma.$transaction(
+    async (tx) => {
+      await tx.$executeRaw`SELECT pg_advisory_xact_lock(hashtext('redicycle-seed'))`;
+      await seed(tx);
+    },
+    // Waiting for another build's seed counts towards the timeout.
+    { maxWait: 10_000, timeout: 120_000 }
+  );
 }
 
 main()
