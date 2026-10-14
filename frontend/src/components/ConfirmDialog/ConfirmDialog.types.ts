@@ -4,7 +4,7 @@ interface ConfirmDialogProps {
    */
   title: string;
   /** Whether the dialog is visible */
-  
+
   open: boolean;
 
   /** Additional context for the action */
