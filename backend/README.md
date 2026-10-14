@@ -340,9 +340,19 @@ only seeded account with `isAdmin: true`.
 > These credentials are for local and preview databases only. Never seed them into anything
 > that holds real accounts.
 
+<<<<<<< HEAD
 Re-running the seed is safe. Categories, accounts, shops, home rows and their slots upsert on
 their unique keys; items are matched on title plus shop, since `Item` has no unique column of
 its own.
+=======
+
+Re-running the seed is safe. Accounts and categories are upserted on their natural keys
+(`email`, `slug`), so an account you registered while testing survives; shops, items, rows
+and conversations are rebuilt from scratch. Running it twice at the same time is safe too, which
+happens on the shared preview database when two PRs deploy together: the seed runs in one
+transaction behind a lock, so the second run waits for the first to finish.
+
+> > > > > > > origin/main
 
 ### Creating New Models
 
