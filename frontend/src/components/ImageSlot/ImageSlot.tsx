@@ -74,71 +74,69 @@ const ImageSlot = ({
               setBrokenUrl(value);
             }}
           ></img>
-          {shape === 'circle' ? (
-            (onScale || onUpload || onChange) && (
-            <div ref={menuRef}>
-              <button
-                type="button"
-                aria-label="Reframe, change or delete the image"
-                className={`${isOpen ? 'opacity-100' : revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-[6%] bottom-[6%]`}
-                title="Reframe, change or delete the image"
-                onClick={() => setIsOpen(!isOpen)}
-              >
-                <svg width="15" height="15" fill="currentColor" viewBox="0 0 256 256">
-                  <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
-                </svg>
-              </button>
-              <div
-                className={`${buttonStyle} absolute top-[70%] left-[90%] w-full flex flex-col gap-2 p-2 rounded-input ${isOpen ? 'block' : 'hidden'}`}
-              >
-                {onScale && (
+          {shape === 'circle'
+            ? (onScale || onUpload || onChange) && (
+                <div ref={menuRef}>
                   <button
-                    type='button'
-                    className="cursor-pointer"
-                    aria-label="Rescale image"
-                    onClick={() => onScale()}
+                    type="button"
+                    aria-label="Reframe, change or delete the image"
+                    className={`${isOpen ? 'opacity-100' : revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-[6%] bottom-[6%]`}
+                    title="Reframe, change or delete the image"
+                    onClick={() => setIsOpen(!isOpen)}
                   >
-                    Rescale image
+                    <svg width="15" height="15" fill="currentColor" viewBox="0 0 256 256">
+                      <path d="M227.31,73.37,182.63,28.68a16,16,0,0,0-22.63,0L36.69,152A15.86,15.86,0,0,0,32,163.31V208a16,16,0,0,0,16,16H92.69A15.86,15.86,0,0,0,104,219.31L227.31,96a16,16,0,0,0,0-22.63ZM92.69,208H48V163.31l88-88L180.69,120ZM192,108.68,147.31,64l24-24L216,84.68Z"></path>
+                    </svg>
                   </button>
-                )}
-                {onUpload && (
-                  <button
-                    type='button'
-                    className="cursor-pointer "
-                    aria-label="Load a new image"
-                    onClick={() => onUpload()}
+                  <div
+                    className={`${buttonStyle} absolute top-[70%] left-[90%] w-full flex flex-col gap-2 p-2 rounded-input ${isOpen ? 'block' : 'hidden'}`}
                   >
-                    Load image
-                  </button>
-                )}
-                {onChange && (
-                  <button
-                    type='button'
-                    className="cursor-pointer "
-                    aria-label="Delete image"
-                    onClick={() => onChange(null)}
-                  >
-                    Delete
-                  </button>
-                )}
-              </div>
-            </div>
-            )
-          ) : (
-            onChange && (
-              <button
-                title="Remove image"
-                className={`${revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-2 top-2 bg-surface/70 pb-0.5`}
-                aria-label="remove image"
-                type="button"
-                onClick={() => {
-                  onChange(null);
-                }}
-              >
-                x
-              </button>
-            )
-          )}
+                    {onScale && (
+                      <button
+                        type="button"
+                        className="cursor-pointer"
+                        aria-label="Rescale image"
+                        onClick={() => onScale()}
+                      >
+                        Rescale image
+                      </button>
+                    )}
+                    {onUpload && (
+                      <button
+                        type="button"
+                        className="cursor-pointer "
+                        aria-label="Load a new image"
+                        onClick={() => onUpload()}
+                      >
+                        Load image
+                      </button>
+                    )}
+                    {onChange && (
+                      <button
+                        type="button"
+                        className="cursor-pointer "
+                        aria-label="Delete image"
+                        onClick={() => onChange(null)}
+                      >
+                        Delete
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )
+            : onChange && (
+                <button
+                  title="Remove image"
+                  className={`${revealOnHover} ${buttonStyle} flex absolute rounded-pill size-6 justify-center items-center right-2 top-2 bg-surface/70 pb-0.5`}
+                  aria-label="remove image"
+                  type="button"
+                  onClick={() => {
+                    onChange(null);
+                  }}
+                >
+                  x
+                </button>
+              )}
         </>
       )}
     </div>
