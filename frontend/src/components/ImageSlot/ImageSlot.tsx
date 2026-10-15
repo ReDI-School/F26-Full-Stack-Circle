@@ -75,6 +75,7 @@ const ImageSlot = ({
             }}
           ></img>
           {shape === 'circle' ? (
+            (onScale || onUpload || onChange) && (
             <div ref={menuRef}>
               <button
                 type="button"
@@ -92,6 +93,7 @@ const ImageSlot = ({
               >
                 {onScale && (
                   <button
+                    type='button'
                     className="cursor-pointer"
                     aria-label="Rescale image"
                     onClick={() => onScale()}
@@ -101,6 +103,7 @@ const ImageSlot = ({
                 )}
                 {onUpload && (
                   <button
+                    type='button'
                     className="cursor-pointer "
                     aria-label="Load a new image"
                     onClick={() => onUpload()}
@@ -110,6 +113,7 @@ const ImageSlot = ({
                 )}
                 {onChange && (
                   <button
+                    type='button'
                     className="cursor-pointer "
                     aria-label="Delete image"
                     onClick={() => onChange(null)}
@@ -119,6 +123,7 @@ const ImageSlot = ({
                 )}
               </div>
             </div>
+            )
           ) : (
             onChange && (
               <button
