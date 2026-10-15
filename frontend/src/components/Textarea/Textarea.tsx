@@ -44,7 +44,12 @@ const Textarea = ({
         aria-describedby={descriptionIds}
       />
 
-      <div className={styles.message()}>
+      <div
+        className={styles.message()}
+        tabIndex={message ? 0 : undefined}
+        role={message ? 'region' : undefined}
+        aria-label={message ? `${label} ${messageType} message` : undefined}
+      >
         {message ? (
           <span id={messageId} className={hasError ? styles.error() : styles.helper()}>
             {message}

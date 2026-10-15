@@ -14,7 +14,7 @@ const meta: Meta<typeof Textarea> = {
         component:
           'A labelled multi-line input for item descriptions and messages. Uses the TextField ' +
           'styles, resizes vertically, and defaults to four rows. Non-blank errors replace helper ' +
-          'text. One line is reserved for messages; longer messages expand naturally.',
+          'text. A fixed two-line area is reserved for messages; longer messages scroll inside it.',
       },
     },
   },
@@ -99,6 +99,15 @@ export const MessageChanges: Story = {
         'and collection details so buyers can decide whether it is right for them.';
     }
 
+    let helperText: string | undefined;
+    if (messageState === 'helper') {
+      helperText = 'Maximum 500 characters';
+    } else if (messageState === 'long-helper') {
+      helperText =
+        'Describe the item, including its condition, dimensions, any signs of wear, and collection ' +
+        'details. You can also mention how long you have owned it and why you are selling it.';
+    }
+
     return (
       <div className="flex w-full max-w-sm flex-col gap-4">
         <label>
@@ -108,15 +117,12 @@ export const MessageChanges: Story = {
             <option value="helper">Helper text</option>
             <option value="error">Error message</option>
             <option value="long">Long error message</option>
+            <option value="long-helper">Long helper text</option>
           </select>
         </label>
         <p id="message-guidance">Describe your item for buyers.</p>
-        <Textarea
-          {...args}
-          error={error}
-          helperText={messageState === 'helper' ? 'Maximum 500 characters' : undefined}
-        />
-        <p>The next field stays in place for single-line messages.</p>
+        <Textarea {...args} error={error} helperText={helperText} />
+        <p>The next field stays in place for short and long messages.</p>
       </div>
     );
   },
