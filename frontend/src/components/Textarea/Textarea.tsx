@@ -17,10 +17,17 @@ const Textarea = ({
 }: TextareaProps) => {
   const generatedId = useId();
   const textareaId = id ?? generatedId;
-  const message = error || helperText;
-  const messageId = message ? `${textareaId}-${error ? 'error' : 'helper'}` : undefined;
-  const descriptionIds = [describedBy, messageId].filter(Boolean).join(' ') || undefined;
-  const styles = textareaStyles({ hasError: Boolean(error), disabled: textareaProps.disabled });
+  const hasError = Boolean(error?.trim());
+  const message = hasError ? error : helperText;
+  const messageType = hasError ? 'error' : 'helper';
+  const messageId = message ? `${textareaId}-${messageType}` : undefined;
+
+  let descriptionIds = describedBy || undefined;
+  if (messageId) {
+    descriptionIds = describedBy ? `${describedBy} ${messageId}` : messageId;
+  }
+
+  const styles = textareaStyles({ hasError, disabled: textareaProps.disabled });
 
   return (
     <div className={styles.root()}>
@@ -33,15 +40,17 @@ const Textarea = ({
         id={textareaId}
         rows={rows}
         className={styles.input()}
-        aria-invalid={error ? true : ariaInvalid}
+        aria-invalid={hasError ? true : ariaInvalid}
         aria-describedby={descriptionIds}
       />
 
-      {message ? (
-        <span id={messageId} className={error ? styles.error() : styles.helper()}>
-          {message}
-        </span>
-      ) : null}
+      <div className={styles.message()}>
+        {message ? (
+          <span id={messageId} className={hasError ? styles.error() : styles.helper()}>
+            {message}
+          </span>
+        ) : null}
+      </div>
     </div>
   );
 };

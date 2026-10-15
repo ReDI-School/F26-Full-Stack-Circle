@@ -13,7 +13,8 @@ const meta: Meta<typeof Textarea> = {
       description: {
         component:
           'A labelled multi-line input for item descriptions and messages. Uses the TextField ' +
-          'styles, resizes vertically, and defaults to four rows. Errors replace helper text.',
+          'styles, resizes vertically, and defaults to four rows. Non-blank errors replace helper ' +
+          'text. One line is reserved for messages; longer messages expand naturally.',
       },
     },
   },
@@ -54,6 +55,70 @@ export const WithHelperText: Story = {
     label: 'Description',
     helperText: 'Maximum 500 characters',
     maxLength: 500,
+  },
+};
+
+export const EmptyError: Story = {
+  args: {
+    label: 'Description',
+    error: '',
+    helperText: 'Maximum 500 characters',
+  },
+};
+
+export const WhitespaceError: Story = {
+  args: {
+    label: 'Description',
+    error: '   ',
+    helperText: 'Maximum 500 characters',
+  },
+};
+
+export const ExternalInvalid: Story = {
+  args: {
+    label: 'Description',
+    error: '   ',
+    'aria-invalid': true,
+  },
+};
+
+export const MessageChanges: Story = {
+  args: {
+    label: 'Description',
+    id: 'changing-description',
+    'aria-describedby': 'message-guidance',
+  },
+  render: function Render(args) {
+    const [messageState, setMessageState] = useState('none');
+    let error: string | undefined;
+    if (messageState === 'error') {
+      error = 'Description is required';
+    } else if (messageState === 'long') {
+      error =
+        'Please describe the item, including its condition, dimensions, any signs of wear, ' +
+        'and collection details so buyers can decide whether it is right for them.';
+    }
+
+    return (
+      <div className="flex w-full max-w-sm flex-col gap-4">
+        <label>
+          Message state
+          <select value={messageState} onChange={(event) => setMessageState(event.target.value)}>
+            <option value="none">No message</option>
+            <option value="helper">Helper text</option>
+            <option value="error">Error message</option>
+            <option value="long">Long error message</option>
+          </select>
+        </label>
+        <p id="message-guidance">Describe your item for buyers.</p>
+        <Textarea
+          {...args}
+          error={error}
+          helperText={messageState === 'helper' ? 'Maximum 500 characters' : undefined}
+        />
+        <p>The next field stays in place for single-line messages.</p>
+      </div>
+    );
   },
 };
 

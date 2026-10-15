@@ -6,6 +6,7 @@ export const textareaStyles = tv({
   extend: textFieldStyles,
   slots: {
     input: ['py-3', 'resize-y'],
+    message: ['min-h-lh', 'font-sans', 'text-[length:var(--text-caption)]'],
     helper: ['font-sans', 'text-[length:var(--text-caption)]', 'text-muted'],
   },
   variants: {
