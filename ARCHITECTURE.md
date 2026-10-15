@@ -147,12 +147,21 @@ change, the migration file in your PR _is_ the deployment step — see
 >
 > **Never edit, rename or regenerate a migration once it has been pushed — add a new one
 > instead.** The preview database still remembers the old version. Re-creating the same tables
-> under a new migration name fails with errors like `type "Role" already exists`. A failed
-> migration is recorded as failed and **blocks every preview** until a teacher resets the
-> preview database. CI cannot catch this, because it always starts from an empty database. Test
-> a migration against a fresh local database first (`pnpm db:reset && pnpm db:deploy`).
+> under a new migration name fails with errors like `type "Role" already exists`, and the
+> migration is recorded as failed.
 >
-> Production is only migrated after a merge, and only by `main`.
+> When `prisma migrate deploy` fails on a preview, the build **wipes the preview database and
+> rebuilds it** from your branch's migrations, then seeds it. Your preview works, but every
+> other PR's preview now runs against your schema, and breaks if theirs differs, until it is
+> redeployed. If two branches keep disagreeing, they wipe the database back and forth on every
+> push. If your migrations fail on an empty database too, your build fails: the migration
+> itself is broken. CI cannot catch any of this, because it always starts from an empty
+> database. Test a migration against a fresh local database first
+> (`pnpm db:reset && pnpm db:deploy`).
+>
+> Production is never reset. It is only migrated after a merge, and only by `main`, and a
+> failed migration there stops the build. The same rule matters even more on production: a
+> migration that was rewritten after it reached production cannot be applied there at all.
 
 ## 6. CI and Vercel: who catches what
 
@@ -202,9 +211,12 @@ cannot catch:
 - Did your migration succeed locally against an empty database, but the real one already has
   data? Rows that violate a new constraint will fail there and only there.
 
-**If every preview fails with `P3009` ("found failed migrations in the target database")**, a
-migration broke the shared preview database. A teacher resets it: in the Supabase dashboard of
-the **preview** project (never the production one), open the SQL editor and run
+**If your preview fails with `P3009` ("found failed migrations in the target database")**,
+another branch's migration broke the shared preview database, and your branch is older than
+the build that repairs it. Merge `main` into your branch and push: the build then resets the
+preview database by itself (see [What happens when you push](#5-what-happens-when-you-push)).
+If that is not an option, a teacher resets it by hand: in the Supabase dashboard of the
+**preview** project (never the production one), open the SQL editor and run
 
 ```sql
 DROP SCHEMA public CASCADE;
