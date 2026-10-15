@@ -13,7 +13,7 @@ export const buttonStyles = tv({
 });
 
 export const questionStyles = tv({
-  base: 'flex-1 font-display font-extrabold text-base',
+  base: 'font-display font-extrabold text-base',
 });
 
 export const chevronStyles = tv({

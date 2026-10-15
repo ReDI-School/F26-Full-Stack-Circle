@@ -12,6 +12,7 @@ import {
 } from './FAQAccordion.styles';
 
 import { FAQAccordionProps } from './FAQAccordion.types';
+import { Minus, Plus } from 'lucide-react';
 
 const FAQAccordion = ({ items, defaultOpenId }: FAQAccordionProps) => {
   const [openId, setOpenId] = useState<string | null>(defaultOpenId ?? null);
@@ -39,7 +40,9 @@ const FAQAccordion = ({ items, defaultOpenId }: FAQAccordionProps) => {
               <span id={answerId} aria-labelledby={questionId} className={questionStyles()}>
                 {item.question}
               </span>
-              <span className={chevronStyles()}></span>
+              <span className={chevronStyles()}>
+                {isOpen ? <Minus size={18} /> : <Plus size={18} />}
+              </span>
             </button>
             <p className={answerStyles({ open: isOpen })} aria-hidden="true">
               {item.answer}
