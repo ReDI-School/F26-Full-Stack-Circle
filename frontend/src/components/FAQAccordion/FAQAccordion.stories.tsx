@@ -29,6 +29,23 @@ const meta: Meta<typeof FAQAccordion> = {
 export default meta;
 type Story = StoryObj<typeof FAQAccordion>;
 
-export const Default: Story = {
-  args: {},
+export const Default: Story = {};
+
+export const OneOpen: Story = {
+  args: { defaultOpenId: FAQItems[0].id },
+};
+
+export const LongAnswer: Story = {
+  args: {
+    items: [
+      {
+        id: 'long',
+        question: 'Can you give me a very detailed answer?',
+        answer:
+          'Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam blanditiis odit amet consequatur minima temporibus quasi voluptate doloremque molestiae reprehenderit laudantium ullam itaque nostrum necessitatibus, placeat officiis architecto dolor vel.',
+      },
+      ...FAQItems.slice(0, 2),
+    ],
+    defaultOpenId: 'long',
+  },
 };

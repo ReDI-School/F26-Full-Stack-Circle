@@ -37,16 +37,19 @@ const FAQAccordion = ({ items, defaultOpenId }: FAQAccordionProps) => {
               aria-expanded={isOpen}
               onClick={() => handleClick(item.id)}
             >
-              <span id={answerId} aria-labelledby={questionId} className={questionStyles()}>
-                {item.question}
-              </span>
-              <span className={chevronStyles()}>
+              <span className={questionStyles()}>{item.question}</span>
+              <span className={chevronStyles()} aria-hidden="true">
                 {isOpen ? <Minus size={18} /> : <Plus size={18} />}
               </span>
             </button>
-            <p className={answerStyles({ open: isOpen })} aria-hidden="true">
+            <div
+              className={answerStyles({ open: isOpen })}
+              id={answerId}
+              role="region"
+              aria-labelledby={questionId}
+            >
               {item.answer}
-            </p>
+            </div>
           </article>
         );
       })}
