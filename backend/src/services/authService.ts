@@ -16,6 +16,10 @@ export class AuthError extends Error {
   }
 }
 
+/**
+ * Already validated by the controller: trimmed, lowercased email and a
+ * password of at least 8 characters.
+ */
 export interface RegisterInput {
   name: string;
   email: string;
@@ -34,13 +38,6 @@ export interface PublicUser {
   isAdmin: boolean;
   shop: { id: string; name: string } | null;
 }
-
-const MIN_PASSWORD_LENGTH = 8;
-
-// Deliberately permissive: the only thing worth rejecting here is input
-// that is obviously not an address. Real verification is an email round
-// trip, which is a different ticket.
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 const toPublicUser = (user: {
   id: string;
@@ -70,27 +67,10 @@ export class AuthService {
    * anything, so a half-finished registration would leave someone with
    * a broken account for a person to fix by hand.
    */
-  async register(input: RegisterInput): Promise<PublicUser> {
-    const name = typeof input.name === 'string' ? input.name.trim() : '';
-    const email = typeof input.email === 'string' ? input.email.trim().toLowerCase() : '';
-    const password = typeof input.password === 'string' ? input.password : '';
-
-    if (!name) {
-      throw new AuthError(400, 'Please enter your name.');
-    }
-
-    if (!email) {
-      throw new AuthError(400, 'Please enter your email address.');
-    }
-
-    if (!EMAIL_PATTERN.test(email)) {
-      throw new AuthError(400, 'That does not look like an email address.');
-    }
-
-    if (password.length < MIN_PASSWORD_LENGTH) {
-      throw new AuthError(400, `Your password needs at least ${MIN_PASSWORD_LENGTH} characters.`);
-    }
-
+  async register({ name, email, password }: RegisterInput): Promise<PublicUser> {
+    // Not validation of the request, which the controller has already
+    // done - this is the rule that no two accounts share an email, and
+    // only the database can answer it.
     const taken = await prisma.user.findUnique({
       where: { email },
       select: { id: true },

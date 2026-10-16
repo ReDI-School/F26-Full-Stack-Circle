@@ -1,9 +1,21 @@
 import { Request, Response } from 'express';
+import { z } from 'zod';
 
 import { TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
 import { AuthError, AuthService } from '../services/authService';
 
 const authService = new AuthService();
+
+/**
+ * The shape of a valid registration request. `trim` and `toLowerCase` are
+ * transforms, not just checks, so the service receives the cleaned values -
+ * which is what makes Ada@... and ada@... the same account.
+ */
+const registerSchema = z.object({
+  name: z.string().trim().min(1),
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(8),
+});
 
 /**
  * The token goes in a cookie the browser cannot read from JavaScript, so
@@ -23,8 +35,17 @@ const cookieOptions = {
 
 export class AuthController {
   async register(req: Request, res: Response) {
+    const parsed = registerSchema.safeParse(req.body ?? {});
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: parsed.error.issues[0]?.message ?? 'Validation failed',
+        details: parsed.error.issues,
+      });
+    }
+
     try {
-      const user = await authService.register(req.body ?? {});
+      const user = await authService.register(parsed.data);
 
       res.cookie(AUTH_COOKIE, signToken(user.id), cookieOptions);
 
