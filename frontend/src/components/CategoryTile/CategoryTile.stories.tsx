@@ -28,7 +28,7 @@ export const Default: Story = {
   },
 };
 
-export const TileRow: Story = {
+export const Row: Story = {
   render: () => (
     <div className="flex flex-wrap gap-3.5">
       <CategoryTile name="clothing" emoji="👕" tint="primary" />
@@ -36,6 +36,16 @@ export const TileRow: Story = {
       <CategoryTile name="electronics" emoji="🔌" tint="tertiary" />
       <CategoryTile name="home" emoji="🪴" tint="primary" />
       <CategoryTile name="sports" emoji="⚽" tint="secondary" />
+    </div>
+  ),
+};
+
+export const Tints: Story = {
+  render: () => (
+    <div className="flex flex-wrap gap-3.5">
+      <CategoryTile name="primary" emoji="👕" tint="primary" />
+      <CategoryTile name="secondary" emoji="📚" tint="secondary" />
+      <CategoryTile name="tertiary" emoji="🔌" tint="tertiary" />
     </div>
   ),
 };
