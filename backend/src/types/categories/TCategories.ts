@@ -1,5 +1,6 @@
-import { Prisma } from '../../../generated/prisma/client';
+import { z } from 'zod';
+import type { CategoryService } from '../../services/categoryService';
+import { GetAllCategoriesResponseSchema } from '../../schemas/GetAllCategoriesResponseSchema';
 
-export type TCategoryWithCount = Prisma.CategoryGetPayload<{
-  include: { _count: { select: { items: true } } };
-}>;
+export type TGetAllCategories = Awaited<ReturnType<CategoryService['getAllCategories']>>[number];
+export type TGetAllCategoriesResponse = z.infer<typeof GetAllCategoriesResponseSchema>;

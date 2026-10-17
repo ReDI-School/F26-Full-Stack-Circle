@@ -1,15 +1,17 @@
 import { Request, Response } from 'express';
 import { CategoryService } from '../services/categoryService';
-import { TCategoryWithCount } from '../types/categories/TCategories';
+import { TGetAllCategories, TGetAllCategoriesResponse } from '../types/categories/TCategories';
+import { GetAllCategoriesResponseSchema } from '../schemas/GetAllCategoriesResponseSchema';
 
 const categoryService = new CategoryService();
 
-const shapeCategories = (categories: TCategoryWithCount[]) => {
-  return categories.map((category) => {
-    const { _count, ...rest } = category;
-    return { ...rest, itemsCount: _count.items };
-  });
-};
+const shapeCategories = (categories: TGetAllCategories[]): TGetAllCategoriesResponse[] =>
+  categories.map((category) =>
+    GetAllCategoriesResponseSchema.parse({
+      ...category,
+      itemCount: category._count.items,
+    })
+  );
 
 export class CategoryController {
   async getCategories(req: Request, res: Response) {
