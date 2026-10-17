@@ -14,7 +14,16 @@ const authService = new AuthService();
 const registerSchema = z.object({
   name: z.string().trim().min(1),
   email: z.string().trim().toLowerCase().email(),
-  password: z.string().min(8),
+  // bcrypt hashes only the first 72 bytes and discards the rest without
+  // complaining, so a longer password would be half-accepted: the prefix
+  // alone would log you in. Rejecting it is better than silently
+  // throwing part of someone's credential away.
+  password: z
+    .string()
+    .min(8)
+    .refine((value) => Buffer.byteLength(value, 'utf8') <= 72, {
+      message: 'Password must be at most 72 bytes long.',
+    }),
 });
 
 /**

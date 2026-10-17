@@ -18,7 +18,7 @@ export class AuthError extends Error {
 
 /**
  * Already validated by the controller: trimmed, lowercased email and a
- * password of at least 8 characters.
+ * password between 8 characters and 72 bytes.
  */
 export interface RegisterInput {
   name: string;
@@ -60,6 +60,13 @@ const defaultShopName = (name: string): string => {
   return `${firstName}'s shop`;
 };
 
+/** Prisma's code for "a unique constraint rejected this write". */
+const isUniqueViolation = (error: unknown): boolean =>
+  typeof error === 'object' &&
+  error !== null &&
+  'code' in error &&
+  (error as { code: unknown }).code === 'P2002';
+
 export class AuthService {
   /**
    * Creates an account and the shop that comes with it. The two are
@@ -68,11 +75,11 @@ export class AuthService {
    * a broken account for a person to fix by hand.
    */
   async register({ name, email, password }: RegisterInput): Promise<PublicUser> {
-    // Not validation of the request, which the controller has already
-    // done - this is the rule that no two accounts share an email, and
-    // only the database can answer it.
-    const taken = await prisma.user.findUnique({
-      where: { email },
+    // Case-insensitive, because accounts created through the older user
+    // routes were stored with whatever casing they were given. Without
+    // this, Alice@Example.com and alice@example.com become two accounts.
+    const taken = await prisma.user.findFirst({
+      where: { email: { equals: email, mode: 'insensitive' } },
       select: { id: true },
     });
 
@@ -82,18 +89,29 @@ export class AuthService {
 
     const passwordHash = await bcrypt.hash(password, 10);
 
-    const user = await prisma.$transaction(async (tx) => {
-      const created = await tx.user.create({
-        data: { name, email, passwordHash },
+    try {
+      const user = await prisma.$transaction(async (tx) => {
+        const created = await tx.user.create({
+          data: { name, email, passwordHash },
+        });
+
+        const shop = await tx.shop.create({
+          data: { name: defaultShopName(name), ownerId: created.id },
+        });
+
+        return { ...created, shop };
       });
 
-      const shop = await tx.shop.create({
-        data: { name: defaultShopName(name), ownerId: created.id },
-      });
+      return toPublicUser(user);
+    } catch (error) {
+      // Two registrations for the same address can both pass the check
+      // above and race to the insert. The loser is a duplicate, not a
+      // server fault, so it gets the same 409 as the sequential case.
+      if (isUniqueViolation(error)) {
+        throw new AuthError(409, 'That email is already registered.');
+      }
 
-      return { ...created, shop };
-    });
-
-    return toPublicUser(user);
+      throw error;
+    }
   }
 }

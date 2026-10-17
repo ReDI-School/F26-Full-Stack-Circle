@@ -3,14 +3,19 @@ import jwt from 'jsonwebtoken';
 
 dotenv.config();
 
-const secret = process.env.JWT_SECRET;
+const secret = process.env.JWT_SECRET?.trim();
 
-// Thrown while this module is first imported, which happens at startup.
-// Without it, jsonwebtoken would happily sign with `undefined` and every
-// token would verify against every other deployment.
-if (!secret) {
+/** The value .env.example ships with, which must never sign a real token. */
+const PLACEHOLDER = 'change-me-to-a-long-random-string';
+
+// Checked while this module is first imported, which happens at startup.
+// jsonwebtoken would reject an undefined secret anyway, but only on the
+// first request that tries to sign one - by which point the service is
+// already accepting traffic. Failing here turns a misconfiguration into a
+// startup error instead of a runtime one.
+if (!secret || secret === PLACEHOLDER) {
   throw new Error(
-    'JWT_SECRET is not set. Copy .env.example to .env and give it a long random value.'
+    'JWT_SECRET is missing or still the example value. Generate one with `openssl rand -base64 32` and put it in .env.'
   );
 }
 
