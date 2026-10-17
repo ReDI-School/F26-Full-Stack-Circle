@@ -33,7 +33,7 @@ const Toast = ({ message, variant = 'success', duration = 4000, open, onDismiss 
       aria-atomic="true"
     >
       <span className={styles.dot()} aria-hidden="true" />
-      <span className="break-words">{message}</span>
+      <span className="min-w-0 break-words">{message}</span>
       {onDismiss && (
         <button
           type="button"
