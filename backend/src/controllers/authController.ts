@@ -1,8 +1,9 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
+import { EmailAlreadyRegisteredError } from '../errors/authErrors';
 import { TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
-import { AuthError, AuthService } from '../services/authService';
+import { AuthService } from '../services/authService';
 
 const authService = new AuthService();
 
@@ -14,15 +15,16 @@ const authService = new AuthService();
 const registerSchema = z.object({
   name: z.string().trim().min(1),
   email: z.string().trim().toLowerCase().email(),
-  // bcrypt hashes only the first 72 bytes and discards the rest without
-  // complaining, so a longer password would be half-accepted: the prefix
-  // alone would log you in. Rejecting it is better than silently
-  // throwing part of someone's credential away.
+  // The character limit is what a person sees. The byte check stays as a
+  // backstop: bcrypt hashes only the first 72 bytes and silently drops
+  // the rest, and 64 characters of emoji or Cyrillic can still exceed
+  // that. Truncation would let the prefix alone log you in.
   password: z
     .string()
-    .min(8)
+    .min(8, 'Password must be at least 8 characters.')
+    .max(64, 'Password must be at most 64 characters.')
     .refine((value) => Buffer.byteLength(value, 'utf8') <= 72, {
-      message: 'Password must be at most 72 bytes long.',
+      message: 'Password is too long.',
     }),
 });
 
@@ -60,10 +62,10 @@ export class AuthController {
 
       res.status(201).json({ user });
     } catch (error) {
-      // Everything the service rejects on purpose carries the status and a
-      // message meant for a person to read.
-      if (error instanceof AuthError) {
-        return res.status(error.status).json({ error: error.message });
+      // Mapping domain errors to HTTP status codes happens here, at the
+      // transport boundary, not in the service.
+      if (error instanceof EmailAlreadyRegisteredError) {
+        return res.status(409).json({ error: error.message });
       }
 
       console.error('Error registering user:', error);

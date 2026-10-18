@@ -1,24 +1,11 @@
 import bcrypt from 'bcryptjs';
 
+import { EmailAlreadyRegisteredError } from '../errors/authErrors';
 import prisma from '../libs/prisma';
 
 /**
- * An error the controller can turn straight into a response. Anything
- * else that escapes the service is a bug and becomes a 500.
- */
-export class AuthError extends Error {
-  constructor(
-    readonly status: number,
-    message: string
-  ) {
-    super(message);
-    this.name = 'AuthError';
-  }
-}
-
-/**
  * Already validated by the controller: trimmed, lowercased email and a
- * password between 8 characters and 72 bytes.
+ * password of 8 to 64 characters that also fits in bcrypt's 72 bytes.
  */
 export interface RegisterInput {
   name: string;
@@ -84,7 +71,7 @@ export class AuthService {
     });
 
     if (taken) {
-      throw new AuthError(409, 'That email is already registered.');
+      throw new EmailAlreadyRegisteredError();
     }
 
     const passwordHash = await bcrypt.hash(password, 10);
@@ -106,9 +93,9 @@ export class AuthService {
     } catch (error) {
       // Two registrations for the same address can both pass the check
       // above and race to the insert. The loser is a duplicate, not a
-      // server fault, so it gets the same 409 as the sequential case.
+      // server fault, so it gets the same error as the sequential case.
       if (isUniqueViolation(error)) {
-        throw new AuthError(409, 'That email is already registered.');
+        throw new EmailAlreadyRegisteredError();
       }
 
       throw error;
