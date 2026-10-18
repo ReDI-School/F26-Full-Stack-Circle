@@ -1,12 +1,17 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@generated/*": ["./generated/*"]
+    },
     "target": "ES2020",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
     "outDir": "./dist",
     "esModuleInterop": true,
     "forceConsistentCasingInFileNames": true,
-    "strict": true,
+    "s
+    trict": true,
     "skipLibCheck": true
   },
   "include": ["src/**/*", "prisma/**/*"],
