@@ -5,6 +5,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import prisma from './libs/prisma';
 import userRouter from './routes/userRoutes';
+import itemRouter from './routes/itemRoutes';
 
 dotenv.config();
 
@@ -75,7 +76,7 @@ api.get('/health', async (req: Request, res: Response) => {
 
 // Routes
 api.use('/users', userRouter);
-
+api.use('/items', itemRouter);
 app.use('/api', api);
 
 const protocol = process.env.PROTOCOL ?? 'http';
