@@ -47,6 +47,16 @@ const defaultShopName = (name: string): string => {
   return `${firstName}'s shop`;
 };
 
+/**
+ * Every character JavaScript's `String.prototype.trim` removes, which is
+ * what Zod's `.trim()` uses on the incoming email. PostgreSQL's `trim()`
+ * only removes spaces, so a stored "\tAlice@Example.com\t" would slip past
+ * it. Written as a PostgreSQL regex and sent as a bound parameter.
+ */
+const JS_WHITESPACE =
+  '[\\t\\n\\v\\f\\r \\u00a0\\u1680\\u2000-\\u200a\\u2028\\u2029\\u202f\\u205f\\u3000\\ufeff]';
+const EDGE_WHITESPACE = `^${JS_WHITESPACE}+|${JS_WHITESPACE}+$`;
+
 /** Prisma's code for "a unique constraint rejected this write". */
 const isUniqueViolation = (error: unknown): boolean =>
   typeof error === 'object' &&
@@ -63,13 +73,16 @@ export class AuthService {
    */
   async register({ name, email, password }: RegisterInput): Promise<PublicUser> {
     // Older user routes stored emails exactly as typed, so a row may hold
-    // " Alice@Example.com ". Normalise the stored side the same way Zod
-    // normalised the input, and compare with `=`. Prisma's
+    // " Alice@Example.com " or "\tAlice@Example.com\n". Normalise the
+    // stored side exactly the way Zod normalised the input (same
+    // whitespace set, then lowercase) and compare with `=`. Prisma's
     // `mode: 'insensitive'` compiles to ILIKE, where `_` and `%` are
     // wildcards: john_doe@... would match an existing john.doe@...
-    // The tagged template sends `email` as a bound parameter, not SQL.
+    // The tagged template sends both values as bound parameters, not SQL.
     const taken = await prisma.$queryRaw<{ id: string }[]>`
-      SELECT id FROM "User" WHERE lower(trim(email)) = ${email} LIMIT 1
+      SELECT id FROM "User"
+      WHERE lower(regexp_replace(email, ${EDGE_WHITESPACE}, '', 'g')) = ${email}
+      LIMIT 1
     `;
 
     if (taken.length > 0) {
