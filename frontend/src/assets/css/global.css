@@ -82,6 +82,7 @@
   --shadow-nav: 0 4px 16px rgba(56, 90, 101, 0.06);
   --shadow-card: 0 8px 24px rgba(56, 90, 101, 0.14);
   --shadow-menu: 0 12px 32px rgba(56, 90, 101, 0.16);
+  --shadow-category-tile-hover: 0 3px 10px rgba(56, 90, 101, 0.16);
 }
 
 /* ============================================================

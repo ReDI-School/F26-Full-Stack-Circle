@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import prisma from './libs/prisma';
 import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
+import categoryRouter from './routes/categoryRoutes';
 
 dotenv.config();
 
@@ -81,6 +82,8 @@ api.get('/health', async (req: Request, res: Response) => {
 // Routes
 api.use('/auth', authRouter);
 api.use('/users', userRouter);
+
+api.use('/categories', categoryRouter);
 
 app.use('/api', api);
 
