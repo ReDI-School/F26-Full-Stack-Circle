@@ -1,3 +1,5 @@
+import { ReactNode } from "react";
+
 interface BannerProps {
   /**
    * The headline of the banner
@@ -5,9 +7,13 @@ interface BannerProps {
   title: string;
 
   // TODO: add the rest of the props this component needs:
-  // - subtitle
-  // - variant: 'hero' | 'cta'
+  subtitle: string;
+
+  variant?: `hero` | `cta`;
+  action?: ReactNode;
+  
   // - action (button on the right of a cta banner)
 }
+
 
 export type { BannerProps };
