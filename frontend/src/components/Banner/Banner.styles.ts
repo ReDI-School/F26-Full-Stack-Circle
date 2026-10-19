@@ -9,10 +9,14 @@ import { tv } from 'tailwind-variants';
  */
 
 export const bannerStyles = tv({
-  base: [
-    'mx-[calc(50%_-_50vw)]',
-    'px-[max(32px,_calc(50vw_-_538px))]',
-  ],
+  
+base: [
+  'w-full',
+  'box-border',
+  'px-8',
+  'min-[1076px]:px-[calc((100vw-1076px)/2)]',
+],
+
   variants: {
     variant: {
       hero: [
@@ -33,7 +37,12 @@ export const bannerStyles = tv({
 });
 
 export const bannerTitleStyles = tv({
-  base: ['font-display', 'font-black', 'leading-[1.1]'],
+  base: [
+    'font-display',
+    'font-black',
+    'leading-[1.1]',
+    'text-surface',
+  ],
   variants: {
     variant: {
       hero: [
@@ -50,8 +59,15 @@ export const bannerSubtitleStyles = tv({
   base: [],
   variants: {
     variant: {
-      hero: ['text-[16px]', 'max-w-[480px]'],
-      cta: ['text-[15px]'],
+      hero: [
+        'text-[16px]',
+        'max-w-[480px]',
+        'text-primary-100',
+      ],
+      cta: [
+        'text-[15px]',
+        'text-tertiary-100',
+      ],
     },
   },
 });
