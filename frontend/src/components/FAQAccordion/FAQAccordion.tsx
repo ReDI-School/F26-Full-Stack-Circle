@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useId, useState } from 'react';
 
 import {
   baseStyles,
@@ -15,6 +15,7 @@ import { FAQAccordionProps } from './FAQAccordion.types';
 import { Minus, Plus } from 'lucide-react';
 
 const FAQAccordion = ({ items, defaultOpenId }: FAQAccordionProps) => {
+  const instanceId = useId();
   const [openId, setOpenId] = useState<string | null>(defaultOpenId ?? null);
 
   const handleClick = (id: string) => {
@@ -25,8 +26,8 @@ const FAQAccordion = ({ items, defaultOpenId }: FAQAccordionProps) => {
     <div className={baseStyles()}>
       {items.map((item) => {
         const isOpen = openId === item.id;
-        const questionId = `faq-question-${item.id}`;
-        const answerId = `faq-answer-${item.id}`;
+        const questionId = `${instanceId}-question-${item.id}`;
+        const answerId = `${instanceId}-answer-${item.id}`;
         return (
           <article className={cardStyles()} key={item.id}>
             <button
