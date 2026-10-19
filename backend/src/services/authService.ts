@@ -62,15 +62,17 @@ export class AuthService {
    * a broken account for a person to fix by hand.
    */
   async register({ name, email, password }: RegisterInput): Promise<PublicUser> {
-    // Case-insensitive, because accounts created through the older user
-    // routes were stored with whatever casing they were given. Without
-    // this, Alice@Example.com and alice@example.com become two accounts.
-    const taken = await prisma.user.findFirst({
-      where: { email: { equals: email, mode: 'insensitive' } },
-      select: { id: true },
-    });
+    // Older user routes stored emails exactly as typed, so a row may hold
+    // " Alice@Example.com ". Normalise the stored side the same way Zod
+    // normalised the input, and compare with `=`. Prisma's
+    // `mode: 'insensitive'` compiles to ILIKE, where `_` and `%` are
+    // wildcards: john_doe@... would match an existing john.doe@...
+    // The tagged template sends `email` as a bound parameter, not SQL.
+    const taken = await prisma.$queryRaw<{ id: string }[]>`
+      SELECT id FROM "User" WHERE lower(trim(email)) = ${email} LIMIT 1
+    `;
 
-    if (taken) {
+    if (taken.length > 0) {
       throw new EmailAlreadyRegisteredError();
     }
 
