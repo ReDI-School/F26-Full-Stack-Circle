@@ -58,7 +58,6 @@ export class ItemService {
           oldPriceCents: true,
           condition: true,
           sold: true,
-          createdAt: true,
           category: { select: { slug: true, name: true } },
           shop: { select: { id: true, name: true } },
           photos: { select: { url: true }, orderBy: { position: 'asc' }, },
