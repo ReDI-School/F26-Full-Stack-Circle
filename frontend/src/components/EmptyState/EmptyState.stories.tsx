@@ -50,7 +50,6 @@ export const NoMessages: Story = {
     variant: 'plain',
     emoji: '📭',
     title: 'No messages yet',
-    description:
-      'Found something you like? Tap "I\'m interested" on an item.',
+    description: 'Found something you like? Tap "I\'m interested" on an item.',
   },
 };
