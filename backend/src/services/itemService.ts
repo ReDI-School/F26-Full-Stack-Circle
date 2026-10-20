@@ -1,48 +1,18 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
-
-interface GetItemsParams {
-  category?: string;
-  q?: string;
-  shopId?: string;
-  take?: number;
-  skip?: number;
-}
+import { ItemError } from '@/errors/itemError';
+import { GetItemsQuery } from '@/schemas/ItemSchema';
 
 export class ItemService {
-  async getItems(params: GetItemsParams) {
+  async getItems(params: GetItemsQuery) {
     const { category, q, shopId, take = 50, skip = 0 } = params;
-
-    const parsedTake = Number(take);
-    const parsedSkip = Number(skip);
-
-    if (
-      !Number.isInteger(parsedTake) ||
-      !Number.isInteger(parsedSkip) ||
-      parsedTake <= 0 ||
-      parsedSkip < 0
-    ) {
-      throw new Error(
-        'INVALID_PAGINATION: take must be a positive integer and skip must be a non-negative integer.',
-      );
-    }
 
     const where: Prisma.ItemWhereInput = {
       sold: false,
     };
 
     if (category) {
-      const categoryExists = await prisma.category.findUnique({
-        where: { slug: category },
-      });
-
-      if (!categoryExists) {
-        throw new Error(`INVALID_CATEGORY: Category '${category}' does not exist.`);
-      }
-
-      where.category = {
-        slug: category,
-      };
+      where.category = { slug: category };
     }
 
     if (shopId) {
@@ -55,7 +25,7 @@ export class ItemService {
         { description: { contains: q, mode: 'insensitive' } },
       ];
     }
-    const [items, total] = await Promise.all([
+    const [items, total, categoryExists] = await Promise.all([
       prisma.item.findMany({
         where,
         select: {
@@ -67,14 +37,24 @@ export class ItemService {
           sold: true,
           category: { select: { slug: true, name: true } },
           shop: { select: { id: true, name: true } },
-          photos: { select: { url: true }, orderBy: { position: 'asc' }, },
+          photos: { select: { url: true }, orderBy: { position: 'asc' } },
         },
         orderBy: { createdAt: 'desc' },
-        take: Math.min(parsedTake, 100),
-        skip: parsedSkip,
+        take,
+        skip,
       }),
       prisma.item.count({ where }),
+      category
+        ? prisma.category.findUnique({
+            where: { slug: category },
+            select: { slug: true },
+          })
+        : Promise.resolve(null),
     ]);
+
+    if (category && !categoryExists) {
+      throw new ItemError(400, `Category '${category}' does not exist.`);
+    }
 
     return { items, total };
   }
