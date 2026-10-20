@@ -15,16 +15,12 @@ export class ItemController {
       });
 
       res.json(result);
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Error fetching items:', error);
-      if (
-        error.message?.startsWith('INVALID_CATEGORY') ||
-        error.message?.startsWith('INVALID_PAGINATION')
-      ) {
-        return res.status(400).json({ error: error.message });
+      if (error instanceof Error) {
+        return res.status(500).json({ error: error.message });
       }
-
-      res.status(500).json({ error: 'Failed to fetch items' });
+      return res.status(500).json({ error: 'Failed to fetch items' });
     }
   }
 }
