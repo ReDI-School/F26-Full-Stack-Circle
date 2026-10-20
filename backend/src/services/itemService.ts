@@ -16,8 +16,15 @@ export class ItemService {
     const parsedTake = Number(take);
     const parsedSkip = Number(skip);
 
-    if (isNaN(parsedTake) || isNaN(parsedSkip) || parsedTake < 0 || parsedSkip < 0) {
-      throw new Error('INVALID_PAGINATION: take and skip must be valid positive numbers.');
+    if (
+      !Number.isInteger(parsedTake) ||
+      !Number.isInteger(parsedSkip) ||
+      parsedTake <= 0 ||
+      parsedSkip < 0
+    ) {
+      throw new Error(
+        'INVALID_PAGINATION: take must be a positive integer and skip must be a non-negative integer.',
+      );
     }
 
     const where: Prisma.ItemWhereInput = {
