@@ -1,4 +1,5 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
+import { fn } from 'storybook/test';
 
 import ConfirmDialog from './ConfirmDialog';
 
@@ -15,36 +16,41 @@ const meta: Meta<typeof ConfirmDialog> = {
       },
     },
   },
+  args: {
+    open: true,
+    description: 'This action cannot be undone.',
+    onConfirm: fn(),
+    onCancel: fn(),
+  },
 };
 
 export default meta;
 type Story = StoryObj<typeof ConfirmDialog>;
 
-export const Default: Story = {
+export const RemoveItem: Story = {
   args: {
-    title: 'Delete your account?',
+    title: 'Remove this item?',
+    description: 'It will disappear from your shop and from the browse pages.',
+    cancelLabel: 'Keep it',
+    confirmLabel: 'Remove it',
   },
 };
 
-// TODO: as you add props to ConfirmDialog.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const DeleteAccount: Story = {
-//   args: {
-//     open: true,
-//     title: 'Delete your account?',
-//     description: "Your shop and all 4 listed items will be gone. This can't be undone.",
-//     cancelLabel: 'Keep it',
-//     confirmLabel: 'Delete',
-//   },
-// };
-//
-// export const RemoveItem: Story = {
-//   args: {
-//     open: true,
-//     title: 'Remove this item?',
-//     description: 'It will disappear from your shop and from the browse pages.',
-//     cancelLabel: 'Keep it',
-//     confirmLabel: 'Remove',
-//   },
-// };
+export const DeleteAccount: Story = {
+  args: {
+    title: 'Delete your account?',
+    description: "Your shop and all 4 listed items will be gone. This can't be undone.",
+    cancelLabel: 'Keep it',
+    confirmLabel: 'Delete',
+  },
+};
+
+export const Closed: Story = {
+  args: {
+    open: false,
+    title: 'Remove this item?',
+    description: 'It will disappear from your shop and from the browse pages.',
+    onCancel: fn(),
+    onConfirm: fn(),
+  },
+};
