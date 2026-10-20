@@ -61,7 +61,7 @@ export class ItemService {
           createdAt: true,
           category: { select: { slug: true, name: true } },
           shop: { select: { id: true, name: true } },
-          photos: { select: { url: true } },
+          photos: { select: { url: true }, orderBy: { position: 'asc' }, },
         },
         orderBy: { createdAt: 'desc' },
         take: Math.min(parsedTake, 100),
