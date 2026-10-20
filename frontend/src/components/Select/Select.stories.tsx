@@ -35,28 +35,36 @@ type Story = StoryObj<typeof Select>;
 export const Default: Story = {
   args: {
     label: 'Condition',
+    placeholder: 'Please choose a category',
     options: conditionOptions,
+    defaultValue: '',
   },
 };
 
 export const WithOptions: Story = {
   args: {
     label: 'Condition',
+    placeholder: 'Please choose a category',
     options: conditionOptions,
+    defaultValue: '',
   },
 };
 
 export const Category: Story = {
   args: {
     label: 'Category',
+    placeholder: 'Please choose a category',
     options: categoryOptions,
+    defaultValue: '',
   },
 };
 
 export const WithError: Story = {
   args: {
     label: 'Condition',
+    placeholder: 'Please choose a condition',
     options: conditionOptions,
+    defaultValue: '',
     error: 'Please choose a condition',
   },
 };
@@ -64,7 +72,9 @@ export const WithError: Story = {
 export const Disabled: Story = {
   args: {
     label: 'Condition',
+    placeholder: 'Please choose a category',
     options: conditionOptions,
+    defaultValue: '',
     disabled: true,
   },
 };

@@ -15,7 +15,11 @@ interface SelectProps extends React.SelectHTMLAttributes<HTMLSelectElement> {
    * The error message shown below the select
    */
   error?: string;
-  // - the usual select attributes (value, onChange, ...)
+
+  /**
+   * The first option that is meant to act as a placeholder
+   */
+  placeholder?: string;
 }
 
 export type { SelectProps };

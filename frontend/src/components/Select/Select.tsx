@@ -2,7 +2,7 @@ import { useId } from 'react';
 import { wrapperStyles, labelStyles, selectStyles, errorStyles } from './Select.styles';
 import type { SelectProps } from './Select.types';
 
-const Select = ({ label, options, error, id, ...props }: SelectProps) => {
+const Select = ({ label, options, error, placeholder, id, ...props }: SelectProps) => {
   const generatedId = useId();
   const selectId = id ?? generatedId;
   const errorId = `${selectId}-error`;
@@ -19,6 +19,11 @@ const Select = ({ label, options, error, id, ...props }: SelectProps) => {
         aria-invalid={hasError}
         aria-describedby={hasError ? errorId : undefined}
       >
+        {placeholder ? (
+          <option value="" disabled>
+            {placeholder}
+          </option>
+        ) : null}
         {options.map((option) => (
           <option key={option.value} value={option.value}>
             {option.label}
