@@ -5,7 +5,7 @@ import { GetItemsQuery } from '@/schemas/ItemSchema';
 
 export class ItemService {
   async getItems(params: GetItemsQuery) {
-    const { category, q, shopId, take = 50, skip = 0 } = params;
+    const { category, q, shopId, take, skip } = params;
 
     const where: Prisma.ItemWhereInput = {
       sold: false,
