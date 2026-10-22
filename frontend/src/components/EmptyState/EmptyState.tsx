@@ -6,7 +6,11 @@ const EmptyState = ({ emoji, title, description, action, variant = 'plain' }: Em
 
   return (
     <div className={styles.container()}>
-      <div className={styles.emoji()}>{emoji}</div>
+      {emoji && (
+        <span aria-hidden="true" className={styles.emoji()}>
+            {emoji}
+        </span>
+        )}
       <div className={styles.title()}>{title}</div>
       <div className={styles.description()}>{description}</div>
       <div className={styles.action()}>{action}</div>

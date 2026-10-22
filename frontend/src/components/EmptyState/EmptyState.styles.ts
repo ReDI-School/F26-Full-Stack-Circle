@@ -13,7 +13,7 @@ export const emptyStateStyles = tv({
       'py-15',
     ],
     emoji: ['text-[40px]', 'leading-none'],
-    title: ['font-display', 'text-xl', 'font-extra-bold', 'text-tertiary'],
+    title: ['font-display', 'text-xl', 'font-extrabold', 'text-tertiary'],
     description: ['text-sm', 'text-muted'],
     action: ['mt-2', 'max-w-full'],
   },
