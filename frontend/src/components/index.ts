@@ -18,3 +18,4 @@ export * from './TextField';
 export * from './Textarea';
 export * from './Toast';
 export * from './Footer';
+export * from './FAQAccordion';

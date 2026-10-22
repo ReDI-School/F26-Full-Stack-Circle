@@ -1,5 +1,9 @@
 {
   "compilerOptions": {
+    "paths": {
+      "@/*": ["./src/*"],
+      "@generated/*": ["./generated/*"]
+    },
     "target": "ES2020",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",

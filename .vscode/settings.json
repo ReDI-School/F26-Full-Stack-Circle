@@ -1,10 +1,7 @@
 {
-  "cSpell.words": [
-    "redicycle",
-    "ReDiCycle",
-    "storybook"
-  ],
+  "cSpell.words": ["redicycle", "ReDiCycle", "storybook"],
   "json.schemaDownload.trustedDomains": {
     "https://openapi.vercel.sh/": true
-  }
+  },
+  "editor.defaultFormatter": "esbenp.prettier-vscode"
 }
