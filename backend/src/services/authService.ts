@@ -144,4 +144,14 @@ export class AuthService {
 
     return toPublicUser(user);
   }
+
+  async findPublicUserById(id: string): Promise<PublicUser | null> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { shop: true }
+    });
+
+    return user ? toPublicUser(user) : null;
+
+  }
 }
