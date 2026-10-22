@@ -28,6 +28,11 @@ const registerSchema = z.object({
     }),
 });
 
+const loginSchema = z.object({
+  email: z.string().trim().toLowerCase().email(),
+  password: z.string().min(1),
+});
+
 /**
  * The token goes in a cookie the browser cannot read from JavaScript, so
  * an XSS bug cannot steal a login. The browser sends it on every request
@@ -72,5 +77,36 @@ export class AuthController {
 
       res.status(500).json({ error: 'Failed to register' });
     }
+  }
+
+  async login(req: Request, res: Response) {
+    const parsed = loginSchema.safeParse(req.body ?? {});
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: parsed.error.issues[0]?.message ?? 'Validation failed',
+        details: parsed.error.issues,
+      });
+    }
+
+    try {
+      const user = await authService.login(parsed.data);
+      if (!user) {
+        return res.status(401).json({ error: 'Wrong email or password.' });
+      }
+
+      res.cookie(AUTH_COOKIE, signToken(user.id), cookieOptions);
+
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error('Error logging in:', error);
+
+      res.status(500).json({ error: 'Failed to log in' });
+    }
+  }
+
+  logout(_req: Request, res: Response) {
+    res.clearCookie(AUTH_COOKIE, cookieOptions);
+    return res.status(204).end();
   }
 }
