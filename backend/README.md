@@ -91,6 +91,8 @@ When creating a new feature, you'll need to create files in multiple directories
 
 ```typescript
 // src/services/userService.ts
+import bcrypt from 'bcryptjs';
+
 import prisma from '../libs/prisma';
 
 export class UserService {
@@ -98,26 +100,32 @@ export class UserService {
     return await prisma.user.findMany();
   }
 
-  async getUserById(id: number) {
+  async getUserById(id: string) {
     return await prisma.user.findUnique({
       where: { id },
     });
   }
 
-  async createUser(data: { email: string; name?: string }) {
+  async createUser(data: { email: string; name: string; password: string }) {
     return await prisma.user.create({
-      data,
+      data: {
+        email: data.email,
+        name: data.name,
+        // Hashed here so a plain password can never reach the database,
+        // whichever route calls this.
+        passwordHash: await bcrypt.hash(data.password, 10),
+      },
     });
   }
 
-  async updateUser(id: number, data: { email?: string; name?: string }) {
+  async updateUser(id: string, data: { email?: string; name?: string }) {
     return await prisma.user.update({
       where: { id },
       data,
     });
   }
 
-  async deleteUser(id: number) {
+  async deleteUser(id: string) {
     return await prisma.user.delete({
       where: { id },
     });
@@ -147,7 +155,7 @@ export class UserController {
 
   async getUserById(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = String(req.params.id);
       const user = await userService.getUserById(id);
       if (!user) {
         return res.status(404).json({ error: 'User not found' });
@@ -172,7 +180,7 @@ export class UserController {
 
   async updateUser(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = String(req.params.id);
       const data = req.body;
       const user = await userService.updateUser(id, data);
       res.json({ user });
@@ -184,7 +192,7 @@ export class UserController {
 
   async deleteUser(req: Request, res: Response) {
     try {
-      const id = Number(req.params.id);
+      const id = String(req.params.id);
       await userService.deleteUser(id);
       res.json({ message: 'User deleted successfully' });
     } catch (error) {
@@ -252,80 +260,89 @@ The project uses Prisma as its ORM, and all database models are defined in the `
 
 Nine models, all defined in `prisma/schema.prisma`.
 
-| Model             | What it holds                                                   |
-| ----------------- | --------------------------------------------------------------- |
-| `User`            | An account: email, name, avatar, role, bcrypt password hash     |
-| `Shop`            | One person's shop. Exactly one per account, with a URL `slug`   |
-| `Category`        | A browsable category, with the emoji and tint the tiles need    |
-| `Item`            | One thing for sale, belonging to a shop                         |
-| `ItemImage`       | A photo of an item, ordered by `position` (0 is the main one)   |
-| `Thread`          | One conversation about one item, between a buyer and the seller |
-| `Message`         | One message inside a thread                                     |
-| `HomepageRow`     | A curated row on the homepage, e.g. "fresh finds"               |
-| `HomepageRowItem` | One ordered slot in such a row                                  |
+| Model         | What it holds                                                    |
+| ------------- | ---------------------------------------------------------------- |
+| `User`        | An account: email, name, avatar, bcrypt password hash, `isAdmin` |
+| `Shop`        | One person's shop. Exactly one per account                       |
+| `Category`    | A browsable category, with the emoji and tint the tiles need     |
+| `Item`        | One thing for sale, belonging to a shop                          |
+| `ItemPhoto`   | A photo of an item, ordered by `position` (0 is the main one)    |
+| `Thread`      | One conversation about one item, between a buyer and the seller  |
+| `Message`     | One message inside a thread                                      |
+| `HomeRow`     | A curated row on the homepage, e.g. "fresh finds ✨"             |
+| `HomeRowItem` | One ordered slot in such a row                                   |
 
-And three enums: `Role` (`USER` / `ADMIN`), `Condition`
-(`NEW` / `LIKE_NEW` / `GOOD` / `USED`) and `ItemStatus`
-(`AVAILABLE` / `SOLD` / `REMOVED`).
+And one enum: `Condition` (`NEW` / `LIKE_NEW` / `GOOD` / `USED`).
+
+Every `id` is a UUID (`String @id @default(uuid())`), not a sequential integer. Sequential
+ids leak information: anyone who sees their own id can estimate how many records exist and
+enumerate their neighbours. UUIDs make that guessing impractical — but they are not
+authorization. Every endpoint still has to check that the caller is allowed to touch that
+record.
 
 #### How the pieces connect
 
 ```text
 User 1───1 Shop 1───* Item *───1 Category
                        │
-                       ├──* ItemImage
-                       ├──* Thread *───1 User            (the buyer)
-                       │        └──* Message *───1 User  (the sender)
-                       └──* HomepageRowItem *───1 HomepageRow
+                       ├──* ItemPhoto
+                       ├──* Thread *───1 User   (buyer)
+                       │        │   ───1 User   (seller)
+                       │        └──* Message *───1 User   (sender)
+                       └──* HomeRowItem *───1 HomeRow
 ```
 
 #### Things worth knowing before you query
 
 - **Prices are whole cents, in `Int`.** `priceCents: 1800` is €18 — divide by 100 to display
   it. Floats are not safe for money: `0.1 + 0.2` is not `0.3` in binary floating point.
-  `originalPriceCents` holds the price before a discount, or `null`; the item detail page
-  shows it struck through next to the current one.
+  `oldPriceCents` holds the price before a discount, or `null`; the item detail page shows it
+  struck through next to the current one. `0` is a valid price — the add-item form says
+  "0 = give away".
 - **Items belong to a shop, not to a person.** The seller is one hop further:
   `item.shop.owner`. Cards credit "Lena's shop", which is why it is modelled this way.
-- **`REMOVED` is a soft delete.** Deleting an item for real would cascade into the threads
-  that reference it and wipe someone's message history, so browse filters on
-  `status = AVAILABLE` instead.
-- **One thread per buyer per item**, enforced by `@@unique([itemId, buyerId])` on `Thread`.
-  Tapping "I'm interested" twice reopens the same conversation rather than starting a
-  second one.
+- **`Thread` stores `sellerId` as well as `buyerId`.** It could be derived through
+  `item.shop.ownerId`, but keeping it on the row lets the inbox list a person's threads in
+  one query instead of a three-level join.
+- **One thread per buyer per item**, enforced by `@@unique([itemId, buyerId])`. A buyer
+  asking twice about the same item lands in the existing conversation.
 - **An unread message has `readAt = null`** — that is the orange dot in the inbox list.
-- **Categories are rows, not an enum**, because each one carries an emoji, a tint and a sort
-  order, and an admin should be able to add one without a migration. `Condition` and
-  `ItemStatus` are enums, because they are fixed labels the code branches on.
+- **Homepage rows are curated, not computed.** An admin picks which items appear in
+  "fresh finds ✨"; that is what `HomeRow` and `HomeRowItem` are for.
+- **Categories are rows, not an enum**, because each one carries an emoji and a `tint`
+  (`0`, `1` or `2` — which of the three pastel tints the tile uses), and an admin should be
+  able to add one without a migration. `Condition` is an enum, because it is a fixed set of
+  labels the code branches on.
 
 ### Seeded data and logins
 
-`pnpm db:seed` fills the database with the content drawn in `docs/design/screens`:
-5 categories, 4 accounts, 4 shops, 16 items, 4 curated homepage rows and 2 conversations.
+`pnpm db:seed` fills the database with the content from the prototype:
+5 categories, 6 accounts each with a shop, 16 items, 4 curated home rows and 2 conversations.
 
 Every seeded account shares the same password, hashed with bcrypt exactly as a real
 registration will be — so the login form works against them with no special case.
 
-| Email                   | Name     | Shop        | Role    |
-| ----------------------- | -------- | ----------- | ------- |
-| `lena@redi-school.org`  | Lena K.  | Lena's shop | `ADMIN` |
-| `omar@redi-school.org`  | Omar M.  | Omar's shop | `USER`  |
-| `mira@redi-school.org`  | Mira S.  | Mira's shop | `USER`  |
-| `jonas@redi-school.org` | Jonas B. | Jonas' shop | `USER`  |
+| Email                   | Name            | Shop         | Admin |
+| ----------------------- | --------------- | ------------ | ----- |
+| `admin@redi-school.org` | ReDiCycle Admin | ReDiCycle HQ | ✅    |
+| `lena@redi-school.org`  | Lena K.         | Lena's shop  |       |
+| `omar@redi-school.org`  | Omar M.         | Omar's shop  |       |
+| `mira@redi-school.org`  | Mira S.         | Mira's shop  |       |
+| `jonas@redi-school.org` | Jonas B.        | Jonas' shop  |       |
+| `sara@redi-school.org`  | Sara T.         | Sara's shop  |       |
 
-**The password for all four is `redicycle123`.**
+**The password for all six is `redicycle123`.**
 
-Log in as `lena@redi-school.org` to reach the admin page — she is the only seeded admin.
+Log in as `admin@redi-school.org` to reach `/admin` and curate the homepage rows — it is the
+only seeded account with `isAdmin: true`.
 
 > [!WARNING]
 > These credentials are for local and preview databases only. Never seed them into anything
 > that holds real accounts.
 
-Re-running the seed is safe. Accounts and categories are upserted on their natural keys
-(`email`, `slug`), so an account you registered while testing survives; shops, items, rows
-and conversations are rebuilt from scratch. Running it twice at the same time is safe too, which
-happens on the shared preview database when two PRs deploy together: the seed runs in one
-transaction behind a lock, so the second run waits for the first to finish.
+Re-running the seed is safe. Categories, accounts, shops, home rows and their slots upsert on
+their unique keys; items are matched on title plus shop, since `Item` has no unique column of
+its own.
 
 ### Creating New Models
 
@@ -334,10 +351,10 @@ Open `prisma/schema.prisma` and add your new model. Here's an example:
 ```prisma
 // prisma/schema.prisma
 model Review {
-  id        Int      @id @default(autoincrement())
+  id        String   @id @default(uuid())
   body      String
   rating    Int
-  itemId    Int
+  itemId    String
   item      Item     @relation(fields: [itemId], references: [id], onDelete: Cascade)
   createdAt DateTime @default(now())
 
@@ -396,19 +413,22 @@ From Prisma 7 on, the client is created once, with a driver adapter, in
 
 ```typescript
 // src/services/userService.ts
+import bcrypt from 'bcryptjs';
+
 import prisma from '../libs/prisma';
 
 export class UserService {
-  async createUser(data: { email: string; name?: string }) {
+  async createUser(data: { email: string; name: string; password: string }) {
     return await prisma.user.create({
       data: {
         email: data.email,
         name: data.name,
+        passwordHash: await bcrypt.hash(data.password, 10),
       },
     });
   }
 
-  async getUserWithItems(id: number) {
+  async getUserWithItems(id: string) {
     return await prisma.user.findUnique({
       where: { id },
       include: {
