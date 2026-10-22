@@ -1,13 +1,25 @@
-import { tv } from 'tailwind-variants';
-
-/**
- * TODO: style the component with the design tokens from
- * src/assets/css/global.css (bg-primary, text-tertiary, rounded-pill, ...).
- *
- * white card, radius-card, centred column: a large Avatar, the shop name in display 800,
- * then '4 items' in muted 13px.
- */
+import { tv } from '../../config/tv';
 export const shopCardStyles = tv({
-  base: [],
-  variants: {},
+  slots: {
+    base: [
+      'flex',
+      'flex-col',
+      'items-center',
+      'gap-2',
+      'p-5',
+      'bg-white',
+      'border',
+      'border-border',
+      'rounded-card',
+      'text-center',
+      'cursor-pointer',
+      'transition-transform',
+      'duration-200',
+      'hover:-translate-y-0.5',
+      'hover:shadow-card',
+      'w-[200px]'
+    ],
+    name: ['font-display', 'font-extrabold', 'text-[15px]'],
+    itemCount: ['text-muted', 'text-[13px]'],
+  },
 });

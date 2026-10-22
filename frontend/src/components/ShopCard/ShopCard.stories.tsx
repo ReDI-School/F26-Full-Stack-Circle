@@ -22,17 +22,29 @@ type Story = StoryObj<typeof ShopCard>;
 
 export const Default: Story = {
   args: {
-    name: "Lena's shop",
+    name: "Lena Koch",
+    itemCount: 6,
   },
 };
 
-// TODO: as you add props to ShopCard.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const WithItemCount: Story = {
-//   args: { name: "Lena's shop", itemCount: 4 },
-// };
-//
-// export const SingleItem: Story = {
-//   args: { name: "Omar's shop", itemCount: 1 },
-// };
+
+export const WithPhoto: Story = {
+  args: { name: "Omar Mansour", itemCount: 1, avatarUrl: 'https://i.pravatar.cc/150?img=47', },
+};
+
+
+export const SingleItem: Story = {
+  args: { name: "Omar Mansour", itemCount: 1 },
+};
+
+
+
+export const Row: Story = {
+  render: () => (
+    <div className="flex items-center gap-4"> 
+    <ShopCard name="Lena Koch" itemCount={4} />
+    <ShopCard name="Sarah Miller" itemCount={1} />
+    <ShopCard name="Omar Mansour" itemCount={2} />
+    </div>
+  ),
+};
