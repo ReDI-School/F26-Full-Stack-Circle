@@ -16,4 +16,44 @@ export const getItemsQuerySchema = z.object({
     .pipe(z.number().int().nonnegative()),
 });
 
+export const GetItemByIdResponseSchema = z.object({
+  id: z.string(),
+  title: z.string(),
+  description: z.string(),
+  priceCents: z.number().int(),
+  oldPriceCents: z.number().int().nullable(),
+  condition: z.string(),
+  sold: z.boolean(),
+  categoryId: z.string(),
+  shopId: z.string(),
+  createdAt: z.date(),
+  updatedAt: z.date(),
+
+  category: z.object({
+    slug: z.string(),
+    name: z.string(),
+  }),
+
+  shop: z.object({
+    id: z.string(),
+    name: z.string(),
+    subline: z.string().nullable(),
+
+    owner: z.object({
+      id: z.string(),
+      name: z.string(),
+      avatarUrl: z.string().nullable(),
+    }),
+  }),
+
+  photos: z.array(
+    z.object({
+      id: z.string(),
+      url: z.string(),
+      position: z.number().int().nonnegative(),
+    })
+  ),
+});
+
 export type GetItemsQuery = z.infer<typeof getItemsQuerySchema>;
+export type GetItemById = z.infer<typeof GetItemByIdResponseSchema>;
