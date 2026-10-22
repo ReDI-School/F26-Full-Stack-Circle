@@ -1,11 +1,5 @@
 import { useId } from 'react';
-import {
-  wrapperStyles,
-  labelStyles,
-  selectStyles,
-  errorStyles,
-  placeholderStyles,
-} from './Select.styles';
+import { wrapperStyles, labelStyles, selectStyles, errorStyles } from './Select.styles';
 import type { SelectProps } from './Select.types';
 
 const Select = ({ label, options, error, placeholder, id, ...props }: SelectProps) => {
@@ -26,7 +20,7 @@ const Select = ({ label, options, error, placeholder, id, ...props }: SelectProp
         aria-describedby={hasError ? errorId : undefined}
       >
         {placeholder ? (
-          <option className={placeholderStyles()} value="" disabled>
+          <option value="" disabled>
             {placeholder}
           </option>
         ) : null}

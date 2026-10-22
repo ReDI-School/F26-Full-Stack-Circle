@@ -8,10 +8,6 @@ export const labelStyles = tv({
   base: ['font-sans font-bold text-body text-ink'],
 });
 
-export const placeholderStyles = tv({
-  base: 'text-placeholder',
-});
-
 export const selectStyles = tv({
   base: [
     'w-full bg-surface py-3 px-3 font-sans text-body text-ink rounded-input border-[1.5px] border-border-input outline-none transition-all duration-150 focus:border-primary focus:ring-[3px] focus:ring-primary-100 cursor-pointer',
