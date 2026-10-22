@@ -11,7 +11,7 @@ const ShopCard = ({ name, itemCount, avatarUrl, onClick }: ShopCardProps) => {
     <div className={styles.base()}>
       <Avatar name={name} size="lg" src={avatarUrl} />
 
-      <h2 className={styles.name()}>{shopName}'s shop</h2>
+      <h2 className={styles.name()}>{shopName}&apos;s shop</h2>
 
       <p className={styles.itemCount()}>
         {itemCount} {itemText}
