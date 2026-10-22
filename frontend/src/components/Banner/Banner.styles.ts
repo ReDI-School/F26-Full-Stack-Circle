@@ -9,21 +9,11 @@ import { tv } from 'tailwind-variants';
  */
 
 export const bannerStyles = tv({
-  
-base: [
-  'w-full',
-  'box-border',
-  'px-8',
-  'min-[1076px]:px-[calc((100vw-1076px)/2)]',
-],
+  base: ['w-full', 'box-border', 'px-8', 'min-[1076px]:px-[calc((100vw-1076px)/2)]'],
 
   variants: {
     variant: {
-      hero: [
-        'bg-primary',
-        'flex flex-col',
-        'py-11',
-      ],
+      hero: ['bg-primary', 'flex flex-col', 'py-11'],
       cta: [
         'bg-tertiary',
         'flex items-center justify-between',
@@ -37,19 +27,10 @@ base: [
 });
 
 export const bannerTitleStyles = tv({
-  base: [
-    'font-display',
-    'font-black',
-    'leading-[1.1]',
-    'text-surface',
-  ],
+  base: ['font-display', 'font-black', 'leading-[1.1]', 'text-surface'],
   variants: {
     variant: {
-      hero: [
-        'text-[42px]',
-        'tracking-[-0.5px]',
-        'max-w-[560px]',
-      ],
+      hero: ['text-[42px]', 'tracking-[-0.5px]', 'max-w-[560px]'],
       cta: ['text-[28px]'],
     },
   },
@@ -59,15 +40,8 @@ export const bannerSubtitleStyles = tv({
   base: [],
   variants: {
     variant: {
-      hero: [
-        'text-[16px]',
-        'max-w-[480px]',
-        'text-primary-100',
-      ],
-      cta: [
-        'text-[15px]',
-        'text-tertiary-100',
-      ],
+      hero: ['text-[16px]', 'max-w-[480px]', 'text-primary-100'],
+      cta: ['text-[15px]', 'text-tertiary-100'],
     },
   },
 });

@@ -5,7 +5,7 @@ import { Button } from '../Button';
 const meta: Meta<typeof Banner> = {
   title: 'Components/Banner',
   component: Banner,
-  tags: ["autodocs"],
+  tags: ['autodocs'],
   parameters: {
     docs: {
       description: {
@@ -26,22 +26,17 @@ export const Hero: Story = {
   args: {
     variant: 'hero',
     title: "Someone's old, your new ♻",
-    subtitle:`   Secondhand treasures from the community. No fees, no middleman — 
-    you and the seller sort it out directly.`
+    subtitle: `   Secondhand treasures from the community. No fees, no middleman — 
+    you and the seller sort it out directly.`,
   },
 };
-
 
 export const Cta: Story = {
   args: {
     variant: 'cta',
     title: 'That drawer full of stuff you never use?',
     subtitle: 'Open a shop and give it a second life.',
-    action: (
-      <Button variant="primary">
-        Start selling
-      </Button>
-    ),
+    action: <Button variant="primary">Start selling</Button>,
   },
 };
 
@@ -55,7 +50,6 @@ export const CtaMobile: Story = {
     },
   },
 };
-
 
 // TODO: as you add props to Banner.types.ts, add a story for each variant and
 // state so you can see them all side by side. Something like:

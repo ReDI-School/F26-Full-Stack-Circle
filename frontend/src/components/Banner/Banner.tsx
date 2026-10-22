@@ -7,45 +7,24 @@ import {
   bannerActionStyles,
 } from './Banner.styles';
 
-const Banner = ({
-  variant,
-  title,
-  subtitle,
-  action,
-}: BannerProps) => {
+const Banner = ({ variant, title, subtitle, action }: BannerProps) => {
   return (
     <section className={bannerStyles({ variant })}>
       {variant === 'hero' ? (
         <>
-          <h1 className={bannerTitleStyles({ variant })}>
-            {title}
-          </h1>
+          <h1 className={bannerTitleStyles({ variant })}>{title}</h1>
 
-          {subtitle && (
-            <p className={bannerSubtitleStyles({ variant })}>
-              {subtitle}
-            </p>
-          )}
+          {subtitle && <p className={bannerSubtitleStyles({ variant })}>{subtitle}</p>}
         </>
       ) : (
         <>
           <div className={bannerContentStyles({ variant })}>
-            <h2 className={bannerTitleStyles({ variant })}>
-              {title}
-            </h2>
+            <h2 className={bannerTitleStyles({ variant })}>{title}</h2>
 
-            {subtitle && (
-              <p className={bannerSubtitleStyles({ variant })}>
-                {subtitle}
-              </p>
-            )}
+            {subtitle && <p className={bannerSubtitleStyles({ variant })}>{subtitle}</p>}
           </div>
 
-          {action && (
-            <div className={bannerActionStyles()}>
-              {action}
-            </div>
-          )}
+          {action && <div className={bannerActionStyles()}>{action}</div>}
         </>
       )}
     </section>

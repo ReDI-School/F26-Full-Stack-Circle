@@ -1,4 +1,4 @@
-import { ReactNode } from "react";
+import { ReactNode } from 'react';
 
 interface BannerProps {
   /**
@@ -13,9 +13,8 @@ interface BannerProps {
   // it is reactnode because i want to pass Button jsx to the component
   // reactnode is a type that reatc can render
   action?: ReactNode;
-  
+
   // - action (button on the right of a cta banner)
 }
-
 
 export type { BannerProps };
