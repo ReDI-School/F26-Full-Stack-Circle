@@ -17,7 +17,7 @@ export const shopCardStyles = tv({
       'duration-200',
       'hover:-translate-y-0.5',
       'hover:shadow-card',
-      'w-[200px]'
+      'w-[200px]',
     ],
     name: ['font-display', 'font-extrabold', 'text-[15px]'],
     itemCount: ['text-muted', 'text-[13px]'],
