@@ -103,8 +103,7 @@ export class AuthController {
     return res.status(204).end();
   }
 
-
   me(req: Request, res: Response) {
-    res.status(200).json({user: req.user})
+    res.status(200).json({ user: req.user });
   }
 }

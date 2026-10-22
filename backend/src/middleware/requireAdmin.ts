@@ -5,8 +5,8 @@ import { NextFunction, Request, Response } from 'express';
  */
 
 export const requireAdmin = (req: Request, res: Response, next: NextFunction) => {
-    if (!req.user?.isAdmin) {
-        return res.status(403).json({ error: 'Admins only.' });
-    }
-    next();
-}
+  if (!req.user?.isAdmin) {
+    return res.status(403).json({ error: 'Admins only.' });
+  }
+  next();
+};
