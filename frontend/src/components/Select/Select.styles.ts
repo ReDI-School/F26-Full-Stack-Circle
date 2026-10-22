@@ -11,6 +11,8 @@ export const labelStyles = tv({
 export const selectStyles = tv({
   base: [
     'w-full bg-surface py-3 px-3 font-sans text-body text-ink rounded-input border-[1.5px] border-border-input outline-none transition-all duration-150 focus:border-primary focus:ring-[3px] focus:ring-primary-100 cursor-pointer',
+    'has-[option[value=""]:checked]:text-placeholder',
+    'disabled:cursor-not-allowed',
   ],
   variants: {
     error: {
