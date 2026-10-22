@@ -18,7 +18,8 @@
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
     "format:check": "prettier --check .",
-    "clean": "rm -rf .next storybook-static"
+    "clean": "rm -rf .next storybook-static",
+    "test": "vitest run"
   },
   "engines": {
     "node": ">=24.0.0"

@@ -24,7 +24,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
     "format:check": "prettier --check .",
-    "clean": "rm -rf dist generated"
+    "clean": "rm -rf dist generated",
+    "test": "vitest run",
+    "test:e2e": "vitest run --config vitest.e2e.config.ts"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -58,6 +60,7 @@
     "prisma": "^7.10.0",
     "tsc-alias": "^1.9.4",
     "tsx": "^4.23.13",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
   }
 }

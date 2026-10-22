@@ -261,8 +261,10 @@ pnpm storybook
 
 ### Tests
 
-Vitest, Playwright and the Storybook test addon are installed, but nothing is wired up yet:
-there is no `test` script and no Vitest config. Setting that up is one of the tickets.
+`pnpm test` runs every story in a real Chromium through the Storybook Vitest addon: each story
+must render without errors, and a story with a `play` function is an interaction test (see
+`ConfirmDialog.stories.tsx`). The first run needs a browser:
+`pnpm exec playwright install chromium`.
 
 ### ESLint, Prettier and TypeScript
 
