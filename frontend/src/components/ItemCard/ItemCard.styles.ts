@@ -67,7 +67,7 @@ export const itemCardStyles = tv({
       'flex',
       'items-center',
       'justify-center',
-      'bg-[rgba(34,52,58,0.55)]',
+      'bg-ink/55',
       'font-display',
       'text-lg',
       'font-black',
@@ -106,6 +106,6 @@ export const itemCardStyles = tv({
     },
   },
   defaultVariants: {
-    size: 'sm',
+    size: 'md',
   },
 });

@@ -31,7 +31,6 @@ export const Default: Story = {
       category: 'Clothing',
       seller: 'Riddhi',
       imageUrl: 'https://images.unsplash.com/photo-1543076447-215ad9ba6923?w=600',
-      size: 'sm',
     };
     return (
       <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
@@ -40,6 +39,7 @@ export const Default: Story = {
     );
   },
 };
+
 export const Discounted: Story = {
   decorators: [],
   render: () => {
@@ -50,7 +50,6 @@ export const Discounted: Story = {
       condition: 'NEW' as ItemCardProps['condition'],
       category: 'Accessories',
       seller: 'Maya',
-      size: 'sm',
       imageUrl: 'https://images.unsplash.com/photo-1548036328-c9fa89d128fa?w=600',
     };
     return (
@@ -60,6 +59,7 @@ export const Discounted: Story = {
     );
   },
 };
+
 export const Free: Story = {
   decorators: [],
   render: () => {
@@ -71,7 +71,6 @@ export const Free: Story = {
       category: 'Furniture',
       seller: 'Alex',
       imageUrl: undefined,
-      size: 'sm',
     };
     return (
       <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
@@ -91,7 +90,6 @@ export const Sold: Story = {
       condition: 'GOOD' as ItemCardProps['condition'],
       category: 'Clothing',
       seller: 'Maya',
-      size: 'sm',
     };
     return (
       <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
@@ -101,7 +99,7 @@ export const Sold: Story = {
   },
 };
 
-export const SmNoPhotoall: Story = {
+export const NoPhoto: Story = {
   decorators: [],
   render: () => {
     const item: ItemCardProps = {
@@ -136,7 +134,7 @@ export const Small: Story = {
     };
     return (
       <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
-        <ItemCard {...item} size="md" />
+        <ItemCard {...item} />
       </div>
     );
   },

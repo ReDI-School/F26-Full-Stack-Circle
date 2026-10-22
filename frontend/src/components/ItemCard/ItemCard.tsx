@@ -1,7 +1,8 @@
 import { ConditionBadge } from '@/components/ConditionBadge';
-import { formatPrice } from '@/libs/price';
+import { formatPrice } from '@/lib/price';
 import { itemCardStyles } from './ItemCard.styles';
 import type { ItemCardProps } from './ItemCard.types';
+import Image from 'next/image';
 
 const ItemCard = ({
   title,
@@ -12,7 +13,7 @@ const ItemCard = ({
   seller,
   imageUrl,
   sold = false,
-  size = 'md',
+  size,
   onClick,
 }: ItemCardProps) => {
   const styles = itemCardStyles({ size });
@@ -22,15 +23,12 @@ const ItemCard = ({
   const meta = size === 'sm' ? seller : [category, seller].filter(Boolean).join(' · ');
 
   return (
-    <button
-      type="button"
-      className={styles.base()}
-      onClick={onClick}
-      aria-label={`${title}, ${formatPrice(priceCents)}`}
-    >
+    <button type="button" className={styles.base()} onClick={onClick}>
       <div className={styles.photo()}>
+        {}
+
         {imageUrl ? (
-          <img src={imageUrl} alt={title} loading="lazy" className={styles.image()} />
+          <Image src={imageUrl} alt={title} loading="lazy" className={styles.image()} />
         ) : (
           <div className={styles.placeholder()} aria-label="No item photo available">
             item photo
@@ -45,9 +43,9 @@ const ItemCard = ({
       </div>
 
       <div className={styles.body()}>
-        <h3 className={styles.title()} title={title}>
+        <span className={styles.title()} title={title}>
           {title}
-        </h3>
+        </span>
 
         {meta && <p className={styles.meta()}>{meta}</p>}
 
