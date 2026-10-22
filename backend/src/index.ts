@@ -7,6 +7,7 @@ import cookieParser from 'cookie-parser';
 import prisma from './libs/prisma';
 import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
+import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
 
 dotenv.config();
@@ -84,7 +85,7 @@ api.use('/auth', authRouter);
 api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
-
+api.use('/items', itemRouter);
 app.use('/api', api);
 
 const protocol = process.env.PROTOCOL ?? 'http';
