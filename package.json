@@ -26,5 +26,8 @@
     "db:push": "pnpm --filter backend db:push",
     "db:seed": "pnpm --filter backend db:seed",
     "db:studio": "pnpm --filter backend db:studio"
+  },
+  "dependencies": {
+    "lucide-react": "^1.55.0"
   }
 }

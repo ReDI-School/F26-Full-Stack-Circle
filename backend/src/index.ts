@@ -3,7 +3,9 @@ import dotenv from 'dotenv';
 import express, { Request, Response, Router } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
+import cookieParser from 'cookie-parser';
 import prisma from './libs/prisma';
+import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
 import categoryRouter from './routes/categoryRoutes';
 
@@ -15,6 +17,9 @@ const app = express();
 app.use(helmet());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+// Reads the auth cookie into req.cookies. It has to run before the routes,
+// or the routes see no cookies at all.
+app.use(cookieParser());
 
 app.use(
   cors({
@@ -75,6 +80,7 @@ api.get('/health', async (req: Request, res: Response) => {
 });
 
 // Routes
+api.use('/auth', authRouter);
 api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
