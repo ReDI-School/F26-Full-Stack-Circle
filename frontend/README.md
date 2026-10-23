@@ -204,11 +204,70 @@ in production Vercel routes `/api` to the backend service, and in development th
 `next.config.ts` proxies it to the backend on port 4000. So one URL works everywhere — and because the dev
 request goes through the Next.js server, there is no CORS involved either.
 
-```tsx
-import { apiUrl } from '../config';
+Use the shared browser client in Client Components and event handlers:
 
-const response = await fetch(apiUrl('/users')); // → /api/users
+```tsx
+import { api, ApiError } from '@/config/api';
+
+const response = await api.get<{ items: Item[] }>('/items?category=books');
+await api.post('/items', { title: 'Blue jacket' });
+await api.patch('/items/item-id', { price: 12 });
+await api.del('/items/item-id');
 ```
+
+Paths are relative to `/api`; do not include `/api` again. Every request sends
+`credentials: 'include'` and JSON headers. POST and PATCH serialize their body as JSON.
+All methods return `Promise<T | null>` because a successful `204 No Content` returns `null`.
+The generic describes the expected response; it does not validate JSON at runtime.
+
+A non-2xx response throws `ApiError` with `status`, `message`, and `fields` (a map of
+field names to strings or string arrays). Both `{ message, fields }` and the existing
+backend's `{ error }` shape are supported. Non-JSON error responses still produce an
+`ApiError` with the HTTP status and a fallback message. Network and abort failures keep
+their original error type. Use `error instanceof ApiError` when a form needs field errors.
+
+Pass an optional `{ signal }` as the second argument to GET/DELETE or the third argument
+to POST/PATCH to cancel a request. This client uses relative URLs and browser cookies;
+it is not a Server Component client or a substitute for server-side authentication.
+
+### Loading, error and empty results
+
+```tsx
+'use client';
+
+import { useApi } from '@/hooks';
+
+// Inside a Client Component:
+const { data, error, loading, refetch } = useApi<{ items: Item[] }>('/items');
+```
+
+Apply these states in order on every page:
+
+| State                   | What to show                                                                                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `loading`               | A skeleton matching the content: grey rounded blocks in the shape of the cards. Use design tokens, an accessible loading label and `aria-busy`; avoid a spinner or blank screen. |
+| `error`                 | A short message and the existing `Button` labelled “Try again”, calling `refetch`. Forms can also show `ApiError.fields` beside their inputs.                                    |
+| Successful empty result | The shared `EmptyState` component, once #25 is merged. An empty list is a successful result, not an error.                                                                       |
+| Successful data         | Render the page's existing components with that data.                                                                                                                            |
+
+`useApi<T>(url)` fetches on mount, URL changes and `refetch()`. The URL is relative to
+`/api`, just like the client. It returns `data: T | null`, `error: Error | null`,
+`loading: boolean` and a stable `refetch: () => void`. A refetch clears the displayed
+result/error and shows loading. A `204` finishes loading with `data: null`; use the
+endpoint's contract to decide how to display that outcome.
+
+Cleanup aborts the request on unmount or replacement. Late responses and failures are
+ignored even if the transport finishes after cancellation. Returning to a previous URL
+fetches again. There is no caching, automatic retry or request deduplication.
+
+### Remaining integration for #47
+
+This foundation can be reviewed independently while #47 is blocked by #23. After Toast merges,
+add `ToastProvider` and `useToast`, mount the provider in the app shell, and verify one
+toast at a time, replacement, unmount cleanup and the ticket's 3.2-second dismissal.
+Coordinate timer ownership with the final Toast API so only one timer controls dismissal.
+The real-page demonstration, screenshots and full API/Toast integration checks remain
+part of #47; these utilities alone do not complete the ticket.
 
 ## 🔧 Available Scripts
 
@@ -261,8 +320,16 @@ pnpm storybook
 
 ### Tests
 
-Vitest, Playwright and the Storybook test addon are installed, but nothing is wired up yet:
-there is no `test` script and no Vitest config. Setting that up is one of the tickets.
+Run `pnpm --filter frontend test` from the repository root. The focused Vitest config runs
+API-client tests in Node and hook lifecycle tests in headless Chromium, using the existing
+Playwright dependency. On a fresh machine, install the browser once with
+`pnpm --filter frontend exec playwright install chromium`.
+
+Use `pnpm --filter frontend test --project api` or `--project hooks` to run one group.
+The hook tests cover StrictMode, unmount cancellation, URL changes, repeated refetches,
+out-of-order responses, network errors and retry. These tests simulate server responses;
+they do not replace the final real-backend integration checks. Storybook tests are not
+included in this focused configuration.
 
 ### ESLint, Prettier and TypeScript
 
