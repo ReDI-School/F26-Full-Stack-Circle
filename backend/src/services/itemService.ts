@@ -58,4 +58,42 @@ export class ItemService {
 
     return { items, total };
   }
+
+  async getById(id: string) {
+    return prisma.item.findUnique({
+      where: { id },
+      include: {
+        category: {
+          select: {
+            slug: true,
+            name: true,
+          },
+        },
+        shop: {
+          select: {
+            id: true,
+            name: true,
+            subline: true,
+            owner: {
+              select: {
+                id: true,
+                name: true,
+                avatarUrl: true,
+              },
+            },
+          },
+        },
+        photos: {
+          select: {
+            id: true,
+            url: true,
+            position: true,
+          },
+          orderBy: {
+            position: 'asc',
+          },
+        },
+      },
+    });
+  }
 }
