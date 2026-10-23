@@ -13,6 +13,11 @@ export interface RegisterInput {
   password: string;
 }
 
+export interface LoginInput {
+  email: string;
+  password: string;
+}
+
 /**
  * The only shape of a user that ever leaves the API. `passwordHash` is
  * not on it, and cannot be added by accident, because every response
@@ -115,5 +120,37 @@ export class AuthService {
 
       throw error;
     }
+  }
+
+  async login({ email, password }: LoginInput): Promise<PublicUser | null> {
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { shop: true },
+    });
+
+    /**
+     * A real bcrypt hash of a made-up password. Used when the email isn't found,
+     * so that case takes as long as a wrong password and the response time
+     * doesn't reveal which emails are registered.
+     */
+    const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10);
+
+    const hashToCheck = user?.passwordHash ?? DUMMY_HASH;
+    const passwordMatches = await bcrypt.compare(password, hashToCheck);
+
+    if (!user || !passwordMatches) {
+      return null;
+    }
+
+    return toPublicUser(user);
+  }
+
+  async findPublicUserById(id: string): Promise<PublicUser | null> {
+    const user = await prisma.user.findUnique({
+      where: { id },
+      include: { shop: true },
+    });
+
+    return user ? toPublicUser(user) : null;
   }
 }
