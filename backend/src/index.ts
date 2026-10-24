@@ -10,6 +10,7 @@ import userRouter from './routes/userRoutes';
 import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
 import { errorHandler, notFoundHandler } from './shared/middleware/error-handler';
+import shopRouter from './routes/shopRoutes';
 
 dotenv.config();
 
@@ -88,7 +89,7 @@ api.use('/users', userRouter);
 api.use('/categories', categoryRouter);
 api.use('/items', itemRouter);
 app.use('/api', api);
-api.use('/shops', shopRouter)
+api.use('/shops', shopRouter);
 
 app.use(notFoundHandler);
 app.use(errorHandler);

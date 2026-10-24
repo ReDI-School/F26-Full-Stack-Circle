@@ -16,9 +16,16 @@ const statusByKind: Record<ErrorKind, number> = {
   conflict: 409,
 };
 
-const isZodError = (e: any): e is { issues: { path: PropertyKey[]; message: string }[] } =>
-  e?.name === 'ZodError' && Array.isArray(e.issues);
+type ZodLikeError = {
+  name: 'ZodError';
+  issues: { path: PropertyKey[]; message: string }[];
+};
 
+const isZodError = (e: unknown): e is ZodLikeError =>
+  typeof e === 'object' &&
+  e !== null &&
+  (e as { name?: unknown }).name === 'ZodError' &&
+  Array.isArray((e as { issues?: unknown }).issues);
 export const notFoundHandler: RequestHandler = (req, _res, next) =>
   next(new NotFoundError('Route', `${req.method} ${req.path}`));
 
