@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { z } from 'zod';
 
-import { EmailAlreadyRegisteredError } from '../errors/authErrors';
+import { EmailAlreadyRegisteredError } from '../shared/errors/authErrors';
 import { TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
 import { AuthService } from '../services/authService';
 
