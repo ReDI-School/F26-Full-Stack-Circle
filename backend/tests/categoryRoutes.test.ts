@@ -12,7 +12,7 @@ vi.mock('@/services/categoryService', () => ({
   },
 }));
 
-import categoryRouter from '../src/routes/categoryRoutes';
+import categoryRouter from '@/routes/categoryRoutes';
 
 const app = express();
 app.use(express.json());

@@ -12,8 +12,8 @@ vi.mock('@/services/itemService', () => ({
   },
 }));
 
-import itemRouter from '../src/routes/itemRoutes';
-import { ItemError } from '../src/errors/itemError';
+import itemRouter from '@/routes/itemRoutes';
+import { ItemError } from '@/errors/itemError';
 
 const app = express();
 app.use(express.json());
