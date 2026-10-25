@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { ItemService } from '../services/itemService';
 import { getItemsQuerySchema } from '@/schemas/ItemSchema';
-import { ZodError } from 'zod/v3';
+import { ZodError } from 'zod';
 import { ItemError } from '@/errors/itemError';
 
 const itemService = new ItemService();
@@ -16,7 +16,7 @@ export class ItemController {
       if (error instanceof ZodError) {
         return res.status(400).json({
           error: 'Validation Error',
-          details: error.errors.map((e) => ({
+          details: error.issues.map((e) => ({
             field: e.path.join('.'),
             message: e.message,
           })),
