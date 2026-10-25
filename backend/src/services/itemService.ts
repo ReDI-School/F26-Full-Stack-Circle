@@ -1,7 +1,7 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
 import { GetItemsQuery } from '@/schemas/ItemSchema';
-import { NotFoundError, ValidationError } from '@/shared/errors';
+import { ValidationError } from '@/shared/errors';
 
 export class ItemService {
   async getItems(params: GetItemsQuery) {
