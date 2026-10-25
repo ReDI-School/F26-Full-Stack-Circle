@@ -12,7 +12,7 @@ vi.mock('@/services/categoryService', () => ({
   },
 }));
 
-import categoryRouter from '@/routes/categoryRoutes';
+import categoryRouter from '../src/routes/categoryRoutes';
 
 const app = express();
 app.use(express.json());
@@ -51,4 +51,3 @@ describe('Category Routes - Response Codes', () => {
     });
   });
 });
-

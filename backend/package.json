@@ -13,7 +13,7 @@
     "dev": "prisma generate && tsx watch src/index.ts",
     "build": "prisma generate && tsc && tsc-alias",
     "start": "node dist/src/index.js",
-    "lint": "eslint src prisma/seed.ts prisma.config.ts",
+    "lint": "eslint src tests prisma/seed.ts prisma.config.ts",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",

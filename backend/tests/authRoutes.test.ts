@@ -17,8 +17,8 @@ vi.mock('@/services/authService', () => ({
   },
 }));
 
-import authRouter from '@/routes/authRoutes';
-import { EmailAlreadyRegisteredError } from '@/errors/authErrors';
+import authRouter from '../src/routes/authRoutes';
+import { EmailAlreadyRegisteredError } from '../src/errors/authErrors';
 
 const app = express();
 app.use(express.json());
@@ -58,10 +58,53 @@ describe('Auth Routes - Response Codes', () => {
       expect(res.status).toBe(400);
     });
 
+    it('returns 400 when password exceeds maximum length', async () => {
+      const res = await request(app)
+        .post('/auth/register')
+        .send({ ...validRegistration, password: 'a'.repeat(65) });
+
+      expect(res.status).toBe(400);
+    });
+
     it('returns 400 when email format is invalid', async () => {
       const res = await request(app)
         .post('/auth/register')
         .send({ ...validRegistration, email: 'not-an-email' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when name is missing', async () => {
+      const res = await request(app).post('/auth/register').send({
+        email: validRegistration.email,
+        password: validRegistration.password,
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when name is empty or only whitespace', async () => {
+      const res = await request(app)
+        .post('/auth/register')
+        .send({ ...validRegistration, name: '   ' });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when email is missing', async () => {
+      const res = await request(app).post('/auth/register').send({
+        name: validRegistration.name,
+        password: validRegistration.password,
+      });
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when password is missing', async () => {
+      const res = await request(app).post('/auth/register').send({
+        name: validRegistration.name,
+        email: validRegistration.email,
+      });
 
       expect(res.status).toBe(400);
     });
@@ -89,4 +132,3 @@ describe('Auth Routes - Response Codes', () => {
     });
   });
 });
-

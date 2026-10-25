@@ -21,7 +21,7 @@ vi.mock('@/services/userService', () => ({
   },
 }));
 
-import userRouter from '@/routes/userRoutes';
+import userRouter from '../src/routes/userRoutes';
 
 const app = express();
 app.use(express.json());

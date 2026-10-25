@@ -12,8 +12,8 @@ vi.mock('@/services/itemService', () => ({
   },
 }));
 
-import itemRouter from '@/routes/itemRoutes';
-import { ItemError } from '@/errors/itemError';
+import itemRouter from '../src/routes/itemRoutes';
+import { ItemError } from '../src/errors/itemError';
 
 const app = express();
 app.use(express.json());
@@ -60,12 +60,24 @@ describe('Item Routes - Response Codes', () => {
       expect(res.status).toBe(400);
     });
 
-    it('returns the status code specified by ItemError (e.g. 404)', async () => {
-      mockGetItems.mockRejectedValue(new ItemError(404, 'Category not found'));
+    it('returns 400 when query parameter take is not a number', async () => {
+      const res = await request(app).get('/items?take=abc');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when query parameter skip is not a number', async () => {
+      const res = await request(app).get('/items?skip=xyz');
+
+      expect(res.status).toBe(400);
+    });
+
+    it('returns 400 when category slug does not exist', async () => {
+      mockGetItems.mockRejectedValue(new ItemError(400, "Category 'unknown' does not exist."));
 
       const res = await request(app).get('/items?category=unknown');
 
-      expect(res.status).toBe(404);
+      expect(res.status).toBe(400);
     });
 
     it('returns 500 when item service throws an unexpected error', async () => {
@@ -77,4 +89,3 @@ describe('Item Routes - Response Codes', () => {
     });
   });
 });
-
