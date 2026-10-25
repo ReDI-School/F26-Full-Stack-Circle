@@ -1,5 +1,5 @@
 import type { ComponentProps } from 'react';
-import { ConditionBadge } from '@/components/ConditionBadge';
+import type { ConditionBadge } from '@/components/ConditionBadge';
 
 export type ItemCondition = ComponentProps<typeof ConditionBadge>['condition'];
 

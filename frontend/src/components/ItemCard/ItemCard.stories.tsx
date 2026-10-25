@@ -1,7 +1,7 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import ItemCard from './ItemCard';
-import { ItemCardProps } from './ItemCard.types';
+import type { ItemCardProps } from './ItemCard.types';
 
 const meta: Meta<typeof ItemCard> = {
   title: 'Components/ItemCard',
@@ -113,7 +113,7 @@ export const NoPhoto: Story = {
     };
     return (
       <div className="grid w-full max-w-5xl grid-cols-2 gap-4 md:grid-cols-4">
-        <ItemCard {...item} size="md" />
+        <ItemCard {...item} />
       </div>
     );
   },

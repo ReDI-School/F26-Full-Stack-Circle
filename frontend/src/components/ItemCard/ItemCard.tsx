@@ -25,10 +25,8 @@ const ItemCard = ({
   return (
     <button type="button" className={styles.base()} onClick={onClick}>
       <div className={styles.photo()}>
-        {}
-
         {imageUrl ? (
-          <Image src={imageUrl} alt={title} loading="lazy" className={styles.image()} />
+          <Image src={imageUrl} alt={title} fill className={styles.image()} />
         ) : (
           <div className={styles.placeholder()} aria-label="No item photo available">
             item photo
