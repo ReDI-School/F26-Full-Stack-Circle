@@ -1,6 +1,10 @@
 import { Request, Response } from 'express';
 import { ItemService } from '../services/itemService';
-import { GetItemByIdResponseSchema, getItemsQuerySchema } from '@/schemas/ItemSchema';
+import {
+  GetItemByIdResponseSchema,
+  GetItemByIdResquestSchema,
+  getItemsQuerySchema,
+} from '@/schemas/ItemSchema';
 import { ZodError } from 'zod/v3';
 import { ItemError } from '@/errors/itemError';
 
@@ -31,18 +35,16 @@ export class ItemController {
   }
 
   async getById(req: Request, res: Response) {
-    const { id } = req.params;
+    const params = GetItemByIdResquestSchema.safeParse(req.params);
 
-    const uuidPattern = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
-
-    if (typeof id !== 'string' || !uuidPattern.test(id)) {
+    if (!params.success) {
       return res.status(400).json({
         error: 'Invalid item id: expected a UUID',
       });
     }
 
     try {
-      const item = await itemService.getById(id);
+      const item = await itemService.getById(params.data.id);
 
       if (!item) {
         return res.status(404).json({

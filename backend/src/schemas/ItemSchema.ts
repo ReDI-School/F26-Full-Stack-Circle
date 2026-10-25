@@ -55,5 +55,10 @@ export const GetItemByIdResponseSchema = z.object({
   ),
 });
 
+export const GetItemByIdResquestSchema = z.object({
+  id: z.uuid(),
+});
+
 export type GetItemsQuery = z.infer<typeof getItemsQuerySchema>;
 export type GetItemById = z.infer<typeof GetItemByIdResponseSchema>;
+export type GetItemByIdParams = z.infer<typeof GetItemByIdResquestSchema>;
