@@ -94,5 +94,4 @@ describe('Category Routes - Response Messages', () => {
       expect(res.body).toEqual({ error: 'Failed to fetch categories' });
     });
   });
-  
 });
