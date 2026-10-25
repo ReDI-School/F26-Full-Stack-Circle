@@ -11,7 +11,7 @@
   },
   "scripts": {
     "dev": "prisma generate && tsx watch src/index.ts",
-    "build": "prisma generate && tsc && tsc-alias",
+    "build": "prisma generate && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "start": "node dist/src/index.js",
     "lint": "eslint src tests prisma/seed.ts prisma.config.ts",
     "format": "prettier --write .",

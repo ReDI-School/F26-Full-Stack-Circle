@@ -11,5 +11,6 @@ export default defineConfig({
   test: {
     environment: 'node',
     mockReset: true,
+    exclude: ['dist/**', 'node_modules/**'],
   },
 });
