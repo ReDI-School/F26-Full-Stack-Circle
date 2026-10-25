@@ -19,3 +19,4 @@ export * from './Textarea';
 export * from './Toast';
 export * from './Footer';
 export * from './FAQAccordion';
+export * from './EmptyState';
