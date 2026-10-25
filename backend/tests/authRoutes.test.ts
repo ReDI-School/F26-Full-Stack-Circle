@@ -132,3 +132,69 @@ describe('Auth Routes - Response Codes', () => {
     });
   });
 });
+
+describe('Auth Routes - Response Messages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  describe('POST /auth/register', () => {
+    it('returns the created user in the body on successful registration', async () => {
+      const user = { id: 'user-1', name: 'Ada Lovelace', email: 'ada@example.com' };
+      mockRegister.mockResolvedValue(user);
+
+      const res = await request(app).post('/auth/register').send(validRegistration);
+
+      expect(res.body).toEqual({ user });
+    });
+
+    it('returns a validation error message when password is too short', async () => {
+      const res = await request(app)
+        .post('/auth/register')
+        .send({ ...validRegistration, password: 'short' });
+
+      expect(res.body.error).toBe('Password must be at least 8 characters.');
+    });
+
+    it('returns a validation error message when password exceeds maximum length', async () => {
+      const res = await request(app)
+        .post('/auth/register')
+        .send({ ...validRegistration, password: 'a'.repeat(65) });
+
+      expect(res.body.error).toBe('Password must be at most 64 characters.');
+    });
+
+    it('returns a validation error message when email format is invalid', async () => {
+      const res = await request(app)
+        .post('/auth/register')
+        .send({ ...validRegistration, email: 'not-an-email' });
+
+      expect(res.body).toHaveProperty('error');
+      expect(res.body).toHaveProperty('details');
+    });
+
+    it('returns validation details array when fields are invalid', async () => {
+      const res = await request(app).post('/auth/register').send({});
+
+      expect(Array.isArray(res.body.details)).toBe(true);
+      expect(res.body.details.length).toBeGreaterThan(0);
+    });
+
+    it('returns the domain error message when email is already registered', async () => {
+      mockRegister.mockRejectedValue(new EmailAlreadyRegisteredError());
+
+      const res = await request(app).post('/auth/register').send(validRegistration);
+
+      expect(res.body).toEqual({ error: 'That email is already registered.' });
+    });
+
+    it('returns a generic error message when auth service throws an unexpected error', async () => {
+      mockRegister.mockRejectedValue(new Error('Unexpected database failure'));
+
+      const res = await request(app).post('/auth/register').send(validRegistration);
+
+      expect(res.body).toEqual({ error: 'Failed to register' });
+    });
+  });
+});

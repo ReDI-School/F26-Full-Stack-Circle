@@ -89,3 +89,51 @@ describe('Item Routes - Response Codes', () => {
     });
   });
 });
+
+describe('Item Routes - Response Messages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  describe('GET /items', () => {
+    it('returns the items and total in the body on success', async () => {
+      mockGetItems.mockResolvedValue({ items: [], total: 0 });
+
+      const res = await request(app).get('/items');
+
+      expect(res.body).toEqual({ items: [], total: 0 });
+    });
+
+    it('returns a Validation Error message and details for invalid query params', async () => {
+      const res = await request(app).get('/items?take=abc');
+
+      expect(res.body.error).toBe('Validation Error');
+      expect(Array.isArray(res.body.details)).toBe(true);
+      expect(res.body.details.length).toBeGreaterThan(0);
+    });
+
+    it('returns a details entry with field and message for invalid query params', async () => {
+      const res = await request(app).get('/items?take=abc');
+
+      expect(res.body.details[0]).toHaveProperty('field');
+      expect(res.body.details[0]).toHaveProperty('message');
+    });
+
+    it('returns the domain error message when category slug does not exist', async () => {
+      mockGetItems.mockRejectedValue(new ItemError(400, "Category 'unknown' does not exist."));
+
+      const res = await request(app).get('/items?category=unknown');
+
+      expect(res.body).toEqual({ error: "Category 'unknown' does not exist." });
+    });
+
+    it('returns a generic error message when item service throws an unexpected error', async () => {
+      mockGetItems.mockRejectedValue(new Error('Unexpected error'));
+
+      const res = await request(app).get('/items');
+
+      expect(res.body).toEqual({ error: 'Failed to fetch items' });
+    });
+  });
+});

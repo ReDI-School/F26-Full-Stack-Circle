@@ -51,3 +51,47 @@ describe('Category Routes - Response Codes', () => {
     });
   });
 });
+
+describe('Category Routes - Response Messages', () => {
+  beforeEach(() => {
+    vi.clearAllMocks();
+    vi.spyOn(console, 'error').mockImplementation(() => {});
+  });
+
+  describe('GET /categories', () => {
+    it('returns the shaped categories array in the body on success', async () => {
+      mockGetAllCategories.mockResolvedValue([
+        {
+          id: 'cat-1',
+          slug: 'clothing',
+          name: 'Clothing',
+          emoji: '👕',
+          tint: 1,
+          _count: { items: 3 },
+        },
+      ]);
+
+      const res = await request(app).get('/categories');
+
+      expect(res.body).toHaveProperty('categories');
+      expect(Array.isArray(res.body.categories)).toBe(true);
+      expect(res.body.categories[0]).toMatchObject({ name: 'Clothing', slug: 'clothing' });
+    });
+
+    it('returns an empty categories array when there are no categories', async () => {
+      mockGetAllCategories.mockResolvedValue([]);
+
+      const res = await request(app).get('/categories');
+
+      expect(res.body).toEqual({ categories: [] });
+    });
+
+    it('returns a generic error message when category service throws an unexpected error', async () => {
+      mockGetAllCategories.mockRejectedValue(new Error('Database error'));
+
+      const res = await request(app).get('/categories');
+
+      expect(res.body).toEqual({ error: 'Failed to fetch categories' });
+    });
+  });
+});
