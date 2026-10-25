@@ -1,5 +1,16 @@
+echo "🧪 Running tests..."
 pnpm test
+
+echo "🔍 Running linter..."
 pnpm lint
+
+echo "🎨 Checking formatting..."
 pnpm format:check
+
+echo "📝 Type-checking..."
 pnpm typecheck
+
+echo "🏗️  Building..."
 pnpm build
+
+echo "✅ All pre-commit checks passed!"
