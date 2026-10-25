@@ -1,4 +1,6 @@
 import type { Request, Response } from 'express';
+// src/controllers/itemController.ts
+import type { Request, Response } from 'express';
 import { ItemService } from '../services/itemService';
 import { getItemsQuerySchema } from '@/schemas/ItemSchema';
 

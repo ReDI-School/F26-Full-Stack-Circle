@@ -11,6 +11,7 @@ import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
 import { errorHandler, notFoundHandler } from './shared/middleware/error-handler';
 import shopRouter from './routes/shopRoutes';
+import { errorHandler, notFoundHandler } from './shared/middleware/error-handler';
 
 dotenv.config();
 
