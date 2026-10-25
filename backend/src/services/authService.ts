@@ -69,6 +69,13 @@ const isUniqueViolation = (error: unknown): boolean =>
   'code' in error &&
   (error as { code: unknown }).code === 'P2002';
 
+/**
+ * A real bcrypt hash of a made-up password. Used when the email isn't found,
+ * so that case takes as long as a wrong password and the response time
+ * doesn't reveal which emails are registered.
+ */
+const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10);
+
 export class AuthService {
   /**
    * Creates an account and the shop that comes with it. The two are
@@ -127,13 +134,6 @@ export class AuthService {
       where: { email },
       include: { shop: true },
     });
-
-    /**
-     * A real bcrypt hash of a made-up password. Used when the email isn't found,
-     * so that case takes as long as a wrong password and the response time
-     * doesn't reveal which emails are registered.
-     */
-    const DUMMY_HASH = bcrypt.hashSync('not-a-real-password', 10);
 
     const hashToCheck = user?.passwordHash ?? DUMMY_HASH;
     const passwordMatches = await bcrypt.compare(password, hashToCheck);
