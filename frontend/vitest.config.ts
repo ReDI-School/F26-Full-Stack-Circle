@@ -14,7 +14,7 @@ export default defineConfig({
       {
         test: {
           name: 'hooks',
-          include: ['src/hooks/**/*.test.tsx'],
+          include: ['src/hooks/**/*.test.tsx', 'src/app/**/*.test.tsx'],
           browser: {
             enabled: true,
             headless: true,
