@@ -26,7 +26,7 @@ export const Hero: Story = {
   args: {
     variant: 'hero',
     title: "Someone's old, your new ♻",
-    subtitle: `   Secondhand treasures from the community. No fees, no middleman — 
+    description: `   Secondhand treasures from the community. No fees, no middleman — 
     you and the seller sort it out directly.`,
   },
 };
@@ -35,7 +35,7 @@ export const Cta: Story = {
   args: {
     variant: 'cta',
     title: 'That drawer full of stuff you never use?',
-    subtitle: 'Open a shop and give it a second life.',
+    description: 'Open a shop and give it a second life.',
     action: <Button variant="primary">Start selling</Button>,
   },
 };
