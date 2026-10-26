@@ -1,12 +1,30 @@
 import { tv } from 'tailwind-variants';
 
-/**
- * TODO: style the component with the design tokens from
- * src/assets/css/global.css (bg-primary, text-tertiary, rounded-pill, ...).
- *
- * same look as TextField: radius-input, 1.5px border-input, focus ring in primary-100.
- */
+export const wrapperStyles = tv({
+  base: ['w-full flex flex-col gap-1.5'],
+});
+
+export const labelStyles = tv({
+  base: ['font-sans font-bold text-body text-ink'],
+});
+
 export const selectStyles = tv({
-  base: [],
-  variants: {},
+  base: [
+    'w-full bg-surface py-3 px-3 font-sans text-body text-ink rounded-input border-[1.5px] border-border-input outline-none transition-all duration-150 focus:border-primary focus:ring-[3px] focus:ring-primary-100 cursor-pointer',
+    'has-[option[value=""]:checked]:text-placeholder',
+    'disabled:cursor-not-allowed',
+  ],
+  variants: {
+    error: {
+      true: 'border-secondary focus:border-secondary focus:ring-secondary-100',
+      false: '',
+    },
+  },
+  defaultVariants: {
+    error: false,
+  },
+});
+
+export const errorStyles = tv({
+  base: 'font-sans text-caption text-secondary',
 });
