@@ -75,7 +75,7 @@ export const itemCardStyles = tv({
       'text-white',
     ],
     body: 'flex min-w-0 flex-col gap-1.5 p-4',
-    title: ['font-display', 'text-base', 'font-extrabold', 'leading-snug'],
+    title: ['font-display', 'text-base', 'font-extrabold', 'truncate', 'leading-snug'],
     meta: ['text-[13px]', 'leading-snug', 'text-muted'],
     priceRow: 'flex flex-wrap items-baseline gap-2',
     price: ['font-display', 'text-secondary', 'font-black', 'leading-tight', 'tabular-nums'],
