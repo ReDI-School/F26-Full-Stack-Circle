@@ -5,7 +5,7 @@ export const getShopsQuerySchema = z.object({
 });
 
 export const getShopParamsSchema = z.object({
-  id: z.string().uuid(),
+  id: z.uuid(),
 });
 
 export type GetShopsQuery = z.infer<typeof getShopsQuerySchema>;
