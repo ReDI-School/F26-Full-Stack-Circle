@@ -1,7 +1,7 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
-import { ItemError } from '@/errors/itemError';
 import { GetItemsQuery } from '@/schemas/ItemSchema';
+import { ValidationError } from '@/shared/errors';
 
 export class ItemService {
   async getItems(params: GetItemsQuery) {
@@ -53,7 +53,7 @@ export class ItemService {
     ]);
 
     if (category && !categoryExists) {
-      throw new ItemError(400, `Category '${category}' does not exist.`);
+      throw new ValidationError(`Category '${category}' does not exist.`);
     }
 
     return { items, total };

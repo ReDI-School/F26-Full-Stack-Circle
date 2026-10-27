@@ -1,7 +1,7 @@
 import bcrypt from 'bcryptjs';
 
-import { EmailAlreadyRegisteredError } from '../errors/authErrors';
-import prisma from '../libs/prisma';
+import { EmailAlreadyRegisteredError } from '../shared/errors/authErrors';
+import prisma from '@/libs/prisma';
 
 /**
  * Already validated by the controller: trimmed, lowercased email and a
