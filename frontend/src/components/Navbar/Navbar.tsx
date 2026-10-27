@@ -44,9 +44,15 @@ const Navbar = ({
   return (
     <nav className={styles.root()} aria-label="Main">
       <div className={styles.inner()}>
-        {/* The Logo's SVG has aria-label="ReDiCycle", which names this button */}
+        {/* The Logo's SVG has aria-label="ReDiCycle", which names this button.
+            Below 400px only the mark shows, so the actions fit on the first line. */}
         <button type="button" className={styles.logoButton()} onClick={onLogoClick}>
-          <Logo size={28} />
+          <span className={styles.logoFull()}>
+            <Logo size={28} />
+          </span>
+          <span className={styles.logoMark()}>
+            <Logo size={28} withWordmark={false} />
+          </span>
         </button>
 
         <input
@@ -80,7 +86,9 @@ const Navbar = ({
                 ) : null}
               </button>
 
-              <AvatarMenu user={user} items={menuItems} />
+              <div className={styles.avatar()}>
+                <AvatarMenu user={user} items={menuItems} />
+              </div>
             </>
           ) : (
             <>

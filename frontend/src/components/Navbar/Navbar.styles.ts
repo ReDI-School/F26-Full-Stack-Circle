@@ -3,6 +3,8 @@ import { tv } from '../../config/tv';
 /**
  * Below 800px the row wraps and the search field moves to its own full-width
  * line (`max-[800px]:` is Tailwind's "narrower than 800px" variant).
+ * Below 400px the logo drops its wordmark: logo + wordmark + actions don't fit
+ * on one line there, and the actions must stay on the first line.
  */
 export const navbarStyles = tv({
   slots: {
@@ -37,6 +39,10 @@ export const navbarStyles = tv({
       'focus-visible:outline-offset-2',
       'focus-visible:outline-tertiary',
     ],
+
+    logoFull: ['flex', 'max-[400px]:hidden'],
+
+    logoMark: ['hidden', 'max-[400px]:flex'],
 
     search: [
       'w-[220px]',
@@ -75,6 +81,14 @@ export const navbarStyles = tv({
       'focus-visible:outline-offset-2',
       'focus-visible:outline-tertiary',
     ],
+
+    /**
+     * AvatarMenu renders a 32px avatar and opens its panel 8px under it. The
+     * spec wants 38x38 here, and the panel must not cover the bar's bottom edge.
+     * Both are set from the Navbar, so AvatarMenu itself stays unchanged:
+     * the avatar is the <span> inside the menu trigger, the panel has role="menu".
+     */
+    avatar: ['flex', '[&_[aria-haspopup=menu]>span]:size-[38px]', '[&_[role=menu]]:mt-5'],
 
     badge: [
       'absolute',
