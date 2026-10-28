@@ -13,6 +13,6 @@
     "strict": true,
     "skipLibCheck": true
   },
-  "include": ["src/**/*", "prisma/**/*"],
+  "include": ["src/**/*", "prisma/**/*", "tests/**/*"],
   "exclude": ["node_modules"]
 }

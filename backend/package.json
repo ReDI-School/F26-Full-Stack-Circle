@@ -11,9 +11,9 @@
   },
   "scripts": {
     "dev": "prisma generate && tsx watch src/index.ts",
-    "build": "prisma generate && tsc && tsc-alias",
+    "build": "prisma generate && tsc -p tsconfig.build.json && tsc-alias -p tsconfig.build.json",
     "start": "node dist/src/index.js",
-    "lint": "eslint src prisma/seed.ts prisma.config.ts",
+    "lint": "eslint src tests prisma/seed.ts prisma.config.ts",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
     "db:generate": "prisma generate",
@@ -24,7 +24,9 @@
     "db:seed": "tsx prisma/seed.ts",
     "postinstall": "prisma generate",
     "format:check": "prettier --check .",
-    "clean": "rm -rf dist generated"
+    "clean": "rm -rf dist generated",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "engines": {
     "node": ">=24.0.0"
@@ -48,6 +50,7 @@
     "@types/express": "^5.0.6",
     "@types/jsonwebtoken": "^9.0.10",
     "@types/node": "^22.20.2",
+    "@types/supertest": "^7.2.1",
     "@typescript-eslint/eslint-plugin": "^8.70.0",
     "@typescript-eslint/parser": "^8.70.0",
     "eslint": "^9.39.5",
@@ -56,8 +59,10 @@
     "globals": "^16.5.0",
     "prettier": "^3.9.6",
     "prisma": "^7.10.0",
+    "supertest": "^7.3.1",
     "tsc-alias": "^1.9.4",
     "tsx": "^4.23.13",
-    "typescript": "~5.9.3"
+    "typescript": "~5.9.3",
+    "vitest": "^4.1.11"
   }
 }
