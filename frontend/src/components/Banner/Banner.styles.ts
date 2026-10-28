@@ -10,12 +10,12 @@ import { tv } from 'tailwind-variants';
 
 export const bannerStyles = tv({
   base: [
-    'box-border',
-    'w-full',
-    'min-w-0',
-    'px-8',
-    'min-[1076px]:px-[max(32px,_calc((100vw-1076px)/2))]',
-  ],
+  'box-border',
+  'w-fill',
+  'min-w-0',
+  'px-8',
+  'min-[1076px]:px-[max(32px,_calc((100vw-1076px)/2))]',
+],
 
   variants: {
     variant: {
@@ -36,7 +36,7 @@ export const bannerTitleStyles = tv({
   base: ['font-display', 'font-black', 'leading-[1.1]', 'text-surface'],
   variants: {
     variant: {
-      hero: ['text-[42px]', 'tracking-[-0.5px]', 'max-w-[560px]'],
+      hero: ['text-[42px]', 'tracking-[-0.5px]', 'max-w-none'],
       cta: ['text-[28px]'],
     },
   },
@@ -46,7 +46,7 @@ export const bannerDescriptionStyles = tv({
   base: [],
   variants: {
     variant: {
-      hero: ['text-[16px]', 'max-w-[480px]', 'text-primary-100'],
+      hero: ['text-[16px]', 'max-w-none', 'text-primary-100'],
       cta: ['text-[15px]', 'text-tertiary-100'],
     },
   },
