@@ -16,7 +16,7 @@ export const getItemsQuerySchema = z.object({
     .pipe(z.number().int().nonnegative()),
 });
 
-export const GetItemByIdResponseSchema = z.object({
+export const getItemByIdResponseSchema = z.object({
   id: z.string(),
   title: z.string(),
   description: z.string(),
@@ -24,10 +24,7 @@ export const GetItemByIdResponseSchema = z.object({
   oldPriceCents: z.number().int().nullable(),
   condition: z.string(),
   sold: z.boolean(),
-  categoryId: z.string(),
-  shopId: z.string(),
   createdAt: z.date(),
-  updatedAt: z.date(),
 
   category: z.object({
     slug: z.string(),
@@ -55,10 +52,10 @@ export const GetItemByIdResponseSchema = z.object({
   ),
 });
 
-export const GetItemByIdResquestSchema = z.object({
+export const getItemByIdRequestSchema = z.object({
   id: z.uuid(),
 });
 
 export type GetItemsQuery = z.infer<typeof getItemsQuerySchema>;
-export type GetItemById = z.infer<typeof GetItemByIdResponseSchema>;
-export type GetItemByIdParams = z.infer<typeof GetItemByIdResquestSchema>;
+export type GetItemById = z.infer<typeof getItemByIdResponseSchema>;
+export type GetItemByIdParams = z.infer<typeof getItemByIdRequestSchema>;

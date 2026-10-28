@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { ItemService } from '../services/itemService';
 import {
-  GetItemByIdResponseSchema,
-  GetItemByIdResquestSchema,
+  getItemByIdResponseSchema,
+  getItemByIdRequestSchema,
   getItemsQuerySchema,
 } from '@/schemas/ItemSchema';
 import { ZodError } from 'zod/v3';
@@ -35,7 +35,7 @@ export class ItemController {
   }
 
   async getById(req: Request, res: Response) {
-    const params = GetItemByIdResquestSchema.safeParse(req.params);
+    const params = getItemByIdRequestSchema.safeParse(req.params);
 
     if (!params.success) {
       return res.status(400).json({
@@ -52,7 +52,7 @@ export class ItemController {
         });
       }
 
-      const validatedItem = GetItemByIdResponseSchema.parse(item);
+      const validatedItem = getItemByIdResponseSchema.parse(item);
 
       return res.status(200).json({ item: validatedItem });
     } catch (error: unknown) {
