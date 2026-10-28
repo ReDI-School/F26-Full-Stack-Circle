@@ -8,7 +8,7 @@ const ShopOwnerSchema = registry.register(
     id: z.uuid(),
     name: z.string(),
     avatarUrl: z.string().nullable(),
-  }),
+  })
 );
 
 const ShopListItemSchema = registry.register(
@@ -17,11 +17,8 @@ const ShopListItemSchema = registry.register(
     id: z.uuid(),
     name: z.string().openapi({ example: 'Second Chance Books' }),
     owner: ShopOwnerSchema,
-    itemCount: z
-      .number()
-      .int()
-      .openapi({ description: 'Number of unsold items', example: 12 }),
-  }),
+    itemCount: z.number().int().openapi({ description: 'Number of unsold items', example: 12 }),
+  })
 );
 
 const ItemCardSchema = registry.register(
@@ -44,7 +41,7 @@ const ItemCardSchema = registry.register(
     photos: z.array(z.object({ url: z.string() })).openapi({
       description: 'Ordered by position',
     }),
-  }),
+  })
 );
 
 const ShopDetailSchema = registry.register(
@@ -57,7 +54,7 @@ const ShopDetailSchema = registry.register(
     items: z.array(ItemCardSchema).openapi({
       description: 'All items including sold ones, newest first',
     }),
-  }),
+  })
 );
 
 registry.registerPath({

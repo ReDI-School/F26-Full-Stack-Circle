@@ -12,7 +12,7 @@ export const ErrorResponseSchema = registry.register(
       message: z.string().openapi({ example: 'Shop not found' }),
       details: z.unknown().optional(),
     }),
-  }),
+  })
 );
 
 export function errorResponse(description: string) {
