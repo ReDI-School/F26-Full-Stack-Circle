@@ -1,6 +1,6 @@
 import bcrypt from 'bcryptjs';
 
-import { EmailAlreadyRegisteredError } from '../shared/errors/authErrors';
+import { EmailAlreadyRegisteredError } from '@/errors/authErrors';
 import prisma from '@/libs/prisma';
 
 /**

@@ -18,7 +18,7 @@ vi.mock('@/services/authService', () => ({
 }));
 
 import authRouter from '@/routes/authRoutes';
-import { EmailAlreadyRegisteredError } from '@/shared/errors/authErrors';
+import { EmailAlreadyRegisteredError } from '@/errors/authErrors';
 
 const app = express();
 app.use(express.json());
