@@ -1,4 +1,4 @@
-import { tv } from '../../config/tv';
+import { tv } from '@/config/tv';
 
 /**
  * No background here: global.css already sets bg-bg on <body>.

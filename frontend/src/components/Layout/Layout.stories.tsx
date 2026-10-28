@@ -1,9 +1,9 @@
 import type { Meta, StoryObj } from '@storybook/react-vite';
 import { fn } from 'storybook/test';
 
-import type { AvatarMenuEntry } from '../AvatarMenu';
-import { Footer } from '../Footer';
-import { Navbar } from '../Navbar';
+import type { AvatarMenuEntry } from '@/components/AvatarMenu';
+import { Footer } from '@/components/Footer';
+import { Navbar } from '@/components/Navbar';
 import Layout from './Layout';
 
 /*
