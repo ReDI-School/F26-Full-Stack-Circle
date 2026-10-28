@@ -10,12 +10,12 @@ import { tv } from 'tailwind-variants';
 
 export const bannerStyles = tv({
   base: [
-  'box-border',
-  'w-fill',
-  'min-w-0',
-  'px-8',
-  'min-[1076px]:px-[max(32px,_calc((100vw-1076px)/2))]',
-],
+    'box-border',
+    'w-fill',
+    'min-w-0',
+    'px-8',
+    'min-[1076px]:px-[max(32px,_calc((100vw-1076px)/2))]',
+  ],
 
   variants: {
     variant: {
