@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
 import { registerSchema, loginSchema } from '../schemas/AuthSchema';
 
-import { EmailAlreadyRegisteredError } from '@/errors/authErrors';
-import { TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
+import { EmailAlreadyRegisteredError } from '../errors/authErrors';
+import { AUTH_COOKIE, TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
 import { AuthService } from '../services/authService';
 
 const authService = new AuthService();

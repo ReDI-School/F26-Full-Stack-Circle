@@ -1,6 +1,6 @@
 import express from 'express';
 import request from 'supertest';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 
 const { mockGetShopById } = vi.hoisted(() => ({
   mockGetShopById: vi.fn(),
