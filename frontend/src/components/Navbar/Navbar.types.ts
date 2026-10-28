@@ -38,7 +38,8 @@ interface NavbarProps {
   onSearchChange?: (value: string) => void;
 
   /**
-   * Called when Enter is pressed in the search field
+   * Called with the search text when the search is submitted: Enter on a
+   * keyboard, or the "Search"/"Go" key on a phone keyboard
    */
   onSearch?: (value: string) => void;
 

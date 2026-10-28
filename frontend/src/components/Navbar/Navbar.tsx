@@ -1,6 +1,6 @@
 'use client';
 
-import type { KeyboardEvent } from 'react';
+import type { FormEvent } from 'react';
 
 import { AvatarMenu } from '../AvatarMenu';
 import { Button } from '../Button';
@@ -34,11 +34,13 @@ const Navbar = ({
   const styles = navbarStyles();
   const hasUnread = unreadCount > 0;
 
-  const handleSearchKeyDown = (event: KeyboardEvent<HTMLInputElement>) => {
-    // isComposing: don't search while an IME (e.g. Japanese input) is still composing
-    if (event.key === 'Enter' && !event.nativeEvent.isComposing) {
-      onSearch?.(event.currentTarget.value);
-    }
+  // A real form submit covers Enter on a keyboard and the "Search"/"Go" key
+  // on phone keyboards, and the browser never submits mid-IME-composition.
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    // Stay on the page: the parent decides what searching means
+    event.preventDefault();
+    const query = new FormData(event.currentTarget).get('q');
+    onSearch?.(typeof query === 'string' ? query : '');
   };
 
   return (
@@ -55,15 +57,19 @@ const Navbar = ({
           </span>
         </button>
 
-        <input
-          type="search"
-          className={styles.search()}
-          placeholder="Search all items…"
-          aria-label="Search all items"
-          value={searchValue}
-          onChange={(event) => onSearchChange?.(event.target.value)}
-          onKeyDown={handleSearchKeyDown}
-        />
+        {/* role="search" makes this a search landmark for screen readers */}
+        <form role="search" className={styles.searchForm()} onSubmit={handleSearchSubmit}>
+          <input
+            type="search"
+            name="q"
+            enterKeyHint="search"
+            className={styles.search()}
+            placeholder="Search all items…"
+            aria-label="Search all items"
+            value={searchValue}
+            onChange={(event) => onSearchChange?.(event.target.value)}
+          />
+        </form>
 
         <div className={styles.actions()}>
           {user ? (

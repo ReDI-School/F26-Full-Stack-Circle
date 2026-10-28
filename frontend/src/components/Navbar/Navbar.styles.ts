@@ -44,8 +44,11 @@ export const navbarStyles = tv({
 
     logoMark: ['hidden', 'max-[400px]:flex'],
 
+    // The form is the flex item, so it carries the width and the mobile line break
+    searchForm: ['w-[220px]', 'max-[800px]:order-9', 'max-[800px]:w-full'],
+
     search: [
-      'w-[220px]',
+      'w-full',
       'rounded-pill',
       'bg-bg',
       'py-2.5',
@@ -59,8 +62,6 @@ export const navbarStyles = tv({
       'duration-150',
       'focus:ring-[3px]',
       'focus:ring-primary-100',
-      'max-[800px]:order-9',
-      'max-[800px]:w-full',
     ],
 
     actions: ['ml-auto', 'flex', 'shrink-0', 'items-center', 'gap-3'],
