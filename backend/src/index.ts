@@ -1,5 +1,6 @@
 import dotenv from 'dotenv';
-
+import swaggerUi from 'swagger-ui-express';
+import { buildOpenApiDocument } from './docs/openapi';
 import express, { Request, Response, Router } from 'express';
 import helmet from 'helmet';
 import cors from 'cors';
@@ -15,6 +16,12 @@ dotenv.config();
 
 const app = express();
 
+const openApiDoc = buildOpenApiDocument();
+
+if (process.env.NODE_ENV !== 'production') {
+  app.get('/api/docs.json', (_req, res) => res.json(openApiDoc));
+  app.use('/api/docs', swaggerUi.serve, swaggerUi.setup(openApiDoc));
+}
 // Middleware
 app.use(helmet());
 app.use(express.json());
