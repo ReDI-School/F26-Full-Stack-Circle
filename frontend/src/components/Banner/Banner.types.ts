@@ -7,7 +7,7 @@ interface BannerProps {
   title: string;
 
   // TODO: add the rest of the props this component needs:
-  description: string;
+  description?: string;
 
   variant: 'hero' | 'cta';
   // it is reactnode because i want to pass Button jsx to the component
