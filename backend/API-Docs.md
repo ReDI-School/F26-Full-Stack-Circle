@@ -14,10 +14,10 @@ Libraries: [`@asteasolutions/zod-to-openapi`](https://github.com/asteasolutions/
 
 ## What is automatic and what is not
 
-| Automatic | Manual (your job) |
-|---|---|
+| Automatic                                                                      | Manual (your job)                                                                                         |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------- |
 | Request validation rules (types, min/max, uuid, optional…) show up in the docs | Every endpoint must be **registered** in a docs file. Express routes are **not** picked up automatically. |
-| Reused schemas appear under "Schemas" | **Response schemas** must be written by hand and kept in sync with the Prisma `select` in the service. |
+| Reused schemas appear under "Schemas"                                          | **Response schemas** must be written by hand and kept in sync with the Prisma `select` in the service.    |
 
 If you forget to register an endpoint or import a docs file, it silently disappears from Swagger. No error.
 
@@ -25,14 +25,14 @@ If you forget to register an endpoint or import a docs file, it silently disappe
 
 ## File overview
 
-| File | What it does | When to touch it |
-|---|---|---|
-| `src/libs/zod.ts` | Extends Zod with `.openapi()` and re-exports `z` | Never |
-| `src/schemas/<Module>Schema.ts` | Request validation (params, query, body) + param metadata | Every new module |
-| `src/docs/registry.ts` | Central registry, shared error shape, shared components | Only for things shared across modules |
-| `src/docs/<module>.docs.ts` | Endpoints and response schemas of one module | Every new module |
-| `src/docs/openapi.ts` | Imports all docs files and builds the document | One import line per module |
-| `src/index.ts` | Serves Swagger UI (mounted **before** `helmet`) | Never |
+| File                            | What it does                                              | When to touch it                      |
+| ------------------------------- | --------------------------------------------------------- | ------------------------------------- |
+| `src/libs/zod.ts`               | Extends Zod with `.openapi()` and re-exports `z`          | Never                                 |
+| `src/schemas/<Module>Schema.ts` | Request validation (params, query, body) + param metadata | Every new module                      |
+| `src/docs/registry.ts`          | Central registry, shared error shape, shared components   | Only for things shared across modules |
+| `src/docs/<module>.docs.ts`     | Endpoints and response schemas of one module              | Every new module                      |
+| `src/docs/openapi.ts`           | Imports all docs files and builds the document            | One import line per module            |
+| `src/index.ts`                  | Serves Swagger UI (mounted **before** `helmet`)           | Never                                 |
 
 ### How it works at runtime
 
@@ -97,7 +97,7 @@ const CategorySchema = registry.register(
     name: z.string(),
     emoji: z.string(),
     tint: z.number().int().min(0).max(2),
-  }),
+  })
 );
 
 registry.registerPath({
@@ -165,12 +165,12 @@ Open `/api/docs`, use **Try it out** on each endpoint, and check that the real r
 
 ## When you change an existing endpoint
 
-| You changed… | Also update… |
-|---|---|
-| The Prisma `select` in a service | The response schema in `<module>.docs.ts` |
-| A validation rule in `<Module>Schema.ts` | Nothing, docs update automatically |
-| A route path or HTTP method | `path` / `method` in `registerPath` |
-| A status code (new 403, 409…) | `responses` in `registerPath` |
+| You changed…                             | Also update…                              |
+| ---------------------------------------- | ----------------------------------------- |
+| The Prisma `select` in a service         | The response schema in `<module>.docs.ts` |
+| A validation rule in `<Module>Schema.ts` | Nothing, docs update automatically        |
+| A route path or HTTP method              | `path` / `method` in `registerPath`       |
+| A status code (new 403, 409…)            | `responses` in `registerPath`             |
 
 ---
 
@@ -187,9 +187,9 @@ Open `/api/docs`, use **Try it out** on each endpoint, and check that the real r
 
 ## Troubleshooting
 
-| Problem | Likely cause |
-|---|---|
-| `.openapi is not a function` | Zod imported from `'zod'` instead of `'@/libs/zod'` |
-| Endpoint missing in Swagger | Not registered, or docs file not imported in `openapi.ts` |
-| Swagger UI is a blank page | Docs route mounted after `helmet()` (CSP blocks it) |
+| Problem                            | Likely cause                                                                      |
+| ---------------------------------- | --------------------------------------------------------------------------------- |
+| `.openapi is not a function`       | Zod imported from `'zod'` instead of `'@/libs/zod'`                               |
+| Endpoint missing in Swagger        | Not registered, or docs file not imported in `openapi.ts`                         |
+| Swagger UI is a blank page         | Docs route mounted after `helmet()` (CSP blocks it)                               |
 | Path param not shown / shown twice | Path uses `:id` instead of `{id}`, or param is missing `.openapi({ param: ... })` |
