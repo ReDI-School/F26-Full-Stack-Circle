@@ -14,6 +14,8 @@
     "start:frontend": "pnpm --filter frontend dev",
     "storybook": "pnpm --filter frontend storybook",
     "build": "pnpm --recursive build",
+    "test": "pnpm --filter backend test",
+    "test:backend": "pnpm --filter backend test",
     "typecheck": "pnpm --recursive --parallel typecheck",
     "lint": "pnpm --recursive --parallel lint",
     "format": "pnpm --recursive --parallel format",
@@ -25,9 +27,13 @@
     "db:deploy": "pnpm --filter backend db:deploy",
     "db:push": "pnpm --filter backend db:push",
     "db:seed": "pnpm --filter backend db:seed",
-    "db:studio": "pnpm --filter backend db:studio"
+    "db:studio": "pnpm --filter backend db:studio",
+    "prepare": "husky"
   },
   "dependencies": {
     "lucide-react": "^1.55.0"
+  },
+  "devDependencies": {
+    "husky": "^9.1.7"
   }
 }

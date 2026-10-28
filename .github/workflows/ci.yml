@@ -91,6 +91,11 @@ jobs:
       - name: Build
         run: pnpm --filter backend build
 
+      - name: Run tests
+        run: pnpm --filter backend test
+        env:
+          JWT_SECRET: ci-test-secret-placeholder
+
       - name: Apply the migrations to the database
         run: pnpm --filter backend db:deploy
 
