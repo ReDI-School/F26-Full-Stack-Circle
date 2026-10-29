@@ -10,24 +10,28 @@ import { tv } from 'tailwind-variants';
 
 export const bannerStyles = tv({
   base: [
-    'box-border',
-    'w-fill',
-    'min-w-0',
-    'px-8',
-    'min-[1076px]:px-[max(32px,_calc((100vw-1076px)/2))]',
-  ],
-
+  'box-border',
+  'w-full',
+  'max-w-full',
+  'min-w-0',
+  'px-8',
+  'min-[1076px]:px-[max(32px,_calc((100vw_-_1076px)/2))]',
+],
   variants: {
     variant: {
       hero: ['bg-primary', 'flex flex-col', 'py-11'],
       cta: [
-        'bg-tertiary',
-        'flex items-center justify-between',
-        'gap-6',
-        'py-10',
-        'max-[800px]:flex-col',
-        'max-[800px]:items-start',
-      ],
+  'bg-tertiary',
+  'flex',
+  'w-full',
+  'min-w-0',
+  'items-center',
+  'justify-between',
+  'gap-6',
+  'py-10',
+  'max-[800px]:flex-col',
+  'max-[800px]:items-start',
+],
     },
   },
 });
@@ -63,5 +67,5 @@ export const bannerContentStyles = tv({
 });
 
 export const bannerActionStyles = tv({
-  base: ['ml-auto', 'shrink-0', 'max-[800px]:ml-0'],
+  base: ['ml-auto', 'min-w-0', 'max-w-full', 'shrink-0', 'max-[800px]:ml-0'],
 });

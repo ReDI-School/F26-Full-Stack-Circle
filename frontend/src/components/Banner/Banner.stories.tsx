@@ -40,16 +40,18 @@ export const Cta: Story = {
   },
 };
 
+
 export const CtaMobile: Story = {
   args: {
     ...Cta.args,
   },
-  parameters: {
+  globals: {
     viewport: {
-      defaultViewport: 'mobile1',
+      value: 'mobile1',
     },
   },
 };
+
 
 // TODO: as you add props to Banner.types.ts, add a story for each variant and
 // state so you can see them all side by side. Something like:
