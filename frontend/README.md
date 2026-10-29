@@ -96,14 +96,14 @@ there is no route configuration file.
 ### 2. Layouts (`src/app/layout.tsx`)
 
 The root layout is the shell around every page. It imports the global stylesheets and renders
-the shared `Layout` component:
+the shared `AppShell`, which mounts `ToastProvider` around `Layout`:
 
 ```tsx
 const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body>
-        <Layout>{children}</Layout>
+        <AppShell>{children}</AppShell>
       </body>
     </html>
   );
@@ -204,11 +204,102 @@ in production Vercel routes `/api` to the backend service, and in development th
 `next.config.ts` proxies it to the backend on port 4000. So one URL works everywhere — and because the dev
 request goes through the Next.js server, there is no CORS involved either.
 
-```tsx
-import { apiUrl } from '../config';
+Use the shared browser client in Client Components and event handlers:
 
-const response = await fetch(apiUrl('/users')); // → /api/users
+```tsx
+import { api, ApiError } from '@/config/api';
+
+const response = await api.get<{ items: Item[] }>('/items?category=books');
+await api.post('/items', { title: 'Blue jacket' });
+await api.patch('/items/item-id', { price: 12 });
+await api.del('/items/item-id');
 ```
+
+Paths are relative to `/api`; do not include `/api` again. Every request sends
+`credentials: 'include'` and JSON headers. POST and PATCH serialize their body as JSON.
+All methods return `Promise<T | null>` because a successful `204 No Content` returns `null`.
+The generic describes the expected response; it does not validate JSON at runtime.
+
+A non-2xx response throws `ApiError` with `status`, `message`, and `fields` (a map of
+field names to strings or string arrays). Both `{ message, fields }` and the existing
+backend's `{ error }` shape are supported. Non-JSON error responses still produce an
+`ApiError` with the HTTP status and a fallback message. Network and abort failures keep
+their original error type. Use `error instanceof ApiError` when a form needs field errors.
+
+Pass an optional `{ signal }` as the second argument to GET/DELETE or the third argument
+to POST/PATCH to cancel a request. This client uses relative URLs and browser cookies;
+it is not a Server Component client or a substitute for server-side authentication.
+
+### Loading, error and empty results
+
+```tsx
+'use client';
+
+import { useApi } from '@/hooks';
+
+// Inside a Client Component:
+const { data, error, loading, refetch } = useApi<{ items: Item[] }>('/items');
+```
+
+Apply these states in order on every page:
+
+| State                   | What to show                                                                                                                                                                     |
+| ----------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `loading`               | A skeleton matching the content: grey rounded blocks in the shape of the cards. Use design tokens, an accessible loading label and `aria-busy`; avoid a spinner or blank screen. |
+| `error`                 | A short message and the existing `Button` labelled “Try again”, calling `refetch`. Forms can also show `ApiError.fields` beside their inputs.                                    |
+| Successful empty result | The shared `EmptyState` component. An empty list is a successful result, not an error.                                                                                           |
+| Successful data         | Render the page's existing components with that data.                                                                                                                            |
+
+`useApi<T>(url)` fetches on mount, URL changes and `refetch()`. The URL is relative to
+`/api`, just like the client. It returns `data: T | null`, `error: Error | null`,
+`loading: boolean` and a stable `refetch: () => void`. A refetch clears the displayed
+result/error and shows loading. A `204` finishes loading with `data: null`; use the
+endpoint's contract to decide how to display that outcome.
+
+Cleanup aborts the request on unmount or replacement. Late responses and failures are
+ignored even if the transport finishes after cancellation. Returning to a previous URL
+fetches again. There is no caching, automatic retry or request deduplication.
+
+### Shared notifications
+
+`AppShell` mounts one `ToastProvider` for all pages. In any descendant Client Component:
+
+```tsx
+import { useToast } from '@/hooks';
+
+// Inside the component:
+const toast = useToast();
+// After a user action succeeds or fails:
+toast.success("Item listed! It's live in your shop.");
+toast.error('Wrong email or password.');
+```
+
+Only one toast is visible at a time. Every call replaces the current notification and starts
+a fresh 3.2-second lifetime, including repeated identical messages. `Toast` owns the timer;
+the provider does not add a second timer. Dismissal, replacement and unmount clear it.
+Calling `useToast` outside the provider throws a descriptive error.
+
+The homepage's `HomeCategories` demonstrates `useApi('/categories')` with a skeleton,
+an inline error and retry, successful empty results, and the existing category tiles.
+Explicit refreshes show success/error feedback; initial loading does not pop a toast.
+Empty results use the shared `EmptyState` component. Full homepage composition and browse
+navigation remain in #48/#50.
+
+### Integration checks
+
+The provider uses the shared Toast component merged in #68.
+Routing, navigation and authentication work in the app shell remain in #46.
+
+The unit and browser component tests simulate API responses. The local integration was
+also verified against the real Express backend and an isolated, migrated and seeded
+PostgreSQL database: registration, HttpOnly session-cookie transmission, empty and loaded
+categories, retry after a database error, notification replacement and mobile layout.
+
+To repeat the real integration, point the backend at a disposable local database, apply
+migrations and seed it, then run `pnpm start:all`. Inspect the `/api/categories` request in
+the browser Network tab after registration to verify that the `token` cookie is sent.
+The `Feedback/ToastProvider` documentation in Storybook includes the interactive example
+and screenshots of desktop, mobile and homepage success/error states.
 
 ## 🔧 Available Scripts
 
@@ -261,8 +352,17 @@ pnpm storybook
 
 ### Tests
 
-Vitest, Playwright and the Storybook test addon are installed, but nothing is wired up yet:
-there is no `test` script and no Vitest config. Setting that up is one of the tickets.
+Run `pnpm --filter frontend test` from the repository root. The focused Vitest config runs
+API-client tests in Node and hook lifecycle tests in headless Chromium, using the existing
+Playwright dependency. On a fresh machine, install the browser once with
+`pnpm --filter frontend exec playwright install chromium`.
+
+Use `pnpm --filter frontend test --project api` or `--project hooks` to run one group.
+The browser tests cover StrictMode, unmount cancellation, URL changes, repeated refetches,
+out-of-order responses, network errors and retry, notification replacement and timer cleanup,
+and the homepage loading/error/empty/refresh flow. These tests simulate server responses;
+they do not replace the final real-backend integration checks. Storybook tests are not
+included in this focused configuration.
 
 ### ESLint, Prettier and TypeScript
 
