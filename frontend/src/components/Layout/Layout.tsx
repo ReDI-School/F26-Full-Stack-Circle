@@ -11,15 +11,15 @@ const Layout = ({ children, navbar, footer, variant = 'default' }: LayoutProps) 
 
   return (
     <div className={styles.root()}>
-      {!isBare && navbar ? <header className={styles.header()}>{navbar}</header> : null}
+      {/* The slots are rendered as they are, with no wrapper: Navbar brings its
+          own sticky <nav> and Footer its own <footer>, so Layout only owns <main> */}
+      {isBare ? null : navbar}
 
       <main className={styles.main()}>
         <div className={styles.content()}>{children}</div>
       </main>
 
-      {/* A div, not <footer>: the Footer component renders its own <footer>,
-          and HTML does not allow a <footer> inside another <footer> */}
-      {!isBare && footer ? <div>{footer}</div> : null}
+      {isBare ? null : footer}
     </div>
   );
 };

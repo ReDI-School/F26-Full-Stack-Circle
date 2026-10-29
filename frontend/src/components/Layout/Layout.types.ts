@@ -9,13 +9,14 @@ interface LayoutProps {
   children: ReactNode;
 
   /**
-   * Rendered at the top, in a sticky header. Passed in, so Layout never
-   * imports Navbar itself.
+   * Rendered at the top, as it is (the Navbar is sticky itself). Passed in,
+   * so Layout never imports Navbar itself.
    */
   navbar?: ReactNode;
 
   /**
-   * Rendered at the bottom. Passed in, so Layout never imports Footer itself.
+   * Rendered at the bottom, as it is (the Footer renders its own <footer>).
+   * Passed in, so Layout never imports Footer itself.
    */
   footer?: ReactNode;
 

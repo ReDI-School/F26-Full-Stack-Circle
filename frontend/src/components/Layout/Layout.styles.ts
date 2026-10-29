@@ -5,12 +5,10 @@ import { tv } from '@/config/tv';
  */
 export const layoutStyles = tv({
   slots: {
-    // At least the full viewport height, so the footer can sit at the bottom
+    // At least the full viewport height, so the footer can sit at the bottom.
+    // The navbar is a direct child of this column, so its own `sticky top-0`
+    // keeps it on top for the whole page; Layout adds no sticky of its own.
     root: ['flex', 'min-h-screen', 'flex-col'],
-
-    // A sticky element only sticks inside its parent. The header is exactly as
-    // tall as the navbar, so the header itself has to be the sticky part.
-    header: ['sticky', 'top-0', 'z-20'],
 
     // flex-1 grows <main> to fill the leftover height, which keeps the footer
     // at the bottom of a short page instead of halfway up the screen
