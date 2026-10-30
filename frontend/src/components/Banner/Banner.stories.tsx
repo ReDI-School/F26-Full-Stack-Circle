@@ -7,6 +7,7 @@ const meta: Meta<typeof Banner> = {
   component: Banner,
   tags: ['autodocs'],
   parameters: {
+    layout: 'fullscreen',
     docs: {
       description: {
         component:
@@ -19,6 +20,7 @@ const meta: Meta<typeof Banner> = {
 };
 
 export default meta;
+
 
 type Story = StoryObj<typeof meta>;
 
@@ -45,13 +47,12 @@ export const CtaMobile: Story = {
   args: {
     ...Cta.args,
   },
-  globals: {
+  parameters: {
     viewport: {
-      value: 'mobile1',
+      defaultViewport: 'mobile1',
     },
   },
 };
-
 
 // TODO: as you add props to Banner.types.ts, add a story for each variant and
 // state so you can see them all side by side. Something like:
