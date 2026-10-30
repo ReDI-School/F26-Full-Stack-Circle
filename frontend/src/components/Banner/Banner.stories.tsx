@@ -21,7 +21,6 @@ const meta: Meta<typeof Banner> = {
 
 export default meta;
 
-
 type Story = StoryObj<typeof meta>;
 
 export const Hero: Story = {
@@ -41,7 +40,6 @@ export const Cta: Story = {
     action: <Button variant="primary">Start selling</Button>,
   },
 };
-
 
 export const CtaMobile: Story = {
   args: {

@@ -8,8 +8,6 @@ import { tv } from '@/config/tv';
  * pushed to the right. Both full width, white text.
  */
 
-
-
 export const bannerStyles = tv({
   base: [
     'box-border',
