@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import '../assets/css/reset.css';
 import '../assets/css/global.css';
 
-import { Layout } from '../components';
+import { Footer, Layout } from '@/components';
+import { AppShell } from '@/components/AppShell';
 
 export const metadata: Metadata = {
   title: "ReDiCycle — someone's old, your new",
@@ -19,7 +20,12 @@ const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body>
-        <Layout>{children}</Layout>
+        <Layout
+          navbar={<AppShell />}
+          footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
+        >
+          {children}
+        </Layout>
       </body>
     </html>
   );
