@@ -1,38 +1,16 @@
 'use client';
-import { Navbar } from '@/components';
-import { useEffect, useState } from 'react';
-import { AuthContext } from '../AuthContext';
-import { apiUrl } from '@/config';
+import { Footer, Layout, Navbar } from '@/components';
+import { useAuth } from '@/hooks';
 
-const AppShell = () => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(false);
-  useEffect(() => {
-    async function fetchMe() {
-      const response = await fetch(apiUrl('auth/me'), {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        if (response.status === 401) return;
-        throw new Error(`Response status: ${response.status}`);
-      }
-      const data = await response.json();
-      setUser(data);
-      console.log('data', data);
-    }
-    try {
-      fetchMe();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
-  }, []);
-
+const AppShell = ({ children }: { children: React.ReactNode }) => {
+  const { user } = useAuth();
   return (
-    <AuthContext value={{ user, loading }}>
-      <Navbar user={user} />
-    </AuthContext>
+    <Layout
+      navbar={<Navbar user={user} />}
+      footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
+    >
+      {children}
+    </Layout>
   );
 };
 
