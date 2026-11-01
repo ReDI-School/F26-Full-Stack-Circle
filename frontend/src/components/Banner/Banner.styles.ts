@@ -9,27 +9,18 @@ import { tv } from '@/config/tv';
  */
 
 export const bannerStyles = tv({
-  base: [
-  'box-border',
-  'mx-0',
-  'px-8',
-  'min-[1076px]:px-[calc((100vw-1076px)/2)]',
-  ],
+  base: ['box-border', 'mx-0', 'px-8', 'min-[1076px]:px-[calc((100vw-1076px)/2)]'],
   variants: {
     variant: {
-      hero: [
-  'bg-primary',
-  'flex flex-col',
-  'py-11',
-],
-cta: [
-  'bg-tertiary',
-  'flex items-center justify-between',
-  'gap-6',
-  'py-10',
-  'max-[799px]:flex-col',
-  'max-[799px]:items-start',
-],
+      hero: ['bg-primary', 'flex flex-col', 'py-11'],
+      cta: [
+        'bg-tertiary',
+        'flex items-center justify-between',
+        'gap-6',
+        'py-10',
+        'max-[799px]:flex-col',
+        'max-[799px]:items-start',
+      ],
     },
   },
 });
