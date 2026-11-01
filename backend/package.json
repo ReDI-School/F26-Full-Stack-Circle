@@ -16,6 +16,7 @@
     "lint": "eslint src prisma/seed.ts prisma.config.ts",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
+    "test:create-item": "node --test tests/createItem.test.mjs",
     "db:generate": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:deploy": "prisma migrate deploy",
