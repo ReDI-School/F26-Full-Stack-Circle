@@ -43,15 +43,6 @@ const LoginForm = () => {
       >
         Log in
       </Button>
-
-      <Button
-        onClick={() => {
-          console.log('Logging out');
-          logout();
-        }}
-      >
-        Log out
-      </Button>
     </>
   );
 };

@@ -23,7 +23,6 @@ const RootLayout = ({ children }: RootLayoutProps) => {
         <AuthProvider>
           <AppShell>{children}</AppShell>
         </AuthProvider>
-          
       </body>
     </html>
   );
