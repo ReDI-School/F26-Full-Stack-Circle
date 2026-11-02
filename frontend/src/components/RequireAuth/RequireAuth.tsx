@@ -1,24 +1,40 @@
 'use client';
+import { useEffect } from 'react';
 import UseAuth from '@/hooks/UseAuth';
 import { usePathname, useRouter } from 'next/navigation';
 
-const RequireAuth = ({ children, notice }: { children: React.ReactNode; notice?: string }) => {
+const RequireAuth = ({
+  children,
+  notice,
+  needAdminRights = false,
+}: {
+  children: React.ReactNode;
+  notice?: string;
+  needAdminRights?: boolean;
+}) => {
   const router = useRouter();
-  let pathname = usePathname();
+  const pathname = usePathname();
   const { user, loading } = UseAuth();
 
-  if (loading) {
-    return <div>Loading...</div>;
-  }
+  useEffect(() => {
+    if (loading) return;
 
-  if (pathname.split('').filter((segment) => segment === '/').length > 1) {
-    pathname = '/';
-  }
+    let redirectPath = pathname;
+    if (redirectPath && redirectPath.split('').filter((segment) => segment === '/').length > 1) {
+      redirectPath = '/';
+    }
 
-  if (!user) {
-    router.push(
-      `/login${pathname ? `?next=${encodeURIComponent(pathname)}&notice=${notice || ''}` : ''}`
-    );
+    if (!user) {
+      router.replace(
+        `/login${redirectPath ? `?next=${encodeURIComponent(redirectPath)}&notice=${notice || ''}` : ''}`
+      );
+    } else if (needAdminRights && !user.isAdmin) {
+      router.replace('/');
+    }
+  }, [loading, user, needAdminRights, pathname, notice, router]);
+
+  if (loading || !user || (needAdminRights && !user.isAdmin)) {
+    return null;
   }
 
   return <>{children}</>;

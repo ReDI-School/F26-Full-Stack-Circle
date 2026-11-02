@@ -4,21 +4,24 @@ import TextField from '@/components/TextField/TextField';
 import UseAuth from '@/hooks/UseAuth';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { Suspense } from 'react';
+
 /**
  * The log in page.
  *
  * TODO: build the two-column layout from the prototype, with the form on
  * one side. Use the TextField and Button components once you have built them.
  */
-const Login = () => {
+const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { login, logout } = UseAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
+  const notice = searchParams.get('notice');
   return (
     <>
-      <h1>Log in</h1>
+      {notice && <p>{notice}</p>}
       <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
       <TextField
         label="Password"
@@ -49,6 +52,16 @@ const Login = () => {
       >
         Log out
       </Button>
+    </>
+  );
+};
+const Login = () => {
+  return (
+    <>
+      <h1>Log in</h1>
+      <Suspense>
+        <LoginForm />
+      </Suspense>
     </>
   );
 };

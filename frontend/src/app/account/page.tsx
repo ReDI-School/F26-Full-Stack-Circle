@@ -1,6 +1,6 @@
 'use client';
 import { RequireAuth } from '@/components/RequireAuth';
-const Register = () => {
+const Account = () => {
   return (
     <RequireAuth notice="Please log in to view your account information.">
       <h1>Account</h1>
@@ -8,4 +8,4 @@ const Register = () => {
   );
 };
 
-export default Register;
+export default Account;

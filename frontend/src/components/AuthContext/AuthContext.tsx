@@ -25,28 +25,29 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     async function fetchMe() {
-      const response = await fetch(apiUrl('auth/me'), {
-        credentials: 'include',
-      });
-      if (!response.ok) {
-        if (response.status === 401) {
-          setUser(null);
-
-          return;
+      try {
+        const response = await fetch(apiUrl('auth/me'), {
+          credentials: 'include',
+        });
+        if (!response.ok) {
+          if (response.status === 401) {
+            setUser(null);
+            return;
+          }
+          throw new Error(`Response status: ${response.status}`);
         }
-        throw new Error(`Response status: ${response.status}`);
+        const data = await response.json();
+        setUser(data.user);
+        console.log('data', data.user);
+      } catch (error) {
+        console.error(error);
+        setUser(null);
+      } finally {
+        setLoading(false);
       }
-      const data = await response.json();
-      setUser(data.user);
-      console.log('data', data.user);
     }
-    try {
-      fetchMe();
-    } catch (error) {
-      console.error(error);
-    } finally {
-      setLoading(false);
-    }
+
+    fetchMe();
   }, []);
 
   const login = async (email: string, password: string) => {
@@ -85,11 +86,17 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     setLoading(false);
   };
 
-  const logout = () => {
-    fetch(apiUrl('auth/logout'), {
-      method: 'POST',
-      credentials: 'include',
-    });
+  const logout = async () => {
+    try {
+      await fetch(apiUrl('auth/logout'), {
+        method: 'POST',
+        credentials: 'include',
+      });
+    } catch (error) {
+      console.error(error);
+    } finally {
+      setUser(null);
+    }
   };
   const refresh = null;
 
