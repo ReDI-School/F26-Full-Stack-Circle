@@ -98,6 +98,3 @@ curl -i -b /tmp/redicycle-item-cookies \
   -d '{"title":"Oak bedside table","description":"Ready for collection.","priceCents":2500,"condition":"GOOD","categoryId":"128a5a09-f22d-41e5-a652-407f3e360ae1"}' \
   http://localhost:4000/api/items
 ```
-
-The Storybook create-item examples demonstrate the response states using mocked
-requests. The HTTP suite above verifies the real API and database behavior.
