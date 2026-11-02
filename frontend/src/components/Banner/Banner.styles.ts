@@ -9,13 +9,8 @@ import { tv } from '@/config/tv';
  */
 
 export const bannerStyles = tv({
-  base: [
-  'box-border',
-  'mx-[calc(50%-50vw)]',
-  'px-8',
-  'min-[1076px]:px-[calc(50vw-538px)]',
-],
-  
+  base: ['box-border', 'mx-[calc(50%-50vw)]', 'px-8', 'min-[1076px]:px-[calc(50vw-538px)]'],
+
   variants: {
     variant: {
       hero: ['bg-primary', 'flex flex-col', 'py-11'],
@@ -35,7 +30,11 @@ export const bannerTitleStyles = tv({
   base: ['font-display', 'font-black', 'leading-[1.1]', 'text-surface', 'break-words'],
   variants: {
     variant: {
-      hero: ['http://localhost:6006/?path=/docs/components-avatar--docs', 'tracking-[-0.5px]', 'max-w-[560px]'],
+      hero: [
+        'http://localhost:6006/?path=/docs/components-avatar--docs',
+        'tracking-[-0.5px]',
+        'max-w-[560px]',
+      ],
       cta: ['text-[28px]'],
     },
   },
