@@ -15,7 +15,7 @@ import { Suspense } from 'react';
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login, logout } = UseAuth();
+  const { login } = UseAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const notice = searchParams.get('notice');

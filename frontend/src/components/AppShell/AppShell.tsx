@@ -3,10 +3,12 @@ import { Footer, Layout, Navbar } from '@/components';
 import { apiUrl } from '@/config';
 import { useAuth } from '@/hooks';
 import { useEffect, useState } from 'react';
-import { GearIcon, StorefrontIcon } from '@/lib/icons';
+import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
+import { useRouter } from 'next/navigation';
 
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { user, logout } = useAuth();
+  const router = useRouter();
   const [unreadCount, setUnreadCount] = useState<number>(0);
   useEffect(() => {
     const unreadCount = async () => {
@@ -23,27 +25,52 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
     };
     unreadCount();
   }, []);
+  const myShopItem = {
+    type: 'item' as const,
+    icon: StorefrontIcon(),
+    label: 'My shop',
+    onClick: () => {
+      router.push('/shop');
+    },
+  };
+  const accountSettingsItem = {
+    type: 'item' as const,
+    icon: GearIcon(),
+    label: 'Account settings',
+    onClick: () => {
+      router.push('/account');
+    },
+  };
+  const adminItem = {
+    type: 'item' as const,
+    icon: AdminBadge(),
+    label: 'Admin',
+    onClick: () => {
+      router.push('/admin');
+    },
+  };
+  const logoutItem = {
+    type: 'item' as const,
+    label: 'Log out',
+    onClick: () => {
+      logout();
+      router.push('/login');
+    },
+  };
+  const dividerItem = { type: 'divider' as const };
 
+  const adminMenuItems = [myShopItem, accountSettingsItem, adminItem, dividerItem, logoutItem];
+  const userMenuItems = [myShopItem, accountSettingsItem, dividerItem, logoutItem];
   return (
     <Layout
       navbar={
         <Navbar
           user={user}
           unreadCount={unreadCount}
-          menuItems={[
-            { type: 'item', icon: StorefrontIcon(), label: 'My shop', onClick: () => {} },
-            { type: 'item', icon: GearIcon(), label: 'Account settings', onClick: () => {} },
-            { type: 'divider' },
-            {
-              type: 'item',
-              label: 'Log out',
-              onClick: () => {
-                logout();
-              },
-            },
-          ]}
+          menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
         />
       }
+      // TODO: fill in the footer with the correct links, once we have them
       footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
     >
       {children}
