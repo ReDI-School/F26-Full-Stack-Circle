@@ -1,14 +1,34 @@
-import { bannerStyles } from './Banner.styles';
 import type { BannerProps } from './Banner.types';
+import {
+  bannerStyles,
+  bannerTitleStyles,
+  bannerDescriptionStyles,
+  bannerContentStyles,
+  bannerActionStyles,
+} from './Banner.styles';
 
-/**
- * TODO: build the Banner.
- *
- * hero = primary bg, 26px display black title. cta = tertiary bg, 20px title, action
- * pushed to the right. Both full width, white text.
- */
-const Banner = ({ title }: BannerProps) => {
-  return <div className={bannerStyles()}>{title}</div>;
+const Banner = ({ variant, title, description, action }: BannerProps) => {
+  return (
+    <section className={bannerStyles({ variant })}>
+      {variant === 'hero' ? (
+        <>
+          <h1 className={bannerTitleStyles({ variant })}>{title}</h1>
+
+          {description && <p className={bannerDescriptionStyles({ variant })}>{description}</p>}
+        </>
+      ) : (
+        <>
+          <div className={bannerContentStyles({ variant })}>
+            <h2 className={bannerTitleStyles({ variant })}>{title}</h2>
+
+            {description && <p className={bannerDescriptionStyles({ variant })}>{description}</p>}
+          </div>
+
+          {action && <div className={bannerActionStyles()}>{action}</div>}
+        </>
+      )}
+    </section>
+  );
 };
 
 export default Banner;

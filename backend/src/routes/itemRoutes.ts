@@ -7,6 +7,7 @@ const itemController = new ItemController();
 const itemRouter = Router();
 const threadController = new ThreadController();
 
+itemRouter.post('/', requireAuth, (req, res) => itemController.create(req, res));
 itemRouter.get('/', (req, res) => itemController.getItems(req, res));
 itemRouter.get('/:id', (req, res) => itemController.getById(req, res));
 
