@@ -1,9 +1,5 @@
 import { Meta, Canvas } from '@storybook/addon-docs/blocks';
 import * as ToastProviderStories from './ToastProvider.stories';
-import desktopToast from './screenshots/toast-desktop.png';
-import mobileToast from './screenshots/toast-mobile-long.png';
-import homepage from './screenshots/homepage-desktop.png';
-import errorState from './screenshots/homepage-error.png';
 
 <Meta of={ToastProviderStories} />
 
@@ -16,36 +12,9 @@ with the keyboard.
 
 <Canvas of={ToastProviderStories.Interactive} />
 
-## Desktop notification
-
-The success message appears after an explicit action.
-
-<img src={desktopToast.src} alt="Success notification in the desktop ToastProvider story" />
-
-## Long message on mobile
-
-Long messages wrap within the viewport and keep the dismiss control available.
-
-<img
-  src={mobileToast.src}
-  alt="Long error notification wrapping within a mobile viewport"
-  style={{ maxWidth: 375, width: '100%' }}
-/>
-
 ## Homepage integration
 
 The homepage uses the shared API client and `useApi` to load categories from the
 backend. Refreshing successfully shows a notification. Loading uses a skeleton;
 an empty response uses `EmptyState`; a failure shows a short message and a retry
 button.
-
-<img
-  src={homepage.src}
-  alt="Homepage showing categories loaded from the backend and a success notification"
-/>
-
-<img
-  src={errorState.src}
-  alt="Homepage showing a failed category request, retry control and error notification"
-  style={{ maxWidth: 375, width: '100%' }}
-/>

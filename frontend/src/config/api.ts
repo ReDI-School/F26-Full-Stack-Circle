@@ -19,6 +19,47 @@ type RequestOptions = Pick<RequestInit, 'signal'>;
 const isRecord = (value: unknown): value is Record<string, unknown> =>
   typeof value === 'object' && value !== null && !Array.isArray(value);
 
+const readFields = (body: Record<string, unknown>): ApiErrorFields => {
+  // A Map also treats names such as "__proto__" as ordinary field names.
+  const fields = new Map<string, string | string[]>();
+  if (isRecord(body.fields)) {
+    for (const [field, value] of Object.entries(body.fields)) {
+      if (
+        typeof value === 'string' ||
+        (Array.isArray(value) && value.every((item) => typeof item === 'string'))
+      ) {
+        fields.set(field, value);
+      }
+    }
+  }
+
+  if (Array.isArray(body.details)) {
+    for (const detail of body.details) {
+      if (!isRecord(detail) || typeof detail.message !== 'string') continue;
+      // Auth returns Zod issue paths; items and the central handler return field names.
+      const field =
+        typeof detail.field === 'string'
+          ? detail.field
+          : Array.isArray(detail.path) &&
+              detail.path.every((part) => typeof part === 'string' || typeof part === 'number')
+            ? detail.path.join('.')
+            : '';
+      if (!field) continue;
+
+      const previous = fields.get(field);
+      fields.set(
+        field,
+        previous === undefined
+          ? detail.message
+          : [...new Set([previous].flat().concat(detail.message))]
+      );
+    }
+  }
+
+  // Unlike defineProperty's defaults, these properties can be updated or deleted by forms.
+  return Object.fromEntries(fields);
+};
+
 const readError = async (response: Response): Promise<ApiError> => {
   // A proxy may return HTML or an empty body instead of the API's JSON error.
   const text = await response.text();
@@ -30,24 +71,16 @@ const readError = async (response: Response): Promise<ApiError> => {
   }
 
   let message = `Request failed (${response.status}).`;
-  const fields: ApiErrorFields = {};
+  let fields: ApiErrorFields = {};
   if (isRecord(payload)) {
-    if (typeof payload.message === 'string' && payload.message) {
-      message = payload.message;
-    } else if (typeof payload.error === 'string' && payload.error) {
-      message = payload.error;
+    // Accept current responses and #111's nested { error: { message, details } }.
+    const body = isRecord(payload.error) ? payload.error : payload;
+    if (typeof body.message === 'string' && body.message) {
+      message = body.message;
+    } else if (typeof body.error === 'string' && body.error) {
+      message = body.error;
     }
-
-    if (isRecord(payload.fields)) {
-      for (const [field, value] of Object.entries(payload.fields)) {
-        if (
-          typeof value === 'string' ||
-          (Array.isArray(value) && value.every((item) => typeof item === 'string'))
-        ) {
-          Object.defineProperty(fields, field, { value, enumerable: true });
-        }
-      }
-    }
+    fields = readFields(body);
   }
 
   return new ApiError(response.status, message, fields);

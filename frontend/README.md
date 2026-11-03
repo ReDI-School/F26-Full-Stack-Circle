@@ -221,8 +221,11 @@ All methods return `Promise<T | null>` because a successful `204 No Content` ret
 The generic describes the expected response; it does not validate JSON at runtime.
 
 A non-2xx response throws `ApiError` with `status`, `message`, and `fields` (a map of
-field names to strings or string arrays). Both `{ message, fields }` and the existing
-backend's `{ error }` shape are supported. Non-JSON error responses still produce an
+field names to strings or string arrays). It accepts `{ message, fields }`,
+`{ error, fields }`, the current auth/items `{ error, details }` responses, and the
+central handler's `{ error: { message, details } }` response. Zod `path` arrays and
+`field` names become keys in `fields`; repeated messages for one field are preserved.
+Forms can update or delete entries in this map. Non-JSON error responses still produce an
 `ApiError` with the HTTP status and a fallback message. Network and abort failures keep
 their original error type. Use `error instanceof ApiError` when a form needs field errors.
 
@@ -258,7 +261,9 @@ endpoint's contract to decide how to display that outcome.
 
 Cleanup aborts the request on unmount or replacement. Late responses and failures are
 ignored even if the transport finishes after cancellation. Returning to a previous URL
-fetches again. There is no caching, automatic retry or request deduplication.
+fetches again. This matters for search/filter controls that change the request URL
+without unmounting their component; it does not depend on page navigation. There is
+no caching, automatic retry or request deduplication.
 
 ### Shared notifications
 
@@ -277,7 +282,9 @@ toast.error('Wrong email or password.');
 Only one toast is visible at a time. Every call replaces the current notification and starts
 a fresh 3.2-second lifetime, including repeated identical messages. `Toast` owns the timer;
 the provider does not add a second timer. Dismissal, replacement and unmount clear it.
-Calling `useToast` outside the provider throws a descriptive error.
+Changing only the text of a standalone `Toast` keeps its existing deadline; a new
+provider notification remounts it with a new key to reset the timer. Calling
+`useToast` outside the provider throws a descriptive error.
 
 The homepage's `HomeCategories` demonstrates `useApi('/categories')` with a skeleton,
 an inline error and retry, successful empty results, and the existing category tiles.
@@ -299,7 +306,8 @@ To repeat the real integration, point the backend at a disposable local database
 migrations and seed it, then run `pnpm start:all`. Inspect the `/api/categories` request in
 the browser Network tab after registration to verify that the `token` cookie is sent.
 The `Feedback/ToastProvider` documentation in Storybook includes the interactive example
-and screenshots of desktop, mobile and homepage success/error states.
+for notification replacement and long messages. Screenshots are kept in the PR
+description rather than bundled with the application.
 
 ## 🔧 Available Scripts
 

@@ -2,6 +2,7 @@ import React, { act, useLayoutEffect, StrictMode } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { ToastProvider } from '../components/ToastProvider';
+import { Toast } from '../components/Toast';
 import useToast, { type ToastApi } from './useToast';
 
 let root: Root | null;
@@ -117,4 +118,38 @@ it('removes the portal and timer when the provider unmounts', async () => {
   expect(vi.getTimerCount()).toBe(0);
   await advance(4000);
   expect(notification()).toBeNull();
+});
+
+it('keeps a standalone toast deadline when only its message and callback change', async () => {
+  const firstDismiss = vi.fn();
+  const latestDismiss = vi.fn();
+  await act(async () =>
+    root?.render(<Toast open message="First" duration={3200} onDismiss={firstDismiss} />)
+  );
+  await advance(3000);
+  await act(async () =>
+    root?.render(<Toast open message="Updated" duration={3200} onDismiss={latestDismiss} />)
+  );
+  expect(notification()?.textContent).toContain('Updated');
+  await advance(200);
+  expect(firstDismiss).not.toHaveBeenCalled();
+  expect(latestDismiss).toHaveBeenCalledOnce();
+});
+
+it('restarts a standalone toast timer when its duration changes and clears it when closed', async () => {
+  const dismiss = vi.fn();
+  await act(async () =>
+    root?.render(<Toast open message="Saved" duration={3200} onDismiss={dismiss} />)
+  );
+  await advance(3000);
+  await act(async () =>
+    root?.render(<Toast open message="Saved" duration={1000} onDismiss={dismiss} />)
+  );
+  await advance(999);
+  expect(dismiss).not.toHaveBeenCalled();
+  await advance(1);
+  expect(dismiss).toHaveBeenCalledOnce();
+  await act(async () => root?.render(<Toast open={false} message="Saved" onDismiss={dismiss} />));
+  expect(notification()).toBeNull();
+  expect(vi.getTimerCount()).toBe(0);
 });

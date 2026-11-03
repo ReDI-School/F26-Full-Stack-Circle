@@ -15,7 +15,9 @@ const useApi = <T>(url: string) => {
   const [request, setRequest] = useState({ url, revision: 0 });
   const [result, setResult] = useState<Result<T> | null>(null);
 
-  // Give every URL change a fresh revision, including A -> B -> A.
+  // Search/filter inputs can change the URL while this component stays mounted.
+  // Give every change a fresh revision, even when returning to a previous URL,
+  // so an earlier result cannot reappear before the replacement request finishes.
   // React restarts this render before committing children or running effects.
   if (request.url !== url) {
     setRequest({ url, revision: request.revision + 1 });
