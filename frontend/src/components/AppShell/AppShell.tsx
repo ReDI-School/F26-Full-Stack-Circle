@@ -10,6 +10,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState<number>(0);
+  const [searchValue, setSearchValue] = useState<string>('');
   useEffect(() => {
     const unreadCount = async () => {
       try {
@@ -25,6 +26,9 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
     };
     unreadCount();
   }, []);
+  const handleSearch = () => {
+    router.push(`/?q=${searchValue}`);
+  };
   const myShopItem = {
     type: 'item' as const,
     icon: StorefrontIcon(),
@@ -68,6 +72,9 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
           user={user}
           unreadCount={unreadCount}
           menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
+          searchValue={searchValue}
+          onSearchChange={setSearchValue}
+          onSearch={handleSearch}
         />
       }
       // TODO: fill in the footer with the correct links, once we have them
