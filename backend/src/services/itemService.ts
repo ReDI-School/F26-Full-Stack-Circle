@@ -1,9 +1,43 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
 import { ItemError } from '@/errors/itemError';
-import { GetItemsQuery } from '@/schemas/ItemSchema';
+import { CreateItemInput, GetItemsQuery } from '@/schemas/ItemSchema';
+
+const itemDetails = {
+  category: { select: { slug: true, name: true } },
+  shop: {
+    select: {
+      id: true,
+      name: true,
+      subline: true,
+      owner: { select: { id: true, name: true, avatarUrl: true } },
+    },
+  },
+  photos: {
+    select: { id: true, url: true, position: true },
+    orderBy: { position: 'asc' },
+  },
+} satisfies Prisma.ItemInclude;
 
 export class ItemService {
+  async categoryExists(id: string) {
+    return (await prisma.category.findUnique({ where: { id }, select: { id: true } })) !== null;
+  }
+
+  async create(shopId: string, input: CreateItemInput) {
+    const { photoUrls = [], ...item } = input;
+
+    // Nested creation keeps the item and its ordered photos in one transaction.
+    return prisma.item.create({
+      data: {
+        ...item,
+        shopId,
+        photos: { create: photoUrls.map((url, position) => ({ url, position })) },
+      },
+      include: itemDetails,
+    });
+  }
+
   async getItems(params: GetItemsQuery) {
     const { category, q, shopId, take, skip } = params;
 
@@ -62,38 +96,7 @@ export class ItemService {
   async getById(id: string) {
     return prisma.item.findUnique({
       where: { id },
-      include: {
-        category: {
-          select: {
-            slug: true,
-            name: true,
-          },
-        },
-        shop: {
-          select: {
-            id: true,
-            name: true,
-            subline: true,
-            owner: {
-              select: {
-                id: true,
-                name: true,
-                avatarUrl: true,
-              },
-            },
-          },
-        },
-        photos: {
-          select: {
-            id: true,
-            url: true,
-            position: true,
-          },
-          orderBy: {
-            position: 'asc',
-          },
-        },
-      },
+      include: itemDetails,
     });
   }
 }
