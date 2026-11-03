@@ -1,5 +1,6 @@
 import prisma from '../libs/prisma';
 import { ThreadError } from '@/errors/threadError';
+import { Prisma } from '@generated/prisma/client';
 
 export class ThreadService {
   async expressInterest(itemId: string, buyerId: string) {
@@ -37,21 +38,38 @@ export class ThreadService {
 
     const body = `Hi! I'm interested in "${item.title}". Is it still available?`;
 
-    const thread = await prisma.thread.create({
-      data: {
-        itemId,
-        buyerId,
-        sellerId: item.shop.ownerId,
-        messages: {
-          create: {
-            senderId: buyerId,
-            body,
-            readAt: null,
+    try {
+      const thread = await prisma.thread.create({
+        data: {
+          itemId,
+          buyerId,
+          sellerId: item.shop.ownerId,
+          messages: {
+            create: {
+              senderId: buyerId,
+              body,
+              readAt: null,
+            },
           },
         },
-      },
-    });
+      });
 
-    return { thread, created: true };
+      return { thread, created: true };
+    } catch (error) {
+      // Two requests arrived at once, both found no thread, and both tried to
+      // create one. The loser hits the unique (itemId, buyerId) constraint:
+      // return the thread the winner just made instead of failing.
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2002') {
+        const thread = await prisma.thread.findUnique({
+          where: { itemId_buyerId: { itemId, buyerId } },
+        });
+
+        if (thread) {
+          return { thread, created: false };
+        }
+      }
+
+      throw error;
+    }
   }
 }
