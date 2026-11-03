@@ -4,13 +4,14 @@ import { apiUrl } from '@/config';
 import { useAuth } from '@/hooks';
 import { useEffect, useState } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 
 const AppShell = ({ children }: { children: React.ReactNode }) => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>('');
+  const pathname = usePathname();
   useEffect(() => {
     const unreadCount = async () => {
       try {
@@ -67,6 +68,7 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   const userMenuItems = [myShopItem, accountSettingsItem, dividerItem, logoutItem];
   return (
     <Layout
+      variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
       navbar={
         <Navbar
           user={user}
