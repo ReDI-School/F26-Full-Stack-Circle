@@ -1,14 +1,115 @@
+'use client';
+
+import type { FormEvent } from 'react';
+
+import { AvatarMenu } from '../AvatarMenu';
+import { Button } from '../Button';
+import { Logo } from '../Logo';
 import { navbarStyles } from './Navbar.styles';
 import type { NavbarProps } from './Navbar.types';
 
-/**
- * TODO: build the Navbar.
- *
- * sticky white bar, border-bottom, shadow-nav. Content max-width 1076px: logo, search
- * pill, then right-aligned '+ Add item', inbox icon with a count bubble, and the avatar.
- */
-const Navbar = ({ userName }: NavbarProps) => {
-  return <nav className={navbarStyles()}>{userName}</nav>;
+/** Phosphor "Chat" (regular), 20px. */
+const ChatIcon = () => (
+  <svg width="20" height="20" viewBox="0 0 256 256" fill="currentColor" aria-hidden="true">
+    <path d="M216,48H40A16,16,0,0,0,24,64V224a15.84,15.84,0,0,0,9.25,14.5A16.05,16.05,0,0,0,40,240a15.89,15.89,0,0,0,10.25-3.78l.09-.07L83,208H216a16,16,0,0,0,16-16V64A16,16,0,0,0,216,48ZM40,224h0ZM216,192H80a8,8,0,0,0-5.23,1.95L40,224V64H216Z" />
+  </svg>
+);
+
+/** Keeps the badge small: anything above 99 becomes "99+". */
+const formatUnread = (count: number) => (count > 99 ? '99+' : String(count));
+
+const Navbar = ({
+  user,
+  unreadCount = 0,
+  searchValue,
+  onSearchChange,
+  onSearch,
+  onLogoClick,
+  onAddItem,
+  onInbox,
+  onLogin,
+  onRegister,
+  menuItems = [],
+}: NavbarProps) => {
+  const styles = navbarStyles();
+  const hasUnread = unreadCount > 0;
+
+  // A real form submit covers Enter on a keyboard and the "Search"/"Go" key
+  // on phone keyboards, and the browser never submits mid-IME-composition.
+  const handleSearchSubmit = (event: FormEvent<HTMLFormElement>) => {
+    // Stay on the page: the parent decides what searching means
+    event.preventDefault();
+    const query = new FormData(event.currentTarget).get('q');
+    onSearch?.(typeof query === 'string' ? query : '');
+  };
+
+  return (
+    <nav className={styles.root()} aria-label="Main">
+      <div className={styles.inner()}>
+        {/* The Logo's SVG has aria-label="ReDiCycle", which names this button.
+            Below 400px only the mark shows, so the actions fit on the first line. */}
+        <button type="button" className={styles.logoButton()} onClick={onLogoClick}>
+          <span className={styles.logoFull()}>
+            <Logo size={28} />
+          </span>
+          <span className={styles.logoMark()}>
+            <Logo size={28} withWordmark={false} />
+          </span>
+        </button>
+
+        {/* role="search" makes this a search landmark for screen readers */}
+        <form role="search" className={styles.searchForm()} onSubmit={handleSearchSubmit}>
+          <input
+            type="search"
+            name="q"
+            enterKeyHint="search"
+            className={styles.search()}
+            placeholder="Search all items…"
+            aria-label="Search all items"
+            value={searchValue}
+            onChange={(event) => onSearchChange?.(event.target.value)}
+          />
+        </form>
+
+        <div className={styles.actions()}>
+          {user ? (
+            <>
+              <Button type="button" variant="primary" size="sm" onClick={onAddItem}>
+                + Add item
+              </Button>
+
+              <button
+                type="button"
+                className={styles.inbox()}
+                onClick={onInbox}
+                aria-label={hasUnread ? `Inbox, ${unreadCount} unread` : 'Inbox'}
+              >
+                <ChatIcon />
+                {hasUnread ? (
+                  <span className={styles.badge()} aria-hidden="true">
+                    {formatUnread(unreadCount)}
+                  </span>
+                ) : null}
+              </button>
+
+              <div className={styles.avatar()}>
+                <AvatarMenu user={user} items={menuItems} />
+              </div>
+            </>
+          ) : (
+            <>
+              <Button type="button" variant="ghost" size="sm" onClick={onLogin}>
+                Log in
+              </Button>
+              <Button type="button" variant="primary" size="sm" onClick={onRegister}>
+                Start selling
+              </Button>
+            </>
+          )}
+        </div>
+      </div>
+    </nav>
+  );
 };
 
 export default Navbar;

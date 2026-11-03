@@ -1,15 +1,60 @@
+import { ConditionBadge } from '@/components/ConditionBadge';
+import { formatPrice } from '@/lib/price';
 import { itemCardStyles } from './ItemCard.styles';
 import type { ItemCardProps } from './ItemCard.types';
+import Image from 'next/image';
 
-/**
- * TODO: build the ItemCard.
- *
- * white card, radius-card, border. 180px photo area on top with the condition badge at
- * top-left, then title (display 800, 17px), 'category · seller' in muted 13px, and the
- * price in display black 20px secondary. Hover lifts 2px with shadow-card.
- */
-const ItemCard = ({ title }: ItemCardProps) => {
-  return <div className={itemCardStyles()}>{title}</div>;
+const ItemCard = ({
+  title,
+  priceCents,
+  oldPriceCents,
+  condition,
+  category,
+  seller,
+  imageUrl,
+  sold = false,
+  size,
+  onClick,
+}: ItemCardProps) => {
+  const styles = itemCardStyles({ size });
+
+  const hasDiscount = oldPriceCents !== undefined && oldPriceCents > priceCents;
+
+  const meta = size === 'sm' ? seller : [category, seller].filter(Boolean).join(' · ');
+
+  return (
+    <button type="button" className={styles.base()} onClick={onClick}>
+      <div className={styles.photo()}>
+        {imageUrl ? (
+          <Image src={imageUrl} alt={title} fill className={styles.image()} />
+        ) : (
+          <div className={styles.placeholder()} aria-label="No item photo available">
+            item photo
+          </div>
+        )}
+
+        <div className={styles.condition()}>
+          <ConditionBadge condition={condition} />
+        </div>
+
+        {sold && <div className={styles.soldOverlay()}>SOLD</div>}
+      </div>
+
+      <div className={styles.body()}>
+        <span className={styles.title()} title={title}>
+          {title}
+        </span>
+
+        {meta && <p className={styles.meta()}>{meta}</p>}
+
+        <div className={styles.priceRow()}>
+          <span className={styles.price()}>{formatPrice(priceCents)}</span>
+
+          {hasDiscount && <span className={styles.oldPrice()}>{formatPrice(oldPriceCents)}</span>}
+        </div>
+      </div>
+    </button>
+  );
 };
 
 export default ItemCard;

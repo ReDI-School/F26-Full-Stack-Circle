@@ -1,8 +1,8 @@
 import { Request, Response } from 'express';
-import { z } from 'zod';
+import { registerSchema, loginSchema } from '../schemas/AuthSchema';
 
 import { EmailAlreadyRegisteredError } from '../errors/authErrors';
-import { TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
+import { AUTH_COOKIE, TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
 import { AuthService } from '../services/authService';
 
 const authService = new AuthService();
@@ -12,28 +12,6 @@ const authService = new AuthService();
  * transforms, not just checks, so the service receives the cleaned values -
  * which is what makes Ada@... and ada@... the same account.
  */
-const registerSchema = z.object({
-  name: z.string().trim().min(1),
-  email: z.string().trim().toLowerCase().email(),
-  // The character limit is what a person sees. The byte check stays as a
-  // backstop: bcrypt hashes only the first 72 bytes and silently drops
-  // the rest, and 64 characters of emoji or Cyrillic can still exceed
-  // that. Truncation would let the prefix alone log you in.
-  password: z
-    .string()
-    .min(8, 'Password must be at least 8 characters.')
-    .max(64, 'Password must be at most 64 characters.')
-    .refine((value) => Buffer.byteLength(value, 'utf8') <= 72, {
-      message: 'Password is too long.',
-    }),
-});
-
-/**
- * The token goes in a cookie the browser cannot read from JavaScript, so
- * an XSS bug cannot steal a login. The browser sends it on every request
- * on its own, which means the frontend never touches a token at all.
- */
-const AUTH_COOKIE = 'token';
 
 const cookieOptions = {
   httpOnly: true,
@@ -72,5 +50,40 @@ export class AuthController {
 
       res.status(500).json({ error: 'Failed to register' });
     }
+  }
+
+  async login(req: Request, res: Response) {
+    const parsed = loginSchema.safeParse(req.body ?? {});
+
+    if (!parsed.success) {
+      return res.status(400).json({
+        error: parsed.error.issues[0]?.message ?? 'Validation failed',
+        details: parsed.error.issues,
+      });
+    }
+
+    try {
+      const user = await authService.login(parsed.data);
+      if (!user) {
+        return res.status(401).json({ error: 'Wrong email or password.' });
+      }
+
+      res.cookie(AUTH_COOKIE, signToken(user.id), cookieOptions);
+
+      res.status(200).json({ user });
+    } catch (error) {
+      console.error('Error logging in:', error);
+
+      res.status(500).json({ error: 'Failed to log in' });
+    }
+  }
+
+  logout(_req: Request, res: Response) {
+    res.clearCookie(AUTH_COOKIE, cookieOptions);
+    return res.status(204).end();
+  }
+
+  me(req: Request, res: Response) {
+    res.status(200).json({ user: req.user });
   }
 }
