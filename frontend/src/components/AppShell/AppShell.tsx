@@ -1,12 +1,14 @@
 'use client';
 import { Footer, Layout, Navbar } from '@/components';
+import { ToastProvider } from '../ToastProvider';
+import type { AppShellProps } from './AppShell.types';
 import { apiUrl } from '@/config';
 import { useAuth } from '@/hooks';
 import { useEffect, useState } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
-const AppShell = ({ children }: { children: React.ReactNode }) => {
+const AppShell = ({ children }: AppShellProps) => {
   const { user, logout } = useAuth();
   const router = useRouter();
   const [unreadCount, setUnreadCount] = useState<number>(0);
@@ -67,23 +69,25 @@ const AppShell = ({ children }: { children: React.ReactNode }) => {
   const adminMenuItems = [myShopItem, accountSettingsItem, adminItem, dividerItem, logoutItem];
   const userMenuItems = [myShopItem, accountSettingsItem, dividerItem, logoutItem];
   return (
-    <Layout
-      variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
-      navbar={
-        <Navbar
-          user={user}
-          unreadCount={unreadCount}
-          menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
-          searchValue={searchValue}
-          onSearchChange={setSearchValue}
-          onSearch={handleSearch}
-        />
-      }
-      // TODO: fill in the footer with the correct links, once we have them
-      footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
-    >
-      {children}
-    </Layout>
+    <ToastProvider>
+      <Layout
+        variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
+        navbar={
+          <Navbar
+            user={user}
+            unreadCount={unreadCount}
+            menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
+            searchValue={searchValue}
+            onSearchChange={setSearchValue}
+            onSearch={handleSearch}
+          />
+        }
+        // TODO: fill in the footer with the correct links, once we have them
+        footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
+      >
+        {children}
+      </Layout>
+    </ToastProvider>
   );
 };
 
