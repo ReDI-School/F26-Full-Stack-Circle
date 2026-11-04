@@ -3,7 +3,7 @@ import { Footer, Layout, Navbar } from '@/components';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
 import { useApi, useAuth } from '@/hooks';
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
@@ -15,9 +15,49 @@ const AppShell = ({ children }: AppShellProps) => {
 
   const { data } = useApi<{ unreadCount: number }>('/threads');
   const unreadCount = data?.unreadCount ?? 0;
+
+  const { data: categories } = useApi<{
+    categories: {
+      id: string;
+      slug: string;
+      name: string;
+      emoji: string;
+      tint: number;
+      itemCount: number;
+    }[];
+  }>('/categories');
+
   const handleSearch = () => {
-    router.push(`/?q=${searchValue}`);
+    router.push(`/?q=${encodeURIComponent(searchValue)}`);
   };
+
+  const categoryLinks = useMemo(() => {
+    if (!categories) return [];
+    return categories.categories.map((cat) => ({
+      label: cat.name.toLowerCase(),
+      href: `/?category=${encodeURIComponent(cat.slug)}`,
+    }));
+  }, [categories]);
+
+  const infoLinks = useMemo(
+    () => [
+      { label: 'how to buy', href: '/how-to-buy' },
+      { label: 'how to sell', href: '/how-to-sell' },
+      { label: 'safety tips', href: '/safety' },
+      { label: 'FAQ', href: '/faq' },
+    ],
+    []
+  );
+
+  const accountLinks = useMemo(
+    () => [
+      { label: 'my shop', href: '/shop' },
+      { label: 'account settings', href: '/account' },
+      { label: 'sell an item', href: '/items/new' },
+    ],
+    []
+  );
+
   const myShopItem = {
     type: 'item' as const,
     icon: StorefrontIcon(),
@@ -68,8 +108,9 @@ const AppShell = ({ children }: AppShellProps) => {
             onSearch={handleSearch}
           />
         }
-        // TODO: fill in the footer with the correct links, once we have them
-        footer={<Footer categoryLinks={[]} infoLinks={[]} accountLinks={[]} />}
+        footer={
+          <Footer categoryLinks={categoryLinks} infoLinks={infoLinks} accountLinks={accountLinks} />
+        }
       >
         {children}
       </Layout>

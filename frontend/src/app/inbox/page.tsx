@@ -2,7 +2,7 @@
 import { RequireAuth } from '@/components/RequireAuth';
 const Inbox = () => {
   return (
-    <RequireAuth notice="Please log in to view your inbox.">
+    <RequireAuth notice="Log in to see your messages.">
       <h1>Inbox</h1>
     </RequireAuth>
   );

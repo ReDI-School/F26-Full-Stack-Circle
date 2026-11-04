@@ -25,9 +25,9 @@ const RequireAuth = ({
     const redirectPath = isSafePath(pathname) ? pathname : '/';
 
     if (!user) {
-      router.replace(
-        `/login?next=${encodeURIComponent(redirectPath)}&notice=${encodeURIComponent(notice || '')}`
-      );
+      const params = new URLSearchParams({ next: redirectPath });
+      if (notice) params.set('notice', notice);
+      router.replace(`/login?${params}`);
     } else if (needAdminRights && !user.isAdmin) {
       router.replace('/');
     }
