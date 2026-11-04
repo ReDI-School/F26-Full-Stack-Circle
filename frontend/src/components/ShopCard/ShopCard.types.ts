@@ -1,12 +1,14 @@
-interface ShopCardProps {
-  /**
-   * The name of the shop
-   */
-  name: string;
+import type { AvatarColour } from '../Avatar';
 
-  // TODO: add the rest of the props this component needs:
-  // - itemCount
-  // - onClick
+interface ShopCardProps {
+  /** Complete shop name, displayed unchanged. */
+  name: string;
+  itemCount: number;
+  avatarUrl?: string;
+  /** Cycle primary, secondary, tertiary across a row. Defaults to primary. */
+  avatarColour?: AvatarColour;
+  /** Makes the card a keyboard-accessible button when provided. */
+  onClick?: () => void;
 }
 
 export type { ShopCardProps };
