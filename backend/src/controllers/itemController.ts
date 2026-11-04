@@ -5,6 +5,7 @@ import {
   getItemByIdResponseSchema,
   getItemByIdRequestSchema,
   getItemsQuerySchema,
+  updateItemSchema,
 } from '@/schemas/ItemSchema';
 import { Prisma } from '@generated/prisma/client';
 import { ZodError } from 'zod/v3';
@@ -116,6 +117,69 @@ export class ItemController {
       return res.status(500).json({
         error: 'Failed to fetch item',
       });
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    const params = getItemByIdRequestSchema.safeParse(req.params);
+
+    if (!params.success) {
+      return res.status(400).json({ error: 'Invalid item id: expected a UUID' });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ error: 'You need to log in.' });
+    }
+
+    const parsed = updateItemSchema.safeParse(req.body ?? {});
+    const fields: Record<string, string> = {};
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = String(issue.path[0] ?? 'body');
+        fields[field] ??= issue.message;
+      }
+    }
+
+    const category = updateItemSchema.shape.categoryId.safeParse(req.body?.categoryId);
+
+    try {
+      const item = await itemService.getOwnedItem(params.data.id, req.user.id);
+
+      if (category.success && category.data && !(await itemService.categoryExists(category.data))) {
+        fields.categoryId = 'Category does not exist.';
+      }
+
+      if (!parsed.success || Object.keys(fields).length > 0) {
+        return res.status(400).json({ error: 'Validation failed', fields });
+      }
+
+      const { priceCents, oldPriceCents, ...rest } = parsed.data;
+      const price = itemService.priceChange(item, { priceCents, oldPriceCents });
+
+      if ('error' in price) {
+        return res.status(400).json({
+          error: 'Validation failed',
+          fields: { priceCents: price.error },
+        });
+      }
+
+      const updated = await itemService.update(item.id, { ...rest, ...price.data });
+      return res.status(200).json({ item: getItemByIdResponseSchema.parse(updated) });
+    } catch (error: unknown) {
+      if (error instanceof ItemError) {
+        return res.status(error.statusCode).json({ error: error.message });
+      }
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        return res.status(400).json({
+          error: 'Validation failed',
+          fields: { categoryId: 'Category does not exist.' },
+        });
+      }
+
+      console.error('Error updating item:', error);
+      return res.status(500).json({ error: 'Failed to update item' });
     }
   }
 }
