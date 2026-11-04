@@ -2,33 +2,19 @@
 import { Footer, Layout, Navbar } from '@/components';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
-import { apiUrl } from '@/config';
-import { useAuth } from '@/hooks';
-import { useEffect, useState } from 'react';
+import { useApi, useAuth } from '@/hooks';
+import { useState } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const AppShell = ({ children }: AppShellProps) => {
   const { user, logout } = useAuth();
   const router = useRouter();
-  const [unreadCount, setUnreadCount] = useState<number>(0);
   const [searchValue, setSearchValue] = useState<string>('');
   const pathname = usePathname();
-  useEffect(() => {
-    const unreadCount = async () => {
-      try {
-        const response = await fetch(apiUrl('/threads'), {
-          credentials: 'include',
-        });
-        const data = await response.json();
-        setUnreadCount(data.unreadCount);
-        return;
-      } catch (error) {
-        console.error(error);
-      }
-    };
-    unreadCount();
-  }, []);
+
+  const { data } = useApi<{ unreadCount: number }>('/threads');
+  const unreadCount = data?.unreadCount ?? 0;
   const handleSearch = () => {
     router.push(`/?q=${searchValue}`);
   };

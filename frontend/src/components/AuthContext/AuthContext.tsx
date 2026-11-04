@@ -1,11 +1,15 @@
 'use client';
-import { apiUrl } from '@/config';
+import { api, ApiError } from '@/config/api';
 import { createContext, useEffect, useState } from 'react';
 
 export interface User {
   name: string;
   email: string;
   isAdmin: boolean;
+}
+
+interface AuthResponse {
+  user: User;
 }
 
 interface AuthContextType {
@@ -26,22 +30,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     async function fetchMe() {
       try {
-        const response = await fetch(apiUrl('auth/me'), {
-          credentials: 'include',
-        });
-        if (!response.ok) {
-          if (response.status === 401) {
-            setUser(null);
-            return;
-          }
-          throw new Error(`Response status: ${response.status}`);
-        }
-        const data = await response.json();
-        setUser(data.user);
-        console.log('data', data.user);
+        const data = await api.get<AuthResponse>('/auth/me');
+        setUser(data?.user ?? null);
       } catch (error) {
-        console.error(error);
-        setUser(null);
+        if (error instanceof ApiError && error.status === 401) {
+          setUser(null);
+        } else {
+          console.error(error);
+          setUser(null);
+        }
       } finally {
         setLoading(false);
       }
@@ -51,47 +48,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   const login = async (email: string, password: string) => {
-    const response = await fetch(apiUrl('auth/login'), {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ email, password }),
-    });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-    const data = await response.json();
-    setUser(data.user);
-    console.log('data', data.user);
+    const data = await api.post<AuthResponse>('/auth/login', { email, password });
+    setUser(data?.user ?? null);
     setLoading(false);
   };
 
   const register = async (name: string, email: string, password: string) => {
-    const response = await fetch(apiUrl('auth/register'), {
-      method: 'POST',
-      credentials: 'include',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({ name, email, password }),
-    });
-    if (!response.ok) {
-      throw new Error(`Response status: ${response.status}`);
-    }
-    const data = await response.json();
-    setUser(data.user);
-    console.log('data', data.user);
+    const data = await api.post<AuthResponse>('/auth/register', { name, email, password });
+    setUser(data?.user ?? null);
     setLoading(false);
   };
 
   const logout = async () => {
     try {
-      await fetch(apiUrl('auth/logout'), {
-        method: 'POST',
-        credentials: 'include',
-      });
+      await api.post('/auth/logout');
     } catch (error) {
       console.error(error);
     } finally {
