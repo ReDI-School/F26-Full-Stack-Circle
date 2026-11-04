@@ -87,7 +87,7 @@ const AppShell = ({ children }: AppShellProps) => {
     label: 'Log out',
     onClick: async () => {
       await logout();
-      router.push('/login');
+      router.push('/');
     },
   };
   const dividerItem = { type: 'divider' as const };
@@ -106,6 +106,12 @@ const AppShell = ({ children }: AppShellProps) => {
             searchValue={searchValue}
             onSearchChange={setSearchValue}
             onSearch={handleSearch}
+            onLogin={() => {
+              router.push('/login');
+            }}
+            onRegister={() => {
+              router.push('/register');
+            }}
           />
         }
         footer={
