@@ -45,8 +45,8 @@ const AppShell = ({ children }: AppShellProps) => {
   const logoutItem = {
     type: 'item' as const,
     label: 'Log out',
-    onClick: () => {
-      logout();
+    onClick: async () => {
+      await logout();
       router.push('/login');
     },
   };

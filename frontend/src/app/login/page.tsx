@@ -31,11 +31,12 @@ const LoginForm = () => {
       />
       <Button
         onClick={async () => {
-          console.log('Logging in with', email, password);
           try {
             await login(email, password);
-            const next = searchParams.get('next') || '/';
-            router.push(next);
+            const next = searchParams.get('next') ?? '/';
+            // Open-redirect guard: reject protocol-relative and off-origin paths.
+            const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/';
+            router.push(safePath);
           } catch (error) {
             console.error('Login failed:', error);
           }
