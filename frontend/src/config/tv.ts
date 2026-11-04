@@ -7,7 +7,7 @@ export const tv = createTV({
   twMergeConfig: {
     extend: {
       classGroups: {
-        'font-size': [{ text: ['caption', 'body', 'h2', 'h1', 'display'] }],
+        'font-size': [{ text: ['caption', 'body', 'avatar', 'h2', 'h1', 'display'] }],
       },
     },
   },
