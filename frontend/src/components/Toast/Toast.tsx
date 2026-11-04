@@ -7,21 +7,21 @@ import { createPortal } from 'react-dom';
 
 const Toast = ({ message, variant = 'success', duration = 4000, open, onDismiss }: ToastProps) => {
   const styles = toastStyles({ variant });
-  const onDissmissRef = useRef(onDismiss);
+  const onDismissRef = useRef(onDismiss);
 
   useEffect(() => {
-    onDissmissRef.current = onDismiss;
+    onDismissRef.current = onDismiss;
   }, [onDismiss]);
 
   useEffect(() => {
     if (!open || duration <= 0) return;
 
     const timer = window.setTimeout(() => {
-      onDissmissRef.current?.();
+      onDismissRef.current?.();
     }, duration);
 
     return () => window.clearTimeout(timer);
-  }, [open, duration, message]);
+  }, [open, duration]);
 
   if (!open || typeof document === 'undefined') return null;
 
@@ -37,7 +37,7 @@ const Toast = ({ message, variant = 'success', duration = 4000, open, onDismiss 
       {onDismiss && (
         <button
           type="button"
-          onClick={() => onDissmissRef.current?.()}
+          onClick={() => onDismissRef.current?.()}
           aria-label="Dismiss notification"
         >
           ×
