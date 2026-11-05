@@ -54,13 +54,19 @@ export class ThreadController {
 
   /** GET /api/threads/:id → { thread } with its messages */
   async getById(req: Request, res: Response) {
+    // Check that the id in the URL is a UUID (same { id } check as expressInterest)
+    const params = getItemByIdRequestSchema.safeParse(req.params);
+
+    if (!params.success) {
+      return res.status(400).json({ error: 'Invalid thread id: expected a UUID' });
+    }
+
     if (!req.user) {
       return res.status(401).json({ error: 'You need to log in.' });
     }
 
     try {
-      // Any id that isn't a real thread, even "abc", is simply "no such thread" → 404
-      const thread = await threadService.getById(String(req.params.id), req.user.id);
+      const thread = await threadService.getById(params.data.id, req.user.id);
 
       return res.json({ thread });
     } catch (error) {
