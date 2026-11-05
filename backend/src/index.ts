@@ -9,7 +9,7 @@ import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
 import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
-
+import shopRouter from '@/routes/shopRoutes';
 dotenv.config();
 
 const app = express();
@@ -86,6 +86,7 @@ api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
 api.use('/items', itemRouter);
+api.use('/shops', shopRouter);
 app.use('/api', api);
 
 const protocol = process.env.PROTOCOL ?? 'http';
