@@ -14,13 +14,13 @@ const ShopCard = ({
   const styles = shopCardStyles({ interactive: Boolean(onClick) });
   const content = (
     <>
-      <span aria-hidden="true" className="flex shrink-0">
+      <span aria-hidden="true" className={styles.avatarWrapper()}>
         <Avatar
           name={name}
           src={avatarUrl}
           size="lg"
           colour={avatarColour}
-          className="size-14 text-avatar"
+          className={styles.avatar()}
         />
       </span>
       <span className={styles.name()} title={name}>
