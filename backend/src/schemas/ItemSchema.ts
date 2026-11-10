@@ -89,6 +89,11 @@ export const getItemByIdRequestSchema = z.object({
   id: z.uuid(),
 });
 
+export const setSoldBodySchema = z.object({
+  sold: z.boolean(),
+});
+
 export type GetItemsQuery = z.infer<typeof getItemsQuerySchema>;
 export type GetItemById = z.infer<typeof getItemByIdResponseSchema>;
 export type GetItemByIdParams = z.infer<typeof getItemByIdRequestSchema>;
+export type SetItemSold = z.infer<typeof setSoldBodySchema>;

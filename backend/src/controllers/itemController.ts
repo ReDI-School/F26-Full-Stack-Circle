@@ -5,6 +5,7 @@ import {
   getItemByIdResponseSchema,
   getItemByIdRequestSchema,
   getItemsQuerySchema,
+  setSoldBodySchema,
 } from '@/schemas/ItemSchema';
 import { Prisma } from '@generated/prisma/client';
 import { ZodError } from 'zod/v3';
@@ -115,6 +116,56 @@ export class ItemController {
 
       return res.status(500).json({
         error: 'Failed to fetch item',
+      });
+    }
+  }
+
+  async setSold(req: Request, res: Response) {
+    if (!req.user) {
+      return res.status(401).json({
+        error: 'You need to log in.',
+      });
+    }
+
+    const params = getItemByIdRequestSchema.safeParse(req.params);
+
+    if (!params.success) {
+      return res.status(400).json({
+        error: 'Invalid item id: expected a UUID',
+      });
+    }
+
+    const body = setSoldBodySchema.safeParse(req.body);
+
+    if (!body.success) {
+      return res.status(400).json({
+        error: 'sold is required and must be a boolean',
+      });
+    }
+
+    try {
+      const result = await itemService.setSold(params.data.id, req.user.id, body.data.sold);
+
+      if (result.status === 'not_found') {
+        return res.status(404).json({
+          error: 'Item not found',
+        });
+      }
+
+      if (result.status === 'forbidden') {
+        return res.status(403).json({
+          error: 'You can only update your own items',
+        });
+      }
+
+      const item = getItemByIdResponseSchema.parse(result.item);
+
+      return res.status(200).json({ item });
+    } catch (error: unknown) {
+      console.error('Error updating item sold status:', error);
+
+      return res.status(500).json({
+        error: 'Failed to update item sold status',
       });
     }
   }
