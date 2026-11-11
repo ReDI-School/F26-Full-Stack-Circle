@@ -2,6 +2,91 @@ import prisma from '../libs/prisma';
 import { ThreadError } from '@/errors/threadError';
 import { Prisma } from '@generated/prisma/client';
 
+/** One row of the inbox: exactly what ThreadList renders, no more. */
+export interface ThreadRow {
+  id: string;
+  /** The other person in the conversation, never the logged-in user. */
+  withName: string;
+  /** null when the item is gone; the frontend then shows "Item removed". */
+  item: { id: string; title: string; priceCents: number; photoUrl: string | null } | null;
+  lastMessage: string | null;
+  lastMessageAt: Date | null;
+  /** At least one message someone else sent that the user has not read. */
+  unread: boolean;
+}
+
+export interface ThreadMessage {
+  id: string;
+  body: string;
+  /** Sent by the logged-in user: MessageBubble puts it on the right. */
+  own: boolean;
+  createdAt: Date;
+  readAt: Date | null;
+}
+
+export interface ThreadDetail extends ThreadRow {
+  /** Oldest first, the way a chat reads. */
+  messages: ThreadMessage[];
+}
+
+/** The fields both inbox endpoints need: the people, and the item with its main photo. */
+const threadBaseSelect = {
+  id: true,
+  buyerId: true,
+  sellerId: true,
+  createdAt: true,
+  buyer: { select: { name: true } },
+  seller: { select: { name: true } },
+  item: {
+    select: {
+      id: true,
+      title: true,
+      priceCents: true,
+      photos: { select: { url: true }, orderBy: { position: 'asc' }, take: 1 },
+    },
+  },
+} satisfies Prisma.ThreadSelect;
+
+interface ThreadBase {
+  id: string;
+  buyerId: string;
+  sellerId: string;
+  buyer: { name: string };
+  seller: { name: string };
+  item: {
+    id: string;
+    title: string;
+    priceCents: number;
+    photos: { url: string }[];
+  } | null;
+}
+
+const toThreadRow = (
+  thread: ThreadBase,
+  userId: string,
+  lastMessage: { body: string; createdAt: Date } | undefined,
+  unread: boolean
+): ThreadRow => ({
+  id: thread.id,
+  // You are the buyer in some threads and the seller in others, so the
+  // other person has to be worked out per thread. Getting this backwards
+  // makes every conversation look like it is with yourself.
+  withName: thread.buyerId === userId ? thread.seller.name : thread.buyer.name,
+  // Deleting an item keeps its threads (onDelete: SetNull), so item can be
+  // null; the frontend then shows "Item removed".
+  item: thread.item
+    ? {
+        id: thread.item.id,
+        title: thread.item.title,
+        priceCents: thread.item.priceCents,
+        photoUrl: thread.item.photos[0]?.url ?? null,
+      }
+    : null,
+  lastMessage: lastMessage?.body ?? null,
+  lastMessageAt: lastMessage?.createdAt ?? null,
+  unread,
+});
+
 export class ThreadService {
   async expressInterest(itemId: string, buyerId: string) {
     const item = await prisma.item.findUnique({
@@ -71,5 +156,108 @@ export class ThreadService {
 
       throw error;
     }
+  }
+
+  /**
+   * The logged-in user's conversations, most recent message first, plus how
+   * many of them have unread messages (the navbar badge).
+   *
+   * One findMany: Prisma loads each relation for all threads at once, so the
+   * number of queries stays the same for 2 threads or 200 (no N+1).
+   */
+  async listForUser(userId: string): Promise<{ threads: ThreadRow[]; unreadCount: number }> {
+    const threads = await prisma.thread.findMany({
+      where: { OR: [{ buyerId: userId }, { sellerId: userId }] },
+      select: {
+        ...threadBaseSelect,
+        // Only the newest message is needed for the preview line.
+        messages: {
+          select: { body: true, createdAt: true },
+          orderBy: { createdAt: 'desc' },
+          take: 1,
+        },
+        // Unread = sent by someone else and not read yet. Your own
+        // messages are never unread for you.
+        _count: {
+          select: { messages: { where: { readAt: null, senderId: { not: userId } } } },
+        },
+      },
+    });
+
+    const rows = threads
+      .map((thread) => ({
+        // unread comes from _count, which counts every unread message in the
+        // thread. messages[0] is only the newest message, for the preview line.
+        row: toThreadRow(thread, userId, thread.messages[0], thread._count.messages > 0),
+        // A thread without messages sorts by when it was started.
+        sortAt: (thread.messages[0]?.createdAt ?? thread.createdAt).getTime(),
+      }))
+      // Prisma can't order by "newest related message", so sort here. The
+      // list is one user's conversations, which stays small.
+      .sort((a, b) => b.sortAt - a.sortAt)
+      .map(({ row }) => row);
+
+    return {
+      threads: rows,
+      unreadCount: rows.filter((row) => row.unread).length,
+    };
+  }
+
+  /**
+   * One conversation with all its messages, for a participant only.
+   * Unknown id → 404; someone else's thread → 403. Opening it marks the
+   * other person's unread messages as read, which clears the orange dot.
+   */
+  async getById(threadId: string, userId: string): Promise<ThreadDetail> {
+    const thread = await prisma.thread.findUnique({
+      where: { id: threadId },
+      select: {
+        ...threadBaseSelect,
+        messages: {
+          select: { id: true, body: true, senderId: true, createdAt: true, readAt: true },
+          orderBy: { createdAt: 'asc' },
+        },
+      },
+    });
+
+    if (!thread) {
+      throw new ThreadError(404, 'Conversation not found.');
+    }
+
+    // The most sensitive check in the app: load first, then make sure the
+    // logged-in user is the buyer or the seller before returning anything.
+    if (thread.buyerId !== userId && thread.sellerId !== userId) {
+      throw new ThreadError(403, 'You are not part of this conversation.');
+    }
+
+    // Opening the conversation reads it: mark the other person's unread
+    // messages as read. Only the messages in this response are updated, so a
+    // message that arrives in the meantime stays unread until it is shown.
+    const readAt = new Date();
+    const unreadIds = thread.messages
+      .filter((message) => message.senderId !== userId && message.readAt === null)
+      .map((message) => message.id);
+
+    if (unreadIds.length > 0) {
+      await prisma.message.updateMany({
+        where: { id: { in: unreadIds } },
+        data: { readAt },
+      });
+    }
+
+    const messages: ThreadMessage[] = thread.messages.map((message) => ({
+      id: message.id,
+      body: message.body,
+      own: message.senderId === userId,
+      createdAt: message.createdAt,
+      readAt: unreadIds.includes(message.id) ? readAt : message.readAt,
+    }));
+
+    const unread = messages.some((message) => !message.own && message.readAt === null);
+
+    return {
+      ...toThreadRow(thread, userId, thread.messages.at(-1), unread),
+      messages,
+    };
   }
 }
