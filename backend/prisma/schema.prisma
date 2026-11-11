@@ -130,10 +130,8 @@ model ItemPhoto {
 model Thread {
   id String @id @default(uuid())
 
-  /// Deleting the item keeps the conversation: itemId becomes null and
-  /// the inbox shows "Item removed".
-  itemId String?
-  item   Item?   @relation(fields: [itemId], references: [id], onDelete: SetNull)
+  itemId String
+  item   Item @relation(fields: [itemId], references: [id], onDelete: Cascade)
 
   buyerId String
   buyer   User @relation("ThreadBuyer", fields: [buyerId], references: [id], onDelete: Cascade)
