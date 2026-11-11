@@ -33,6 +33,16 @@ export const createItemSchema = z.object({
 
 export type CreateItemInput = z.infer<typeof createItemSchema>;
 
+// PATCH:
+
+export const updateItemSchema = createItemSchema.partial().extend({
+  oldPriceCents: z
+    .null({ error: 'Old price is set by the server; send null to remove the discount.' })
+    .optional(),
+});
+
+export type UpdateItemInput = z.infer<typeof updateItemSchema>;
+
 export const getItemsQuerySchema = z.object({
   category: z.string().optional(),
   q: z.string().optional(),
