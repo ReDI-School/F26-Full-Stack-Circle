@@ -462,6 +462,12 @@ async function main() {
     },
   ];
 
+  // createMany stamps every row with the same now(), so the messages of one
+  // thread would have no defined order, and neither would the inbox's "last
+  // message". Give each seeded message its own time instead: one minute
+  // apart, in the order they are listed above, starting an hour ago.
+  let messageTime = Date.now() - 60 * 60_000;
+
   for (const thread of threadSeed) {
     const row = await prisma.thread.upsert({
       where: {
@@ -485,12 +491,17 @@ async function main() {
     });
     if (existing === 0) {
       await prisma.message.createMany({
-        data: thread.messages.map((message) => ({
-          threadId: row.id,
-          senderId: users[message.sender],
-          body: message.body,
-          readAt: message.read ? new Date() : null,
-        })),
+        data: thread.messages.map((message) => {
+          messageTime += 60_000;
+
+          return {
+            threadId: row.id,
+            senderId: users[message.sender],
+            body: message.body,
+            createdAt: new Date(messageTime),
+            readAt: message.read ? new Date() : null,
+          };
+        }),
       });
     }
   }
