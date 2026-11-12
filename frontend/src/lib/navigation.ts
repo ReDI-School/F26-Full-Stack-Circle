@@ -17,9 +17,6 @@ function sanitizeNextPath(path: string | null | undefined): string {
  * and pushes the safe path. Use this after a successful login instead of
  * calling router.push with a raw query param value.
  */
-export function pushNext(
-  router: AppRouterInstance,
-  searchParams: ReadonlyURLSearchParams
-): void {
+export function pushNext(router: AppRouterInstance, searchParams: ReadonlyURLSearchParams): void {
   router.push(sanitizeNextPath(searchParams.get('next')));
 }
