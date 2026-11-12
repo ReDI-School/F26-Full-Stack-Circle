@@ -122,6 +122,13 @@ it('sanitises a protocol-relative ?next to /', async () => {
   expect(mockPush).toHaveBeenCalledWith('/');
 });
 
+it('sanitises a backslash bypass in ?next to /', async () => {
+  await setup({ next: '/\\evil.com' });
+  await clickLogin();
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
+  expect(mockPush).toHaveBeenCalledWith('/');
+});
+
 it('sanitises an absolute URL in ?next to /', async () => {
   await setup({ next: 'https://evil.example/steal' });
   await clickLogin();
