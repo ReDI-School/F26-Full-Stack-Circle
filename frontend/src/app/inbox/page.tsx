@@ -1,5 +1,5 @@
 'use client';
-import { RequireAuth } from '@/components/RequireAuth';
+import { RequireAuth } from '@/components';
 const Inbox = () => {
   return (
     <RequireAuth notice="Log in to see your messages.">

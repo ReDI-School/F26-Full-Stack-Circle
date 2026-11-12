@@ -1,7 +1,7 @@
 import React, { act, useLayoutEffect } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { AuthProvider } from '../components/AuthContext';
+import { AuthProvider } from '../context/AuthContext';
 import useAuth from './useAuth';
 
 // ---------------------------------------------------------------------------
@@ -155,7 +155,8 @@ it('refresh re-fetches /me and updates user', async () => {
   await act(async () => {
     refreshPromise = current.refresh();
   });
-  expect(current.loading).toBe(true);
+  // refresh must NOT set loading to true (avoids unmounting protected pages)
+  expect(current.loading).toBe(false);
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
   await act(async () => {
     await refreshPromise;
@@ -163,4 +164,24 @@ it('refresh re-fetches /me and updates user', async () => {
 
   expect(current.loading).toBe(false);
   expect(current.user).toEqual({ name: 'Alice', email: 'a@b.com', isAdmin: false });
+});
+
+it('provides stable function references across re-renders', async () => {
+  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
+  const { login, register, logout, refresh } = current;
+
+  // Trigger a refresh to re-render with updated state
+  let refreshPromise: Promise<void>;
+  await act(async () => {
+    refreshPromise = current.refresh();
+  });
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
+  await act(async () => {
+    await refreshPromise;
+  });
+
+  expect(current.login).toBe(login);
+  expect(current.register).toBe(register);
+  expect(current.logout).toBe(logout);
+  expect(current.refresh).toBe(refresh);
 });

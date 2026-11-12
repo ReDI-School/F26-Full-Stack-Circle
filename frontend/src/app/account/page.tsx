@@ -1,5 +1,5 @@
 'use client';
-import { RequireAuth } from '@/components/RequireAuth';
+import { RequireAuth } from '@/components';
 const Account = () => {
   return (
     <RequireAuth notice="Please log in to view your account information.">

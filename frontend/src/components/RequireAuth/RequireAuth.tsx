@@ -2,16 +2,9 @@
 import { useEffect } from 'react';
 import { useAuth } from '@/hooks';
 import { usePathname, useRouter } from 'next/navigation';
+import type { RequireAuthProps } from './RequireAuth.types';
 
-const RequireAuth = ({
-  children,
-  notice,
-  needAdminRights = false,
-}: {
-  children: React.ReactNode;
-  notice?: string;
-  needAdminRights?: boolean;
-}) => {
+const RequireAuth = ({ children, notice, needAdminRights = false }: RequireAuthProps) => {
   const router = useRouter();
   const pathname = usePathname();
   const { user, loading } = useAuth();

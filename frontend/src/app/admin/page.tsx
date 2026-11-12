@@ -1,5 +1,5 @@
 'use client';
-import { RequireAuth } from '@/components/RequireAuth';
+import { RequireAuth } from '@/components';
 const Admin = () => {
   return (
     <RequireAuth needAdminRights={true} notice="You must be an administrator to access this page.">

@@ -4,7 +4,7 @@ import '../assets/css/reset.css';
 import '../assets/css/global.css';
 
 import { AppShell } from '@/components/AppShell';
-import { AuthProvider } from '@/components/AuthContext';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: "ReDiCycle — someone's old, your new",

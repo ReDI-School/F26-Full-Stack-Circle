@@ -1,5 +1,7 @@
 'use client';
-import { Footer, Layout, Navbar } from '@/components';
+import { Footer } from '../Footer';
+import { Layout } from '../Layout';
+import { Navbar } from '../Navbar';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
 import { useApi, useAuth } from '@/hooks';
@@ -86,8 +88,8 @@ const AppShell = ({ children }: AppShellProps) => {
     type: 'item' as const,
     label: 'Log out',
     onClick: async () => {
+      router.replace('/');
       await logout();
-      router.push('/');
     },
   };
   const dividerItem = { type: 'divider' as const };

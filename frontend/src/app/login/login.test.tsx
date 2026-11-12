@@ -1,7 +1,7 @@
 import React, { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
-import { AuthProvider } from '../../components/AuthContext';
+import { AuthProvider } from '../../context/AuthContext';
 import Login from './page';
 
 // ---------------------------------------------------------------------------
