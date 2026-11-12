@@ -1,6 +1,6 @@
 'use client';
 import { useEffect } from 'react';
-import UseAuth from '@/hooks/UseAuth';
+import { useAuth } from '@/hooks';
 import { usePathname, useRouter } from 'next/navigation';
 
 const RequireAuth = ({
@@ -14,7 +14,7 @@ const RequireAuth = ({
 }) => {
   const router = useRouter();
   const pathname = usePathname();
-  const { user, loading } = UseAuth();
+  const { user, loading } = useAuth();
 
   useEffect(() => {
     if (loading) return;

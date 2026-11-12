@@ -1,7 +1,7 @@
 'use client';
 import Button from '@/components/Button/Button';
 import TextField from '@/components/TextField/TextField';
-import UseAuth from '@/hooks/UseAuth';
+import { useAuth } from '@/hooks';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -15,7 +15,7 @@ import { Suspense } from 'react';
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const { login } = UseAuth();
+  const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
   const notice = searchParams.get('notice');

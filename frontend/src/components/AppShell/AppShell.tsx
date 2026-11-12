@@ -27,8 +27,8 @@ const AppShell = ({ children }: AppShellProps) => {
     }[];
   }>('/categories');
 
-  const handleSearch = () => {
-    router.push(`/?q=${encodeURIComponent(searchValue)}`);
+  const handleSearch = (value: string) => {
+    router.push(`/?q=${encodeURIComponent(value)}`);
   };
 
   const categoryLinks = useMemo(() => {
