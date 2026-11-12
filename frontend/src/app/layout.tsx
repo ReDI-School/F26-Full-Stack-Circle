@@ -3,7 +3,8 @@ import type { Metadata } from 'next';
 import '../assets/css/reset.css';
 import '../assets/css/global.css';
 
-import { AppShell } from '../components';
+import { AppShell } from '@/components/AppShell';
+import { AuthProvider } from '@/context/AuthContext';
 
 export const metadata: Metadata = {
   title: "ReDiCycle — someone's old, your new",
@@ -19,7 +20,9 @@ const RootLayout = ({ children }: RootLayoutProps) => {
   return (
     <html lang="en">
       <body>
-        <AppShell>{children}</AppShell>
+        <AuthProvider>
+          <AppShell>{children}</AppShell>
+        </AuthProvider>
       </body>
     </html>
   );
