@@ -2,6 +2,7 @@
 import Button from '@/components/Button/Button';
 import TextField from '@/components/TextField/TextField';
 import { useAuth } from '@/hooks';
+import { pushNext } from '@/lib/navigation';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -33,10 +34,7 @@ const LoginForm = () => {
         onClick={async () => {
           try {
             await login(email, password);
-            const next = searchParams.get('next') ?? '/';
-            // Open-redirect guard: reject protocol-relative and off-origin paths.
-            const safePath = next.startsWith('/') && !next.startsWith('//') ? next : '/';
-            router.push(safePath);
+            pushNext(router, searchParams);
           } catch (error) {
             console.error('Login failed:', error);
           }

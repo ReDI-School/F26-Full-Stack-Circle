@@ -20,7 +20,7 @@ export default defineConfig({
         test: {
           name: 'api',
           environment: 'node',
-          include: ['src/config/**/*.test.ts'],
+          include: ['src/config/**/*.test.ts', 'src/lib/**/*.test.ts'],
         },
       },
       {

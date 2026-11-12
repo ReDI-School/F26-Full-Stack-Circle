@@ -19,13 +19,10 @@ const RequireAuth = ({
   useEffect(() => {
     if (loading) return;
 
-    // Open-redirect guard: only allow same-origin paths (must start with /).
-    // Paths like //evil.com start with / but the second / makes them protocol-relative.
-    const isSafePath = (path: string) => path.startsWith('/') && !path.startsWith('//');
-    const redirectPath = isSafePath(pathname) ? pathname : '/';
-
+    // usePathname() only ever returns the pathname portion, never a full URL,
+    // so it is always a safe value to put in ?next=.
     if (!user) {
-      const params = new URLSearchParams({ next: redirectPath });
+      const params = new URLSearchParams({ next: pathname });
       if (notice) params.set('notice', notice);
       router.replace(`/login?${params}`);
     } else if (needAdminRights && !user.isAdmin) {
