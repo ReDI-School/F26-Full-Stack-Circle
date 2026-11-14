@@ -47,6 +47,15 @@ const threadBaseSelect = {
   },
 } satisfies Prisma.ThreadSelect;
 
+/** The fields a message needs, wherever one is returned. */
+const messageSelect = {
+  id: true,
+  body: true,
+  senderId: true,
+  createdAt: true,
+  readAt: true,
+} satisfies Prisma.MessageSelect;
+
 interface ThreadBase {
   id: string;
   buyerId: string;
@@ -72,8 +81,8 @@ const toThreadRow = (
   // other person has to be worked out per thread. Getting this backwards
   // makes every conversation look like it is with yourself.
   withName: thread.buyerId === userId ? thread.seller.name : thread.buyer.name,
-  // Deleting an item keeps its threads (onDelete: SetNull), so item can be
-  // null; the frontend then shows "Item removed".
+  // Ready for item: null (the frontend then shows "Item removed"). Whether a
+  // thread outlives its item is decided in #38 (DELETE /api/items/:id).
   item: thread.item
     ? {
         id: thread.item.id,
@@ -86,6 +95,37 @@ const toThreadRow = (
   lastMessageAt: lastMessage?.createdAt ?? null,
   unread,
 });
+
+const toThreadMessage = (
+  message: { id: string; body: string; senderId: string; createdAt: Date; readAt: Date | null },
+  userId: string
+): ThreadMessage => ({
+  id: message.id,
+  body: message.body,
+  own: message.senderId === userId,
+  createdAt: message.createdAt,
+  readAt: message.readAt,
+});
+
+/**
+ * The participant check, written once and used by every thread endpoint:
+ * no such thread → 404, someone else's thread → 403. After it returns,
+ * TypeScript knows the thread is not null.
+ */
+function assertParticipant<T extends { buyerId: string; sellerId: string }>(
+  thread: T | null,
+  userId: string
+): asserts thread is T {
+  if (!thread) {
+    throw new ThreadError(404, 'Conversation not found.');
+  }
+
+  // The most sensitive check in the app: only the buyer and the seller
+  // may read or write a conversation.
+  if (thread.buyerId !== userId && thread.sellerId !== userId) {
+    throw new ThreadError(403, 'You are not part of this conversation.');
+  }
+}
 
 export class ThreadService {
   async expressInterest(itemId: string, buyerId: string) {
@@ -205,59 +245,75 @@ export class ThreadService {
 
   /**
    * One conversation with all its messages, for a participant only.
-   * Unknown id → 404; someone else's thread → 403. Opening it marks the
-   * other person's unread messages as read, which clears the orange dot.
+   * Reading it changes nothing: marking messages as read is its own
+   * endpoint (markRead), so a prefetch never clears someone's badge.
    */
   async getById(threadId: string, userId: string): Promise<ThreadDetail> {
     const thread = await prisma.thread.findUnique({
       where: { id: threadId },
       select: {
         ...threadBaseSelect,
-        messages: {
-          select: { id: true, body: true, senderId: true, createdAt: true, readAt: true },
-          orderBy: { createdAt: 'asc' },
-        },
+        messages: { select: messageSelect, orderBy: { createdAt: 'asc' } },
       },
     });
 
-    if (!thread) {
-      throw new ThreadError(404, 'Conversation not found.');
-    }
+    assertParticipant(thread, userId);
 
-    // The most sensitive check in the app: load first, then make sure the
-    // logged-in user is the buyer or the seller before returning anything.
-    if (thread.buyerId !== userId && thread.sellerId !== userId) {
-      throw new ThreadError(403, 'You are not part of this conversation.');
-    }
-
-    // Opening the conversation reads it: mark the other person's unread
-    // messages as read. Only the messages in this response are updated, so a
-    // message that arrives in the meantime stays unread until it is shown.
-    const readAt = new Date();
-    const unreadIds = thread.messages
-      .filter((message) => message.senderId !== userId && message.readAt === null)
-      .map((message) => message.id);
-
-    if (unreadIds.length > 0) {
-      await prisma.message.updateMany({
-        where: { id: { in: unreadIds } },
-        data: { readAt },
-      });
-    }
-
-    const messages: ThreadMessage[] = thread.messages.map((message) => ({
-      id: message.id,
-      body: message.body,
-      own: message.senderId === userId,
-      createdAt: message.createdAt,
-      readAt: unreadIds.includes(message.id) ? readAt : message.readAt,
-    }));
-
+    const messages = thread.messages.map((message) => toThreadMessage(message, userId));
     const unread = messages.some((message) => !message.own && message.readAt === null);
 
     return {
       ...toThreadRow(thread, userId, thread.messages.at(-1), unread),
       messages,
     };
+  }
+
+  /**
+   * A participant replies. The controller has already trimmed the body and
+   * checked its length; it is stored exactly as typed, newlines included and
+   * not HTML-escaped (React escapes text when it renders it).
+   */
+  async sendMessage(threadId: string, userId: string, body: string): Promise<ThreadMessage> {
+    await this.findForParticipant(threadId, userId);
+
+    // Together: the message, and the thread's updatedAt, which the schema
+    // promises is bumped on every new message.
+    const [message] = await prisma.$transaction([
+      prisma.message.create({
+        data: { threadId, senderId: userId, body },
+        select: messageSelect,
+      }),
+      prisma.thread.update({
+        where: { id: threadId },
+        data: { updatedAt: new Date() },
+        select: { id: true },
+      }),
+    ]);
+
+    return toThreadMessage(message, userId);
+  }
+
+  /**
+   * Marks every message from the other person in this thread as read; your
+   * own messages are left alone. Safe to repeat: on an already-read thread
+   * there is simply nothing left to update.
+   */
+  async markRead(threadId: string, userId: string): Promise<void> {
+    await this.findForParticipant(threadId, userId);
+
+    await prisma.message.updateMany({
+      where: { threadId, senderId: { not: userId }, readAt: null },
+      data: { readAt: new Date() },
+    });
+  }
+
+  /** Loads just enough of a thread to run the participant check. */
+  private async findForParticipant(threadId: string, userId: string): Promise<void> {
+    const thread = await prisma.thread.findUnique({
+      where: { id: threadId },
+      select: { buyerId: true, sellerId: true },
+    });
+
+    assertParticipant(thread, userId);
   }
 }
