@@ -132,39 +132,36 @@ export class ItemController {
     }
 
     const parsed = updateItemSchema.safeParse(req.body ?? {});
-    const fields: Record<string, string> = {};
+    const errorFields: Record<string, string> = {};
 
     if (!parsed.success) {
       for (const issue of parsed.error.issues) {
         const field = String(issue.path[0] ?? 'body');
-        fields[field] ??= issue.message;
+        errorFields[field] ??= issue.message;
       }
     }
 
     const category = updateItemSchema.shape.categoryId.safeParse(req.body?.categoryId);
 
     try {
-      const item = await itemService.getOwnedItem(params.data.id, req.user.id);
+      const [item, categoryFound] = await Promise.all([
+        itemService.getOwnedItem(params.data.id, req.user.id),
+        category.success && category.data ? itemService.categoryExists(category.data) : true,
+      ]);
 
-      if (category.success && category.data && !(await itemService.categoryExists(category.data))) {
-        fields.categoryId = 'Category does not exist.';
+      if (parsed.success && Object.keys(parsed.data).length === 0) {
+        throw new ItemError(400, 'Send at least one field to update.');
       }
 
-      if (!parsed.success || Object.keys(fields).length > 0) {
-        return res.status(400).json({ error: 'Validation failed', fields });
+      if (!categoryFound) {
+        errorFields.categoryId = 'Category does not exist.';
       }
 
-      const { priceCents, oldPriceCents, ...rest } = parsed.data;
-      const price = itemService.priceChange(item, { priceCents, oldPriceCents });
-
-      if ('error' in price) {
-        return res.status(400).json({
-          error: 'Validation failed',
-          fields: { priceCents: price.error },
-        });
+      if (!parsed.success || Object.keys(errorFields).length > 0) {
+        return res.status(400).json({ error: 'Validation failed', fields: errorFields });
       }
 
-      const updated = await itemService.update(item.id, { ...rest, ...price.data });
+      const updated = await itemService.update(item, parsed.data);
       return res.status(200).json({ item: getItemByIdResponseSchema.parse(updated) });
     } catch (error: unknown) {
       if (error instanceof ItemError) {

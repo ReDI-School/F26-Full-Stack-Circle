@@ -1,14 +1,11 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
 import { ItemError } from '@/errors/itemError';
+import { formatPrice } from '@/libs/price';
 import { CreateItemInput, GetItemsQuery, UpdateItemInput } from '@/schemas/ItemSchema';
 
 type OwnedItem = { id: string; priceCents: number; sold: boolean };
 type PriceChange = { priceCents?: number; oldPriceCents?: number | null };
-
-function formatEuro(cents: number) {
-  return `€ ${cents % 100 === 0 ? cents / 100 : (cents / 100).toFixed(2)}`;
-}
 
 const itemDetails = {
   category: { select: { slug: true, name: true } },
@@ -124,34 +121,33 @@ export class ItemService {
     return item;
   }
 
-  priceChange(
+  private priceChange(
     item: OwnedItem,
     { priceCents, oldPriceCents }: Pick<UpdateItemInput, 'priceCents' | 'oldPriceCents'>
-  ): { error: string } | { data: PriceChange } {
+  ): PriceChange {
     if (priceCents === undefined) {
-      return { data: oldPriceCents === null ? { oldPriceCents: null } : {} };
+      return oldPriceCents === null ? { oldPriceCents: null } : {};
     }
 
     if (item.sold) {
-      return { error: 'A sold item cannot be discounted.' };
+      throw new ItemError(400, 'A sold item cannot be discounted.');
     }
 
     if (oldPriceCents === null) {
-      return { data: { priceCents, oldPriceCents: null } };
+      return { priceCents, oldPriceCents: null };
     }
 
     if (priceCents >= item.priceCents) {
-      return { error: `New price must be lower than ${formatEuro(item.priceCents)}` };
+      throw new ItemError(400, `New price must be lower than ${formatPrice(item.priceCents)}`);
     }
 
-    return { data: { priceCents, oldPriceCents: item.priceCents } };
+    return { priceCents, oldPriceCents: item.priceCents };
   }
 
-  async update(
-    id: string,
-    input: Omit<UpdateItemInput, 'priceCents' | 'oldPriceCents'> & PriceChange
-  ) {
-    const { photoUrls, ...item } = input;
+  async update(owned: OwnedItem, input: UpdateItemInput) {
+    const { id } = owned;
+    const { photoUrls, priceCents, oldPriceCents, ...rest } = input;
+    const item = { ...rest, ...this.priceChange(owned, { priceCents, oldPriceCents }) };
 
     if (!photoUrls) {
       return prisma.item.update({ where: { id }, data: item, include: itemDetails });
