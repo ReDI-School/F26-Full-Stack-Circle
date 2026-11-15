@@ -3,6 +3,7 @@ import Button from '@/components/Button/Button';
 import TextField from '@/components/TextField/TextField';
 import { useAuth } from '@/hooks';
 import { pushNext } from '@/lib/navigation';
+import { ApiError } from '@/config/api';
 import { useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { Suspense } from 'react';
@@ -16,6 +17,8 @@ import { Suspense } from 'react';
 const LoginForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [error, setError] = useState<string | null>(null);
+  const [submitting, setSubmitting] = useState(false);
   const { login } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -31,17 +34,30 @@ const LoginForm = () => {
         onChange={(e) => setPassword(e.target.value)}
       />
       <Button
+        type="button"
+        disabled={submitting}
         onClick={async () => {
+          setError(null);
+          setSubmitting(true);
           try {
             await login(email, password);
             pushNext(router, searchParams);
           } catch (error) {
-            console.error('Login failed:', error);
+            setError(
+              error instanceof ApiError ? error.message : 'Unable to log in. Please try again.'
+            );
+          } finally {
+            setSubmitting(false);
           }
         }}
       >
         Log in
       </Button>
+      {error && (
+        <p role="alert" className="text-danger-text">
+          {error}
+        </p>
+      )}
     </>
   );
 };
