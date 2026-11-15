@@ -5,18 +5,18 @@ import { Navbar } from '../Navbar';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
 import { useApi, useAuth } from '@/hooks';
+import useUnreadCount from '@/hooks/useUnreadCount';
 import { useState, useMemo } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
 const AppShell = ({ children }: AppShellProps) => {
-  const { user, logout } = useAuth();
+  const { user, loading, logout } = useAuth();
   const router = useRouter();
   const [searchValue, setSearchValue] = useState<string>('');
   const pathname = usePathname();
 
-  const { data } = useApi<{ unreadCount: number }>('/threads');
-  const unreadCount = data?.unreadCount ?? 0;
+  const unreadCount = useUnreadCount(loading ? null : (user?.email ?? null));
 
   const { data: categories } = useApi<{
     categories: {
@@ -101,20 +101,25 @@ const AppShell = ({ children }: AppShellProps) => {
       <Layout
         variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
         navbar={
-          <Navbar
-            user={user}
-            unreadCount={unreadCount}
-            menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
-            searchValue={searchValue}
-            onSearchChange={setSearchValue}
-            onSearch={handleSearch}
-            onLogin={() => {
-              router.push('/login');
-            }}
-            onRegister={() => {
-              router.push('/register');
-            }}
-          />
+          !loading && (
+            <Navbar
+              user={user}
+              unreadCount={unreadCount}
+              menuItems={user?.isAdmin ? adminMenuItems : userMenuItems}
+              searchValue={searchValue}
+              onSearchChange={setSearchValue}
+              onSearch={handleSearch}
+              onLogoClick={() => router.push('/')}
+              onAddItem={() => router.push('/items/new')}
+              onInbox={() => router.push('/inbox')}
+              onLogin={() => {
+                router.push('/login');
+              }}
+              onRegister={() => {
+                router.push('/register');
+              }}
+            />
+          )
         }
         footer={
           <Footer categoryLinks={categoryLinks} infoLinks={infoLinks} accountLinks={accountLinks} />
