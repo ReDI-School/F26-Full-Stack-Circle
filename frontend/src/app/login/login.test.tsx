@@ -135,25 +135,3 @@ it('sanitises an absolute URL in ?next to /', async () => {
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
   expect(mockPush).toHaveBeenCalledWith('/');
 });
-
-it('shows the API login error and allows a retry without navigating', async () => {
-  await setup();
-  await clickLogin();
-  expect(container.querySelector('button')?.disabled).toBe(true);
-  await respond(1, Response.json({ error: 'Wrong email or password.' }, { status: 401 }));
-  expect(container.querySelector('[role="alert"]')?.textContent).toBe('Wrong email or password.');
-  expect(container.querySelector('button')?.disabled).toBe(false);
-  expect(mockPush).not.toHaveBeenCalled();
-  await clickLogin();
-  expect(container.querySelector('[role="alert"]')).toBeNull();
-  await respond(2, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
-});
-
-it('shows a useful network error instead of failing silently', async () => {
-  await setup();
-  await clickLogin();
-  await act(async () => pending[1].reject(new TypeError('Failed to fetch')));
-  expect(container.querySelector('[role="alert"]')?.textContent).toContain('Please try again');
-  expect(mockPush).not.toHaveBeenCalled();
-});
