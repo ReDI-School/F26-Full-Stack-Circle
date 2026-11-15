@@ -5,7 +5,6 @@ import {
   getItemByIdResponseSchema,
   getItemByIdRequestSchema,
   getItemsQuerySchema,
-  updateItemSchema,
 } from '@/schemas/ItemSchema';
 import { Prisma } from '@generated/prisma/client';
 import { ZodError } from 'zod/v3';
@@ -117,66 +116,6 @@ export class ItemController {
       return res.status(500).json({
         error: 'Failed to fetch item',
       });
-    }
-  }
-
-  async update(req: Request, res: Response) {
-    const params = getItemByIdRequestSchema.safeParse(req.params);
-
-    if (!params.success) {
-      return res.status(400).json({ error: 'Invalid item id: expected a UUID' });
-    }
-
-    if (!req.user) {
-      return res.status(401).json({ error: 'You need to log in.' });
-    }
-
-    const parsed = updateItemSchema.safeParse(req.body ?? {});
-    const errorFields: Record<string, string> = {};
-
-    if (!parsed.success) {
-      for (const issue of parsed.error.issues) {
-        const field = String(issue.path[0] ?? 'body');
-        errorFields[field] ??= issue.message;
-      }
-    }
-
-    const category = updateItemSchema.shape.categoryId.safeParse(req.body?.categoryId);
-
-    try {
-      const [item, categoryFound] = await Promise.all([
-        itemService.getOwnedItem(params.data.id, req.user.id),
-        category.success && category.data ? itemService.categoryExists(category.data) : true,
-      ]);
-
-      if (parsed.success && Object.keys(parsed.data).length === 0) {
-        throw new ItemError(400, 'Send at least one field to update.');
-      }
-
-      if (!categoryFound) {
-        errorFields.categoryId = 'Category does not exist.';
-      }
-
-      if (!parsed.success || Object.keys(errorFields).length > 0) {
-        return res.status(400).json({ error: 'Validation failed', fields: errorFields });
-      }
-
-      const updated = await itemService.update(item, parsed.data);
-      return res.status(200).json({ item: getItemByIdResponseSchema.parse(updated) });
-    } catch (error: unknown) {
-      if (error instanceof ItemError) {
-        return res.status(error.statusCode).json({ error: error.message });
-      }
-
-      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
-        return res.status(400).json({
-          error: 'Validation failed',
-          fields: { categoryId: 'Category does not exist.' },
-        });
-      }
-
-      console.error('Error updating item:', error);
-      return res.status(500).json({ error: 'Failed to update item' });
     }
   }
 }

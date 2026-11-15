@@ -1,11 +1,7 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
 import { ItemError } from '@/errors/itemError';
-import { formatPrice } from '@/libs/price';
-import { CreateItemInput, GetItemsQuery, UpdateItemInput } from '@/schemas/ItemSchema';
-
-type OwnedItem = { id: string; priceCents: number; sold: boolean };
-type PriceChange = { priceCents?: number; oldPriceCents?: number | null };
+import { CreateItemInput, GetItemsQuery } from '@/schemas/ItemSchema';
 
 const itemDetails = {
   category: { select: { slug: true, name: true } },
@@ -102,69 +98,5 @@ export class ItemService {
       where: { id },
       include: itemDetails,
     });
-  }
-
-  async getOwnedItem(id: string, userId: string): Promise<OwnedItem> {
-    const item = await prisma.item.findUnique({
-      where: { id },
-      select: { id: true, priceCents: true, sold: true, shop: { select: { ownerId: true } } },
-    });
-
-    if (!item) {
-      throw new ItemError(404, 'Item not found');
-    }
-
-    if (item.shop.ownerId !== userId) {
-      throw new ItemError(403, 'This item is not yours.');
-    }
-
-    return item;
-  }
-
-  private priceChange(
-    item: OwnedItem,
-    { priceCents, oldPriceCents }: Pick<UpdateItemInput, 'priceCents' | 'oldPriceCents'>
-  ): PriceChange {
-    if (priceCents === undefined) {
-      return oldPriceCents === null ? { oldPriceCents: null } : {};
-    }
-
-    if (item.sold) {
-      throw new ItemError(400, 'A sold item cannot be discounted.');
-    }
-
-    if (oldPriceCents === null) {
-      return { priceCents, oldPriceCents: null };
-    }
-
-    if (priceCents >= item.priceCents) {
-      throw new ItemError(400, `New price must be lower than ${formatPrice(item.priceCents)}`);
-    }
-
-    return { priceCents, oldPriceCents: item.priceCents };
-  }
-
-  async update(owned: OwnedItem, input: UpdateItemInput) {
-    const { id } = owned;
-    const { photoUrls, priceCents, oldPriceCents, ...rest } = input;
-    const item = { ...rest, ...this.priceChange(owned, { priceCents, oldPriceCents }) };
-
-    if (!photoUrls) {
-      return prisma.item.update({ where: { id }, data: item, include: itemDetails });
-    }
-
-    const [, updated] = await prisma.$transaction([
-      prisma.itemPhoto.deleteMany({ where: { itemId: id } }),
-      prisma.item.update({
-        where: { id },
-        data: {
-          ...item,
-          photos: { create: photoUrls.map((url, position) => ({ url, position })) },
-        },
-        include: itemDetails,
-      }),
-    ]);
-
-    return updated;
   }
 }
