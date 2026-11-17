@@ -1,26 +1,28 @@
 import type { Request, Response } from 'express';
 import { ShopService } from '@/services/shopService';
 import { getShopParamsSchema, getShopsQuerySchema } from '@/schemas/ShopSchema';
-import { ZodError } from 'zod/v3';
+
 
 const shopService = new ShopService();
 
 export class ShopController {
   async getShops(req: Request, res: Response) {
+    const query = getShopsQuerySchema.safeParse(req.query);
+  
+    if (!query.success) {
+      return res.status(400).json({
+        error: 'Validation Error',
+        details: query.error.issues.map((e) => ({
+          field: e.path.join('.'),
+          message: e.message,
+        })),
+      });
+    }
+  
     try {
-      const query = getShopsQuerySchema.parse(req.query);
-      const shops = await shopService.getShops(query);
+      const shops = await shopService.getShops(query.data);
       return res.json({ shops });
     } catch (error: unknown) {
-      if (error instanceof ZodError) {
-        return res.status(400).json({
-          error: 'Validation Error',
-          details: error.issues.map((e) => ({
-            field: e.path.join('.'),
-            message: e.message,
-          })),
-        });
-      }
       console.error('Error fetching shops:', error);
       return res.status(500).json({ error: 'Failed to fetch shops' });
     }
