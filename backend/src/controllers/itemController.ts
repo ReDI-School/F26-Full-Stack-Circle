@@ -205,26 +205,17 @@ export class ItemController {
     }
 
     try {
-      const result = await itemService.setSold(params.data.id, req.user.id, body.data.sold);
+      const itemOwned = await itemService.getOwnedItem(params.data.id, req.user.id);
+      const result = await itemService.setSold(itemOwned, body.data.sold);
+      const validatedItem = getItemByIdResponseSchema.parse(result);
 
-      if (result.status === 'not_found') {
-        return res.status(404).json({
-          error: 'Item not found',
-        });
-      }
-
-      if (result.status === 'forbidden') {
-        return res.status(403).json({
-          error: 'You can only update your own items',
-        });
-      }
-
-      const item = getItemByIdResponseSchema.parse(result.item);
-
-      return res.status(200).json({ item });
+      return res.status(200).json({ item: validatedItem });
     } catch (error: unknown) {
-      console.error('Error updating item sold status:', error);
+      if (error instanceof ItemError) {
+        return res.status(error.statusCode).json({ error: error.message });
+      }
 
+      console.error('Error updating item sold status:', error);
       return res.status(500).json({
         error: 'Failed to update item sold status',
       });
