@@ -9,6 +9,7 @@ import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
 import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
+import homeRowRouter from './routes/homeRowRoutes';
 
 dotenv.config();
 
@@ -86,6 +87,7 @@ api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
 api.use('/items', itemRouter);
+api.use('/home-rows', homeRowRouter);
 app.use('/api', api);
 
 const protocol = process.env.PROTOCOL ?? 'http';
