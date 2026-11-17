@@ -22,3 +22,4 @@ export * from './FAQAccordion';
 export * from './EmptyState';
 export * from './ToastProvider';
 export * from './AppShell';
+export * from './RequireAuth';

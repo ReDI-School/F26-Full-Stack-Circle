@@ -10,6 +10,8 @@ import userRouter from './routes/userRoutes';
 import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
 import shopRouter from '@/routes/shopRoutes';
+import threadRouter from './routes/threadRoutes';
+
 dotenv.config();
 
 const app = express();
@@ -40,7 +42,7 @@ app.use(
         callback(new Error('Not allowed by CORS'));
       }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
     exposedHeaders: ['Content-Length', 'X-Kuma-Revision'],
     maxAge: 600,
@@ -87,6 +89,7 @@ api.use('/users', userRouter);
 api.use('/categories', categoryRouter);
 api.use('/items', itemRouter);
 api.use('/shops', shopRouter);
+api.use('/threads', threadRouter);
 app.use('/api', api);
 
 const protocol = process.env.PROTOCOL ?? 'http';
