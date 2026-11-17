@@ -41,7 +41,7 @@ const itemSelect = {
 
 export class HomeRowService {
   async getAllHomeRows() {
-    return await prisma.homeRow.findMany({
+    const homeRows = await prisma.homeRow.findMany({
       orderBy: {
         position: 'asc',
       },
@@ -63,6 +63,14 @@ export class HomeRowService {
         },
       },
     });
+
+    return {
+      rows: homeRows.map((row) => ({
+        key: row.key,
+        title: row.title,
+        items: row.items.map((rowItem) => rowItem.item),
+      })),
+    };
   }
 
   // Replace the complete contents of one homepage row.

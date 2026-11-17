@@ -21,7 +21,7 @@ export class HomeRowController {
   async updateHomeRow(req: Request, res: Response) {
     try {
       const key = String(req.params.key);
-      const { itemIds } = req.body;
+      const { itemIds } = req.body ?? {};
 
       // Validate request body.
       if (
