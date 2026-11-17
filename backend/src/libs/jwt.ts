@@ -19,6 +19,13 @@ if (!secret || secret === PLACEHOLDER) {
   );
 }
 
+/**
+ * The token goes in a cookie the browser cannot read from JavaScript, so
+ * an XSS bug cannot steal a login. The browser sends it on every request
+ * on its own, which means the frontend never touches a token at all.
+ */
+export const AUTH_COOKIE = 'token';
+
 /** Seven days, in seconds - the same lifetime as the auth cookie. */
 export const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7;
 

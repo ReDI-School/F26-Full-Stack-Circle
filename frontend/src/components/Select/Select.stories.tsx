@@ -2,6 +2,18 @@ import type { Meta, StoryObj } from '@storybook/react-vite';
 
 import Select from './Select';
 
+const conditionOptions = [
+  { label: 'New', value: 'NEW' },
+  { label: 'Like new', value: 'LIKE_NEW' },
+  { label: 'Good', value: 'GOOD' },
+  { label: 'Used', value: 'USED' },
+];
+
+const categoryOptions = ['Clothing', 'Books', 'Electronics', 'Home', 'Sports'].map((category) => ({
+  label: category,
+  value: category,
+}));
+
 const meta: Meta<typeof Select> = {
   title: 'Components/Select',
   component: Select,
@@ -23,20 +35,44 @@ type Story = StoryObj<typeof Select>;
 export const Default: Story = {
   args: {
     label: 'Condition',
+    options: conditionOptions,
   },
 };
 
-// TODO: as you add props to Select.types.ts, add a story for each variant and
-// state so you can see them all side by side. Something like:
-//
-// export const WithOptions: Story = {
-//   args: {
-//     label: 'Condition',
-//     options: [
-//       { label: 'New', value: 'new' },
-//       { label: 'Like new', value: 'like-new' },
-//       { label: 'Good', value: 'good' },
-//       { label: 'Used', value: 'used' },
-//     ],
-//   },
-// };
+export const Condition: Story = {
+  args: {
+    label: 'Condition',
+    placeholder: 'Please choose a condition',
+    options: conditionOptions,
+    defaultValue: '',
+  },
+};
+
+export const Category: Story = {
+  args: {
+    label: 'Category',
+    placeholder: 'Please choose a category',
+    options: categoryOptions,
+    defaultValue: '',
+  },
+};
+
+export const WithError: Story = {
+  args: {
+    label: 'Condition',
+    placeholder: 'Please choose a condition',
+    options: conditionOptions,
+    defaultValue: '',
+    error: 'Please choose a condition',
+  },
+};
+
+export const Disabled: Story = {
+  args: {
+    label: 'Condition',
+    placeholder: 'Please choose a condition',
+    options: conditionOptions,
+    defaultValue: '',
+    disabled: true,
+  },
+};

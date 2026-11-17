@@ -1,13 +1,34 @@
-interface AvatarMenuProps {
-  /**
-   * The labels of the menu entries
-   */
-  items: string[];
+import type { ReactNode } from 'react';
 
-  // TODO: add the rest of the props this component needs:
-  // - onClick per entry
-  // - danger entry (Log out)
-  // - divider above an entry
+interface AvatarMenuUser {
+  name: string;
+  avatarUrl?: string;
 }
 
-export type { AvatarMenuProps };
+interface AvatarMenuAction {
+  type?: 'item';
+  label: string;
+  icon?: ReactNode;
+
+  onClick: () => void;
+  danger?: boolean;
+}
+
+interface AvatarMenuDivider {
+  type: 'divider';
+}
+
+type AvatarMenuEntry = AvatarMenuAction | AvatarMenuDivider;
+
+interface AvatarMenuProps {
+  user?: AvatarMenuUser;
+  items: AvatarMenuEntry[];
+}
+
+export type {
+  AvatarMenuProps,
+  AvatarMenuEntry,
+  AvatarMenuAction,
+  AvatarMenuDivider,
+  AvatarMenuUser,
+};

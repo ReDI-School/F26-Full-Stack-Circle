@@ -1,13 +1,63 @@
+'use client';
+
+import { useId } from 'react';
+
 import { textareaStyles } from './Textarea.styles';
 import type { TextareaProps } from './Textarea.types';
 
-/**
- * TODO: build the Textarea.
- *
- * same look as TextField, vertically resizable.
- */
-const Textarea = ({ label }: TextareaProps) => {
-  return <div className={textareaStyles()}>{label}</div>;
+const Textarea = ({
+  label,
+  error,
+  helperText,
+  id,
+  rows = 4,
+  'aria-describedby': describedBy,
+  'aria-invalid': ariaInvalid,
+  ...textareaProps
+}: TextareaProps) => {
+  const generatedId = useId();
+  const textareaId = id ?? generatedId;
+  const hasError = Boolean(error?.trim());
+  const message = hasError ? error : helperText;
+  const messageType = hasError ? 'error' : 'helper';
+  const messageId = message ? `${textareaId}-${messageType}` : undefined;
+
+  let descriptionIds = describedBy || undefined;
+  if (messageId) {
+    descriptionIds = describedBy ? `${describedBy} ${messageId}` : messageId;
+  }
+
+  const styles = textareaStyles({ hasError, disabled: textareaProps.disabled });
+
+  return (
+    <div className={styles.root()}>
+      <label htmlFor={textareaId} className={styles.label()}>
+        {label}
+      </label>
+
+      <textarea
+        {...textareaProps}
+        id={textareaId}
+        rows={rows}
+        className={styles.input()}
+        aria-invalid={hasError ? true : ariaInvalid}
+        aria-describedby={descriptionIds}
+      />
+
+      <div
+        className={styles.message()}
+        tabIndex={message ? 0 : undefined}
+        role={message ? 'region' : undefined}
+        aria-label={message ? `${label} ${messageType} message` : undefined}
+      >
+        {message ? (
+          <span id={messageId} className={hasError ? styles.error() : styles.helper()}>
+            {message}
+          </span>
+        ) : null}
+      </div>
+    </div>
+  );
 };
 
 export default Textarea;
