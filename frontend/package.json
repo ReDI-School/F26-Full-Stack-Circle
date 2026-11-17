@@ -10,6 +10,7 @@
   },
   "scripts": {
     "dev": "next dev",
+    "test": "vitest run",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src",

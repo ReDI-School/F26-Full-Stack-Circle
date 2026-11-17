@@ -1,16 +1,72 @@
 import { Request, Response } from 'express';
 import { ItemService } from '../services/itemService';
 import {
+  createItemSchema,
   getItemByIdResponseSchema,
   getItemByIdRequestSchema,
   getItemsQuerySchema,
+  updateItemSchema,
 } from '@/schemas/ItemSchema';
+import { Prisma } from '@generated/prisma/client';
 import { ZodError } from 'zod/v3';
 import { ItemError } from '@/errors/itemError';
 
 const itemService = new ItemService();
 
 export class ItemController {
+  async create(req: Request, res: Response) {
+    if (!req.user) {
+      return res.status(401).json({ error: 'You need to log in.' });
+    }
+
+    if (!req.user.shop) {
+      return res.status(403).json({ error: 'You need a shop to list an item.' });
+    }
+
+    const parsed = createItemSchema.safeParse(req.body ?? {});
+    const fields: Record<string, string> = {};
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = String(issue.path[0] ?? 'body');
+        fields[field] ??= issue.message;
+      }
+    }
+
+    const category = createItemSchema.shape.categoryId.safeParse(req.body?.categoryId);
+
+    try {
+      // Check the category even when other fields fail, so one response can
+      // show every field the seller needs to correct.
+      if (category.success && !(await itemService.categoryExists(category.data))) {
+        fields.categoryId = 'Category does not exist.';
+      }
+
+      if (!parsed.success || Object.keys(fields).length > 0) {
+        return res.status(400).json({ error: 'Validation failed', fields });
+      }
+
+      const item = await itemService.create(req.user.shop.id, parsed.data);
+      return res.status(201).json({ item: getItemByIdResponseSchema.parse(item) });
+    } catch (error: unknown) {
+      // A category can be removed between validation and the database write.
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === 'P2003' &&
+        category.success &&
+        !(await itemService.categoryExists(category.data))
+      ) {
+        return res.status(400).json({
+          error: 'Validation failed',
+          fields: { categoryId: 'Category does not exist.' },
+        });
+      }
+
+      console.error('Error creating item:', error);
+      return res.status(500).json({ error: 'Failed to create item' });
+    }
+  }
+
   async getItems(req: Request, res: Response) {
     try {
       const queryParams = getItemsQuerySchema.parse(req.query);
@@ -61,6 +117,66 @@ export class ItemController {
       return res.status(500).json({
         error: 'Failed to fetch item',
       });
+    }
+  }
+
+  async update(req: Request, res: Response) {
+    const params = getItemByIdRequestSchema.safeParse(req.params);
+
+    if (!params.success) {
+      return res.status(400).json({ error: 'Invalid item id: expected a UUID' });
+    }
+
+    if (!req.user) {
+      return res.status(401).json({ error: 'You need to log in.' });
+    }
+
+    const parsed = updateItemSchema.safeParse(req.body ?? {});
+    const errorFields: Record<string, string> = {};
+
+    if (!parsed.success) {
+      for (const issue of parsed.error.issues) {
+        const field = String(issue.path[0] ?? 'body');
+        errorFields[field] ??= issue.message;
+      }
+    }
+
+    const category = updateItemSchema.shape.categoryId.safeParse(req.body?.categoryId);
+
+    try {
+      const [item, categoryFound] = await Promise.all([
+        itemService.getOwnedItem(params.data.id, req.user.id),
+        category.success && category.data ? itemService.categoryExists(category.data) : true,
+      ]);
+
+      if (parsed.success && Object.keys(parsed.data).length === 0) {
+        throw new ItemError(400, 'Send at least one field to update.');
+      }
+
+      if (!categoryFound) {
+        errorFields.categoryId = 'Category does not exist.';
+      }
+
+      if (!parsed.success || Object.keys(errorFields).length > 0) {
+        return res.status(400).json({ error: 'Validation failed', fields: errorFields });
+      }
+
+      const updated = await itemService.update(item, parsed.data);
+      return res.status(200).json({ item: getItemByIdResponseSchema.parse(updated) });
+    } catch (error: unknown) {
+      if (error instanceof ItemError) {
+        return res.status(error.statusCode).json({ error: error.message });
+      }
+
+      if (error instanceof Prisma.PrismaClientKnownRequestError && error.code === 'P2003') {
+        return res.status(400).json({
+          error: 'Validation failed',
+          fields: { categoryId: 'Category does not exist.' },
+        });
+      }
+
+      console.error('Error updating item:', error);
+      return res.status(500).json({ error: 'Failed to update item' });
     }
   }
 }

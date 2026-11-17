@@ -35,6 +35,12 @@ jobs:
       - name: Typecheck
         run: pnpm --filter frontend typecheck
 
+      - name: Install test browser
+        run: pnpm --filter frontend exec playwright install --with-deps chromium
+
+      - name: Test
+        run: pnpm --filter frontend test
+
       - name: Build
         run: pnpm --filter frontend build
 
