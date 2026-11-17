@@ -2,13 +2,12 @@ import type { Request, Response } from 'express';
 import { ShopService } from '@/services/shopService';
 import { getShopParamsSchema, getShopsQuerySchema } from '@/schemas/ShopSchema';
 
-
 const shopService = new ShopService();
 
 export class ShopController {
   async getShops(req: Request, res: Response) {
     const query = getShopsQuerySchema.safeParse(req.query);
-  
+
     if (!query.success) {
       return res.status(400).json({
         error: 'Validation Error',
@@ -18,7 +17,7 @@ export class ShopController {
         })),
       });
     }
-  
+
     try {
       const shops = await shopService.getShops(query.data);
       return res.json({ shops });
