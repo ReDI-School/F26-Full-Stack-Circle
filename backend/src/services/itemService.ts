@@ -1,9 +1,47 @@
 import { Prisma } from '@generated/prisma/client';
 import prisma from '../libs/prisma';
 import { ItemError } from '@/errors/itemError';
-import { GetItemsQuery } from '@/schemas/ItemSchema';
+import { formatPrice } from '@/libs/price';
+import { CreateItemInput, GetItemsQuery, UpdateItemInput } from '@/schemas/ItemSchema';
+
+type OwnedItem = { id: string; priceCents: number; sold: boolean };
+type PriceChange = { priceCents?: number; oldPriceCents?: number | null };
+
+const itemDetails = {
+  category: { select: { slug: true, name: true } },
+  shop: {
+    select: {
+      id: true,
+      name: true,
+      subline: true,
+      owner: { select: { id: true, name: true, avatarUrl: true } },
+    },
+  },
+  photos: {
+    select: { id: true, url: true, position: true },
+    orderBy: { position: 'asc' },
+  },
+} satisfies Prisma.ItemInclude;
 
 export class ItemService {
+  async categoryExists(id: string) {
+    return (await prisma.category.findUnique({ where: { id }, select: { id: true } })) !== null;
+  }
+
+  async create(shopId: string, input: CreateItemInput) {
+    const { photoUrls = [], ...item } = input;
+
+    // Nested creation keeps the item and its ordered photos in one transaction.
+    return prisma.item.create({
+      data: {
+        ...item,
+        shopId,
+        photos: { create: photoUrls.map((url, position) => ({ url, position })) },
+      },
+      include: itemDetails,
+    });
+  }
+
   async getItems(params: GetItemsQuery) {
     const { category, q, shopId, take, skip } = params;
 
@@ -62,38 +100,79 @@ export class ItemService {
   async getById(id: string) {
     return prisma.item.findUnique({
       where: { id },
-      include: {
-        category: {
-          select: {
-            slug: true,
-            name: true,
-          },
+      include: itemDetails,
+    });
+  }
+
+  async getOwnedItem(id: string, userId: string): Promise<OwnedItem> {
+    const item = await prisma.item.findUnique({
+      where: { id },
+      select: { id: true, priceCents: true, sold: true, shop: { select: { ownerId: true } } },
+    });
+
+    if (!item) {
+      throw new ItemError(404, 'Item not found');
+    }
+
+    if (item.shop.ownerId !== userId) {
+      throw new ItemError(403, 'This item is not yours.');
+    }
+
+    return item;
+  }
+
+  private priceChange(
+    item: OwnedItem,
+    { priceCents, oldPriceCents }: Pick<UpdateItemInput, 'priceCents' | 'oldPriceCents'>
+  ): PriceChange {
+    if (priceCents === undefined) {
+      return oldPriceCents === null ? { oldPriceCents: null } : {};
+    }
+
+    if (item.sold) {
+      throw new ItemError(400, 'A sold item cannot be discounted.');
+    }
+
+    if (oldPriceCents === null) {
+      return { priceCents, oldPriceCents: null };
+    }
+
+    if (priceCents >= item.priceCents) {
+      throw new ItemError(400, `New price must be lower than ${formatPrice(item.priceCents)}`);
+    }
+
+    return { priceCents, oldPriceCents: item.priceCents };
+  }
+
+  async update(owned: OwnedItem, input: UpdateItemInput) {
+    const { id } = owned;
+    const { photoUrls, priceCents, oldPriceCents, ...rest } = input;
+    const item = { ...rest, ...this.priceChange(owned, { priceCents, oldPriceCents }) };
+
+    if (!photoUrls) {
+      return prisma.item.update({ where: { id }, data: item, include: itemDetails });
+    }
+
+    const [, updated] = await prisma.$transaction([
+      prisma.itemPhoto.deleteMany({ where: { itemId: id } }),
+      prisma.item.update({
+        where: { id },
+        data: {
+          ...item,
+          photos: { create: photoUrls.map((url, position) => ({ url, position })) },
         },
-        shop: {
-          select: {
-            id: true,
-            name: true,
-            subline: true,
-            owner: {
-              select: {
-                id: true,
-                name: true,
-                avatarUrl: true,
-              },
-            },
-          },
-        },
-        photos: {
-          select: {
-            id: true,
-            url: true,
-            position: true,
-          },
-          orderBy: {
-            position: 'asc',
-          },
-        },
-      },
+        include: itemDetails,
+      }),
+    ]);
+
+    return updated;
+  }
+
+  async setSold(owned: OwnedItem, sold: boolean) {
+    return prisma.item.update({
+      where: { id: owned.id },
+      data: { sold },
+      include: itemDetails,
     });
   }
 }
