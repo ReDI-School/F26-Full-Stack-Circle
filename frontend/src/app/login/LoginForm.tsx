@@ -6,11 +6,19 @@ import { useRouter, useSearchParams } from 'next/navigation';
 
 import { Button, TextField } from '../../components';
 
+const getSafeRedirect = (value: string | null) => {
+  if (!value) return '/';
+  if (!value.startsWith('/')) return '/';
+  if (value.startsWith('//') || value.startsWith('/\\')) return '/';
+  return value;
+};
+
 const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const notice = searchParams.get('notice');
   const requestedNext = searchParams.get('next');
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -18,7 +26,20 @@ const LoginForm = () => {
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+
     if (submitting) return;
+
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!normalizedEmail || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(normalizedEmail)) {
+      setError('Please enter a valid email address.');
+      return;
+    }
+
+    if (!password) {
+      setError('Please enter your password.');
+      return;
+    }
 
     setSubmitting(true);
     setError('');
@@ -27,8 +48,13 @@ const LoginForm = () => {
       const response = await fetch('/api/auth/login', {
         method: 'POST',
         credentials: 'include',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: normalizedEmail,
+          password,
+        }),
       });
 
       if (!response.ok) {
@@ -45,17 +71,14 @@ const LoginForm = () => {
           typeof payload.error === 'string'
             ? payload.error
             : 'Unable to log in. Please try again.';
+
         setError(message);
         return;
       }
 
-      const destination =
-        requestedNext?.startsWith('/') &&
-        !requestedNext.startsWith('//') &&
-        !requestedNext.startsWith('/\\')
-          ? requestedNext
-          : '/';
+      const destination = getSafeRedirect(requestedNext);
       router.replace(destination);
+      router.refresh();
     } catch {
       setError('Unable to log in. Please try again.');
     } finally {
@@ -80,8 +103,12 @@ const LoginForm = () => {
           placeholder="you@redi-school.org"
           required
           value={email}
-          onChange={(event) => setEmail(event.target.value)}
+          onChange={(event) => {
+            setEmail(event.target.value);
+            if (error) setError('');
+          }}
         />
+
         <TextField
           label="Password"
           name="password"
@@ -90,11 +117,14 @@ const LoginForm = () => {
           placeholder="••••••••"
           required
           value={password}
-          onChange={(event) => setPassword(event.target.value)}
+          onChange={(event) => {
+            setPassword(event.target.value);
+            if (error) setError('');
+          }}
         />
 
         {error ? (
-          <p role="alert" className="text-[13px] font-medium text-secondary">
+          <p role="alert" aria-live="assertive" className="text-[13px] font-medium text-secondary">
             {error}
           </p>
         ) : null}

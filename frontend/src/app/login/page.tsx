@@ -1,11 +1,12 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 
 import { Layout, Logo } from '../../components';
 import LoginForm from './LoginForm';
 
-const Login = () => (
+const LoginPage = () => (
   <Layout variant="bare">
-    <div className="fixed inset-0 z-10 grid min-h-screen w-full grid-cols-1 min-[800px]:grid-cols-2">
+    <div className="relative grid min-h-screen w-full grid-cols-1 min-[800px]:grid-cols-2">
       <aside className="hidden flex-col justify-between bg-tertiary p-16 text-white min-[800px]:flex">
         <Link href="/" aria-label="ReDiCycle home" className="[&>span>span]:!text-white">
           <Logo size={36} />
@@ -24,9 +25,11 @@ const Login = () => (
         <p className="font-mono text-[12px] text-[#8fb0bc]">Fullstack Circle · ReDi School</p>
       </aside>
 
-      <LoginForm />
+      <Suspense fallback={null}>
+        <LoginForm />
+      </Suspense>
     </div>
   </Layout>
 );
 
-export default Login;
+export default LoginPage;
