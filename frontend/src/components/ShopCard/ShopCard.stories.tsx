@@ -48,11 +48,13 @@ export const SingleItem: Story = {
 export const Row: Story = {
   parameters: { layout: 'padded' },
   render: (args) => {
+    // These names hash deterministically via colourFor(name) to produce the exact
+    // brand colour cycle: bg-primary -> bg-secondary -> bg-tertiary -> bg-primary
     const shops = [
-      { name: "Lena's shop", itemCount: 4 },
-      { name: "Omar's shop", itemCount: 1 },
+      { name: "Maya's shop", itemCount: 4 },
+      { name: "Lena's shop", itemCount: 1 },
       { name: "Priya's shop", itemCount: 12 },
-      { name: "Alex's shop", itemCount: 0 },
+      { name: "Eva's shop", itemCount: 0 },
     ];
 
     return (
