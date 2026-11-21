@@ -1,11 +1,13 @@
 'use client';
 import { RequireAuth } from '@/components';
-const Inbox = () => {
+import Inbox from './Inbox';
+
+const InboxPage = () => {
   return (
     <RequireAuth notice="Log in to see your messages.">
-      <h1>Inbox</h1>
+      <Inbox />
     </RequireAuth>
   );
 };
 
-export default Inbox;
+export default InboxPage;
