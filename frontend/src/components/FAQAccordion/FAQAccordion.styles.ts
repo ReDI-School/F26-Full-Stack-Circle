@@ -5,11 +5,11 @@ export const baseStyles = tv({
 });
 
 export const cardStyles = tv({
-  base: 'w-full bg-white border border-border rounded-2xl overflow-hidden',
+  base: 'w-full bg-white border border-border rounded-[16px] overflow-hidden',
 });
 
 export const buttonStyles = tv({
-  base: 'w-full flex items-center justify-between gap-4 py-4.5 px-6 cursor-pointer select-none hover:bg-bg',
+  base: 'w-full flex items-center justify-between gap-4 py-4.5 px-6 cursor-pointer select-none hover:bg-bg[var(--color-bg)] transition-colors duration-200',
 });
 
 export const questionStyles = tv({
@@ -17,7 +17,7 @@ export const questionStyles = tv({
 });
 
 export const chevronStyles = tv({
-  base: 'font-display font-black text-lg text-primary',
+  base: 'shrink-0 flex item-center justify-center font-display font-black text-lg text-primary transition-transform duration-200',
 });
 
 export const answerStyles = tv({
