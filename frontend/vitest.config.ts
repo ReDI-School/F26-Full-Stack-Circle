@@ -27,7 +27,11 @@ export default defineConfig({
         resolve,
         test: {
           name: 'hooks',
-          include: ['src/hooks/**/*.test.tsx', 'src/app/**/*.test.tsx'],
+          include: [
+            'src/hooks/**/*.test.tsx',
+            'src/app/**/*.test.tsx',
+            'src/components/**/*.test.tsx',
+          ],
           browser: {
             enabled: true,
             headless: true,
