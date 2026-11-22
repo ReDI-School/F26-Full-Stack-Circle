@@ -9,7 +9,7 @@ export const cardStyles = tv({
 });
 
 export const buttonStyles = tv({
-  base: 'w-full flex items-center justify-between gap-4 py-4.5 px-6 cursor-pointer select-none hover:bg-bg[var(--color-bg)] transition-colors duration-200',
+  base: 'w-full flex items-center justify-between gap-4 py-4.5 px-6 cursor-pointer select-none hover:bg-bg transition-colors duration-200',
 });
 
 export const questionStyles = tv({
@@ -17,7 +17,7 @@ export const questionStyles = tv({
 });
 
 export const chevronStyles = tv({
-  base: 'shrink-0 flex item-center justify-center font-display font-black text-lg text-primary transition-transform duration-200',
+  base: 'shrink-0 flex items-center justify-center font-display font-black text-lg text-primary transition-transform duration-200',
 });
 
 export const answerStyles = tv({
