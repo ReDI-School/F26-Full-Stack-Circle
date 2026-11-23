@@ -1,12 +1,23 @@
 interface ShopCardProps {
   /**
-   * The name of the shop
+   * The name of the shop (displayed unchanged)
    */
   name: string;
 
-  // TODO: add the rest of the props this component needs:
-  // - itemCount
-  // - onClick
+  /**
+   * Number of items currently listed
+   */
+  itemCount: number;
+
+  /**
+   * Optional shop avatar/profile image URL
+   */
+  avatarUrl?: string;
+
+  /**
+   * Optional click handler; when provided, the card renders as an accessible button
+   */
+  onClick?: () => void;
 }
 
 export type { ShopCardProps };
