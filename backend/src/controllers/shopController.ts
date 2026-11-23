@@ -31,7 +31,7 @@ export class ShopController {
     const params = getShopParamsSchema.safeParse(req.params);
 
     if (!params.success) {
-      return res.status(400).json({ error: ':id is not a valid UUID' });
+      return res.status(400).json({ error: 'Invalid shop id: expected a UUID' });
     }
 
     try {
