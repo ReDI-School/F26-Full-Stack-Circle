@@ -2,7 +2,7 @@ import { Request, Response } from 'express';
 import { registerSchema, loginSchema } from '../schemas/AuthSchema';
 
 import { EmailAlreadyRegisteredError } from '../errors/authErrors';
-import { AUTH_COOKIE, TOKEN_TTL_SECONDS, signToken } from '../libs/jwt';
+import { AUTH_COOKIE, AUTH_COOKIE_OPTIONS, signToken } from '../libs/jwt';
 import { AuthService } from '../services/authService';
 
 const authService = new AuthService();
@@ -12,15 +12,6 @@ const authService = new AuthService();
  * transforms, not just checks, so the service receives the cleaned values -
  * which is what makes Ada@... and ada@... the same account.
  */
-
-const cookieOptions = {
-  httpOnly: true,
-  sameSite: 'lax' as const,
-  // Only over HTTPS once deployed, so it still works on http://localhost.
-  secure: process.env.NODE_ENV === 'production',
-  path: '/',
-  maxAge: TOKEN_TTL_SECONDS * 1000,
-};
 
 export class AuthController {
   async register(req: Request, res: Response) {
@@ -36,7 +27,7 @@ export class AuthController {
     try {
       const user = await authService.register(parsed.data);
 
-      res.cookie(AUTH_COOKIE, signToken(user.id), cookieOptions);
+      res.cookie(AUTH_COOKIE, signToken(user.id), AUTH_COOKIE_OPTIONS);
 
       res.status(201).json({ user });
     } catch (error) {
@@ -68,7 +59,7 @@ export class AuthController {
         return res.status(401).json({ error: 'Wrong email or password.' });
       }
 
-      res.cookie(AUTH_COOKIE, signToken(user.id), cookieOptions);
+      res.cookie(AUTH_COOKIE, signToken(user.id), AUTH_COOKIE_OPTIONS);
 
       res.status(200).json({ user });
     } catch (error) {
@@ -79,11 +70,7 @@ export class AuthController {
   }
 
   logout(_req: Request, res: Response) {
-    res.clearCookie(AUTH_COOKIE, cookieOptions);
+    res.clearCookie(AUTH_COOKIE, AUTH_COOKIE_OPTIONS);
     return res.status(204).end();
-  }
-
-  me(req: Request, res: Response) {
-    res.status(200).json({ user: req.user });
   }
 }

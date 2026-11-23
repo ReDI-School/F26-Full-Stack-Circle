@@ -18,31 +18,43 @@ export interface LoginInput {
   password: string;
 }
 
+export interface PublicShop {
+  id: string;
+  name: string;
+  subline: string | null;
+}
+
 /**
  * The only shape of a user that ever leaves the API. `passwordHash` is
  * not on it, and cannot be added by accident, because every response
  * goes through here rather than returning the Prisma object directly.
+ *
+ * `GET /api/me` and `GET /api/auth/me` both return this object, so the
+ * account-settings screen and the auth bootstrap cannot drift apart.
  */
 export interface PublicUser {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string | null;
   isAdmin: boolean;
-  shop: { id: string; name: string } | null;
+  shop: PublicShop | null;
 }
 
-const toPublicUser = (user: {
+export const toPublicUser = (user: {
   id: string;
   name: string;
   email: string;
+  avatarUrl: string | null;
   isAdmin: boolean;
-  shop?: { id: string; name: string } | null;
+  shop?: { id: string; name: string; subline: string | null } | null;
 }): PublicUser => ({
   id: user.id,
   name: user.name,
   email: user.email,
+  avatarUrl: user.avatarUrl,
   isAdmin: user.isAdmin,
-  shop: user.shop ? { id: user.shop.id, name: user.shop.name } : null,
+  shop: user.shop ? { id: user.shop.id, name: user.shop.name, subline: user.shop.subline } : null,
 });
 
 /** "Lena K." becomes "Lena's shop". */

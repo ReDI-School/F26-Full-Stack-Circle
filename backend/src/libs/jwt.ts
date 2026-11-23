@@ -29,6 +29,20 @@ export const AUTH_COOKIE = 'token';
 /** Seven days, in seconds - the same lifetime as the auth cookie. */
 export const TOKEN_TTL_SECONDS = 60 * 60 * 24 * 7;
 
+/**
+ * Options used both when setting the cookie on login/register and when
+ * clearing it on logout or account deletion. `clearCookie` only matches
+ * if path / sameSite / secure agree with the cookie that was set.
+ */
+export const AUTH_COOKIE_OPTIONS = {
+  httpOnly: true,
+  sameSite: 'lax' as const,
+  // Only over HTTPS once deployed, so it still works on http://localhost.
+  secure: process.env.NODE_ENV === 'production',
+  path: '/',
+  maxAge: TOKEN_TTL_SECONDS * 1000,
+};
+
 /** Signs a token that identifies one user. */
 export const signToken = (userId: string): string =>
   jwt.sign({ sub: userId }, secret, { expiresIn: TOKEN_TTL_SECONDS });
