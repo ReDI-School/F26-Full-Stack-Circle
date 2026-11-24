@@ -10,10 +10,7 @@ const ItemDetailLoading = () => (
         <div className="h-[420px] animate-pulse rounded-[24px] border border-border bg-muted/40" />
         <div className="mt-3 flex gap-3">
           {[0, 1, 2].map((index) => (
-            <div
-              key={index}
-              className="h-[84px] flex-1 animate-pulse rounded-[14px] bg-muted/40"
-            />
+            <div key={index} className="h-[84px] flex-1 animate-pulse rounded-[14px] bg-muted/40" />
           ))}
         </div>
       </div>

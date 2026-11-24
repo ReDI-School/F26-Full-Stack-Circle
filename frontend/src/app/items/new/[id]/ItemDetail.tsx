@@ -46,22 +46,18 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
         <section aria-label="Item photos" className="min-w-0">
           <div className="relative h-[420px] overflow-hidden rounded-[24px] border border-border bg-bg">
             {selectedPhoto ? (
-  <>
-    {/* eslint-disable-next-line @next/next/no-img-element -- item photos may come from any seller-hosted URL. */}
-    <img
-      src={selectedPhoto}
-      alt={item.title}
-      className="h-full w-full object-cover"
-    />
-  </>
-) : (
-  <ImageSlot
-    value={null}
-    alt={item.title}
-    placeholder="No photos available"
-    className="flex h-full w-full items-center justify-center rounded-[24px] bg-[repeating-linear-gradient(135deg,#f5f7f8_0px,#f5f7f8_10px,#e9eff1_10px,#e9eff1_20px)]"
-  />
-)}
+              <>
+                {/* eslint-disable-next-line @next/next/no-img-element -- item photos may come from any seller-hosted URL. */}
+                <img src={selectedPhoto} alt={item.title} className="h-full w-full object-cover" />
+              </>
+            ) : (
+              <ImageSlot
+                value={null}
+                alt={item.title}
+                placeholder="No photos available"
+                className="flex h-full w-full items-center justify-center rounded-[24px] bg-[repeating-linear-gradient(135deg,#f5f7f8_0px,#f5f7f8_10px,#e9eff1_10px,#e9eff1_20px)]"
+              />
+            )}
           </div>
 
           <div className="mt-3 flex gap-3">
