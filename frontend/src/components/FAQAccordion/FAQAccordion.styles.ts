@@ -17,7 +17,7 @@ export const questionStyles = tv({
 });
 
 export const chevronStyles = tv({
-  base: 'shrink-0 flex items-center justify-center font-display font-black text-lg text-primary transition-transform duration-200',
+  base: 'shrink-0 flex items-center justify-center font-display font-black text-lg text-primary',
 });
 
 export const answerStyles = tv({
