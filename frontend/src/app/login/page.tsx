@@ -6,14 +6,14 @@ import LoginForm from './LoginForm';
 
 const LoginPage = () => (
   <Layout variant="bare">
-    <div className="relative grid min-h-screen w-full grid-cols-1 min-[800px]:grid-cols-2">
+    <div className="fixed inset-0 grid grid-cols-1 overflow-y-auto min-[800px]:grid-cols-2">
       <aside className="hidden flex-col justify-between bg-tertiary p-16 text-white min-[800px]:flex">
         <Link href="/" aria-label="ReDiCycle home" className="[&>span>span]:!text-white">
           <Logo size={36} />
         </Link>
 
         <div>
-          <h1 className="max-w-[520px] font-display text-[52px] font-black leading-[1.1] tracking-[-1px]">
+          <h1 className="max-w-[520px] font-display text-[52px] font-black leading-[1.1] tracking-[-1px] text-white">
             Give your stuff a second life.
           </h1>
           <p className="mt-5 max-w-[420px] text-[17px] text-[#bcd3db]">
