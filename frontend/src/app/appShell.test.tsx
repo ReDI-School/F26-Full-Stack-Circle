@@ -100,7 +100,7 @@ it('waits for the session before showing guest actions and never fetches a guest
   expect(nav?.textContent).not.toContain('Log in');
   expect(nav?.textContent).not.toContain('Start selling');
   expect(requests('/api/threads')).toHaveLength(0);
-  
+
   await respond('/api/auth/me', { error: 'Unauthorized' }, 401);
   const guestNav = container.querySelector('nav');
   expect(guestNav).not.toBeNull();
