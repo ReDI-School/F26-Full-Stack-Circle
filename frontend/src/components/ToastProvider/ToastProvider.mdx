@@ -1,0 +1,20 @@
+import { Meta, Canvas } from '@storybook/addon-docs/blocks';
+import * as ToastProviderStories from './ToastProvider.stories';
+
+<Meta of={ToastProviderStories} />
+
+# Toast provider
+
+Use `useToast()` inside `AppShell` to show success or error feedback. One notification
+is visible at a time. Each message replaces the previous one and starts a fresh
+3.2-second lifetime, even when the text is identical. The dismiss button also works
+with the keyboard.
+
+<Canvas of={ToastProviderStories.Interactive} />
+
+## Homepage integration
+
+The homepage uses the shared API client and `useApi` to load categories from the
+backend. Refreshing successfully shows a notification. Loading uses a skeleton;
+an empty response uses `EmptyState`; a failure shows a short message and a retry
+button.
