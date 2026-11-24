@@ -43,7 +43,10 @@ const NavbarLoading = () => {
         {/* Actions area skeleton - one pill covering the space where buttons/avatar will appear */}
         <div role="status" aria-label="Loading navigation actions" className={styles.actions()}>
           <span className="sr-only">Loading navigation…</span>
-          <div aria-hidden="true" className="h-10 w-48 rounded-pill bg-border motion-safe:animate-pulse" />
+          <div
+            aria-hidden="true"
+            className="h-10 w-48 rounded-pill bg-border motion-safe:animate-pulse"
+          />
         </div>
       </div>
     </nav>

@@ -10,8 +10,6 @@ import { useState, useMemo } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
 
-
-
 const AppShell = ({ children }: AppShellProps) => {
   const { user, loading, logout } = useAuth();
   const router = useRouter();
