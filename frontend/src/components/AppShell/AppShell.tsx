@@ -1,7 +1,7 @@
 'use client';
 import { Footer } from '../Footer';
 import { Layout } from '../Layout';
-import { Navbar } from '../Navbar';
+import { Navbar, NavbarLoading } from '../Navbar';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
 import { useApi, useAuth } from '@/hooks';
@@ -9,6 +9,8 @@ import useUnreadCount from '@/hooks/useUnreadCount';
 import { useState, useMemo } from 'react';
 import { GearIcon, StorefrontIcon, AdminBadge } from '@/lib/icons';
 import { useRouter, usePathname } from 'next/navigation';
+
+
 
 const AppShell = ({ children }: AppShellProps) => {
   const { user, loading, logout } = useAuth();
@@ -101,7 +103,9 @@ const AppShell = ({ children }: AppShellProps) => {
       <Layout
         variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
         navbar={
-          !loading && (
+          loading ? (
+            <NavbarLoading />
+          ) : (
             <Navbar
               user={user}
               unreadCount={unreadCount}
