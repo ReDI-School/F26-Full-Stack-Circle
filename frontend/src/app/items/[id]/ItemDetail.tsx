@@ -45,9 +45,12 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
       <div className="grid grid-cols-1 items-start gap-8 min-[800px]:grid-cols-[1.1fr_1fr]">
         <section aria-label="Item photos" className="min-w-0">
           <div className="relative h-[420px] overflow-hidden rounded-[24px] border border-border bg-bg">
-            <ImageSlot value={selectedPhoto ?? null} alt={item.title}
-            placeholder="No photos available"
-            className="h-full w-full rounded-[24px]"/>
+            <ImageSlot
+              value={selectedPhoto ?? null}
+              alt={item.title}
+              placeholder="No photos available"
+              className="h-full w-full rounded-[24px]"
+            />
           </div>
 
           <div className="mt-3 flex gap-3">
@@ -75,10 +78,10 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- seller photo URLs are not restricted to configured image hosts. */}
                     <ImageSlot
-                    value={photo.url}
-                    alt={`${item.title}, photo ${index + 1}`}
-                    placeholder="Image unavailable"
-                    className="h-full w-full rounded-[14px]"
+                      value={photo.url}
+                      alt={`${item.title}, photo ${index + 1}`}
+                      placeholder="Image unavailable"
+                      className="h-full w-full rounded-[14px]"
                     />
                   </button>
                 );
@@ -90,8 +93,10 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
         <section className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <ConditionBadge condition={item.condition} />
-            <span className="inline-flex rounded-pill border-[1.5px] border-border-input
-            bg-white px-3.5 py-1.5 text-caption font-semibold text-ink">
+            <span
+              className="inline-flex rounded-pill border-[1.5px] border-border-input
+            bg-white px-3.5 py-1.5 text-caption font-semibold text-ink"
+            >
               {item.category.name}
             </span>
           </div>
