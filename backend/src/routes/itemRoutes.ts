@@ -11,6 +11,7 @@ itemRouter.post('/', requireAuth, (req, res) => itemController.create(req, res))
 itemRouter.get('/', (req, res) => itemController.getItems(req, res));
 itemRouter.get('/:id', (req, res) => itemController.getById(req, res));
 itemRouter.patch('/:id', requireAuth, (req, res) => itemController.update(req, res));
+itemRouter.patch('/:id/sold', requireAuth, (req, res) => itemController.setSold(req, res));
 
 itemRouter.post('/:id/interest', requireAuth, (req, res) =>
   threadController.expressInterest(req, res)

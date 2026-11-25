@@ -167,4 +167,12 @@ export class ItemService {
 
     return updated;
   }
+
+  async setSold(owned: OwnedItem, sold: boolean) {
+    return prisma.item.update({
+      where: { id: owned.id },
+      data: { sold },
+      include: itemDetails,
+    });
+  }
 }
