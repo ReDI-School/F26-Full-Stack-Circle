@@ -45,19 +45,9 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
       <div className="grid grid-cols-1 items-start gap-8 min-[800px]:grid-cols-[1.1fr_1fr]">
         <section aria-label="Item photos" className="min-w-0">
           <div className="relative h-[420px] overflow-hidden rounded-[24px] border border-border bg-bg">
-            {selectedPhoto ? (
-              <>
-                {/* eslint-disable-next-line @next/next/no-img-element -- item photos may come from any seller-hosted URL. */}
-                <img src={selectedPhoto} alt={item.title} className="h-full w-full object-cover" />
-              </>
-            ) : (
-              <ImageSlot
-                value={null}
-                alt={item.title}
-                placeholder="No photos available"
-                className="flex h-full w-full items-center justify-center rounded-[24px] bg-[repeating-linear-gradient(135deg,#f5f7f8_0px,#f5f7f8_10px,#e9eff1_10px,#e9eff1_20px)]"
-              />
-            )}
+            <ImageSlot value={selectedPhoto ?? null} alt={item.title}
+            placeholder="No photos available"
+            className="h-full w-full rounded-[24px]"/>
           </div>
 
           <div className="mt-3 flex gap-3">
@@ -84,10 +74,11 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
                     className={`relative h-[84px] min-w-0 flex-1 overflow-hidden rounded-[14px] border transition-colors ${activePhoto === index ? 'border-primary' : 'border-border hover:border-primary'}`}
                   >
                     {/* eslint-disable-next-line @next/next/no-img-element -- seller photo URLs are not restricted to configured image hosts. */}
-                    <img
-                      src={photo.url}
-                      alt={`${item.title}, photo ${index + 1}`}
-                      className="h-full w-full object-cover"
+                    <ImageSlot
+                    value={photo.url}
+                    alt={`${item.title}, photo ${index + 1}`}
+                    placeholder="Image unavailable"
+                    className="h-full w-full rounded-[14px]"
                     />
                   </button>
                 );
@@ -99,7 +90,8 @@ const ItemDetail = ({ item }: ItemDetailProps) => {
         <section className="flex min-w-0 flex-col gap-4">
           <div className="flex flex-wrap items-center gap-2">
             <ConditionBadge condition={item.condition} />
-            <span className="inline-flex rounded-pill border-[1.5px] border-[#cfdee4] bg-white px-3.5 py-1.5 text-caption font-semibold text-ink">
+            <span className="inline-flex rounded-pill border-[1.5px] border-border-input
+            bg-white px-3.5 py-1.5 text-caption font-semibold text-ink">
               {item.category.name}
             </span>
           </div>
