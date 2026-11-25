@@ -94,10 +94,17 @@ afterEach(async () => {
 
 it('waits for the session before showing guest actions and never fetches a guest inbox', async () => {
   await render();
-  expect(container.querySelector('nav')).toBeNull();
+  // During loading, navbar exists but doesn't show guest actions
+  const nav = container.querySelector('nav');
+  expect(nav).not.toBeNull();
+  expect(nav?.textContent).not.toContain('Log in');
+  expect(nav?.textContent).not.toContain('Start selling');
   expect(requests('/api/threads')).toHaveLength(0);
+
   await respond('/api/auth/me', { error: 'Unauthorized' }, 401);
-  expect(container.querySelector('nav')?.textContent).toContain('Log in');
+  const guestNav = container.querySelector('nav');
+  expect(guestNav).not.toBeNull();
+  expect(guestNav?.textContent).toContain('Log in');
   expect(requests('/api/threads')).toHaveLength(0);
 });
 
