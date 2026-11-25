@@ -31,4 +31,37 @@ export const infoPages = {
       href: '/',
     },
   },
+
+  howToSell: {
+    title: 'How to sell',
+    subline: 'Your shop is created the moment you register. Listing an item takes under a minute.',
+    steps: [
+      {
+        step: 1,
+        title: 'List your item',
+        text: 'Add a photo, title, price, condition, and category. Honest photos sell faster than perfect ones.',
+      },
+      {
+        step: 2,
+        title: 'Wait for interest',
+        text: 'Buyers tap "I’m interested" and land in your inbox. You reply when it suits you.',
+      },
+      {
+        step: 3,
+        title: 'Make the deal',
+        text: 'Agree on payment and handover directly with the buyer. Drop the price anytime with the discount button.',
+      },
+      {
+        step: 4,
+        title: 'Mark it sold',
+        text: 'Once it’s gone, mark the item as sold so nobody else asks. Relist it if the deal falls through.',
+      },
+    ],
+    cta: {
+      title: 'That drawer full of stuff you never use?',
+      description: 'List it in under a minute.',
+      buttonLabel: 'Sell something',
+      href: '/items/new',
+    },
+  },
 } as const;
