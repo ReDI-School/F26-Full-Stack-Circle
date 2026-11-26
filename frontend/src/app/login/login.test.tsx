@@ -5,16 +5,21 @@ import { AuthProvider } from '../../context/AuthContext';
 import useAuth from '../../hooks/useAuth';
 
 const mocks = vi.hoisted(() => ({
-  replace: vi.fn(),
-  refresh: vi.fn(),
+  push: vi.fn(),
   searchParams: {} as Record<string, string>,
 }));
 
 vi.mock('next/navigation', () => ({
-  useRouter: () => ({ replace: mocks.replace, refresh: mocks.refresh }),
+  useRouter: () => ({ push: mocks.push }),
   useSearchParams: () => ({
     get: (key: string) => mocks.searchParams[key] ?? null,
   }),
+}));
+
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ href, children, ...props }: React.ComponentProps<'a'>) =>
+    React.createElement('a', { href, ...props }, children),
 }));
 
 vi.mock('../../components', () => ({
@@ -66,8 +71,7 @@ const setInputValue = async (name: string, value: string) => {
 
 const setup = async (searchParams: Record<string, string> = {}) => {
   mocks.searchParams = searchParams;
-  mocks.replace.mockReset();
-  mocks.refresh.mockReset();
+  mocks.push.mockReset();
   pending = [];
 
   container = document.createElement('div');
@@ -132,8 +136,7 @@ it('redirects to / when no ?next is present', async () => {
   await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
-  expect(mocks.replace).toHaveBeenCalledWith('/');
-  expect(mocks.refresh).toHaveBeenCalled();
+  expect(mocks.push).toHaveBeenCalledWith('/');
   expect(container.querySelector('[data-testid="auth-user"]')?.textContent).toBe('a@b.com');
 });
 
@@ -142,7 +145,7 @@ it('redirects to ?next path after successful login', async () => {
   await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
-  expect(mocks.replace).toHaveBeenCalledWith('/inbox');
+  expect(mocks.push).toHaveBeenCalledWith('/inbox');
 });
 
 it('sanitises a protocol-relative ?next to /', async () => {
@@ -150,7 +153,7 @@ it('sanitises a protocol-relative ?next to /', async () => {
   await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
-  expect(mocks.replace).toHaveBeenCalledWith('/');
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('sanitises a backslash bypass in ?next to /', async () => {
@@ -158,7 +161,7 @@ it('sanitises a backslash bypass in ?next to /', async () => {
   await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
-  expect(mocks.replace).toHaveBeenCalledWith('/');
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('sanitises an absolute URL in ?next to /', async () => {
@@ -166,7 +169,7 @@ it('sanitises an absolute URL in ?next to /', async () => {
   await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
-  expect(mocks.replace).toHaveBeenCalledWith('/');
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('shows the generic credentials error and allows retry', async () => {
@@ -178,11 +181,11 @@ it('shows the generic credentials error and allows retry', async () => {
 
   expect(container.querySelector('[role="alert"]')?.textContent).toBe('Wrong email or password.');
   expect(container.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(false);
-  expect(mocks.replace).not.toHaveBeenCalled();
+  expect(mocks.push).not.toHaveBeenCalled();
 
   await submitLogin();
   await respond(2, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mocks.replace).toHaveBeenCalledWith('/');
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('shows a useful network error instead of failing silently', async () => {
@@ -191,5 +194,5 @@ it('shows a useful network error instead of failing silently', async () => {
   await act(async () => pending[1].reject(new TypeError('Failed to fetch')));
 
   expect(container.querySelector('[role="alert"]')?.textContent).toContain('Please try again');
-  expect(mocks.replace).not.toHaveBeenCalled();
+  expect(mocks.push).not.toHaveBeenCalled();
 });

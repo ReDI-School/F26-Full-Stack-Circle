@@ -8,7 +8,6 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const resolve = {
   alias: {
     '@': path.resolve(__dirname, './src'),
-    'next/link': path.resolve(__dirname, './src/test/NextLinkMock.tsx'),
   },
 };
 

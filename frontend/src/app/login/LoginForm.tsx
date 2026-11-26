@@ -7,20 +7,13 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { ApiError } from '../../config/api';
 import { Button, TextField } from '../../components';
 import { useAuth } from '../../hooks';
-
-const getSafeRedirect = (value: string | null) => {
-  if (!value) return '/';
-  if (!value.startsWith('/')) return '/';
-  if (value.startsWith('//') || value.startsWith('/\\')) return '/';
-  return value;
-};
+import { pushNext } from '../../lib/navigation';
 
 const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { login } = useAuth();
   const notice = searchParams.get('notice');
-  const requestedNext = searchParams.get('next');
 
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -49,9 +42,7 @@ const LoginForm = () => {
 
     try {
       await login(normalizedEmail, password);
-      const destination = getSafeRedirect(requestedNext);
-      router.replace(destination);
-      router.refresh();
+      pushNext(router, searchParams);
     } catch (error) {
       if (error instanceof ApiError) {
         if (error.status === 401) {
@@ -73,7 +64,7 @@ const LoginForm = () => {
         <h1 className="font-display text-[32px] font-black">Welcome back!</h1>
 
         {notice ? (
-          <p className="rounded-input bg-primary-100 p-3 text-[13px] text-[#2e7d96]">{notice}</p>
+          <p className="rounded-input bg-primary-100 p-3 text-[13px] text-primary-700">{notice}</p>
         ) : null}
 
         <TextField
