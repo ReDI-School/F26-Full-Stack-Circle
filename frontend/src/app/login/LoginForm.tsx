@@ -4,7 +4,9 @@ import { useState, type FormEvent } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 
+import { ApiError } from '../../config/api';
 import { Button, TextField } from '../../components';
+import { useAuth } from '../../hooks';
 
 const getSafeRedirect = (value: string | null) => {
   if (!value) return '/';
@@ -16,6 +18,7 @@ const getSafeRedirect = (value: string | null) => {
 const LoginForm = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { login } = useAuth();
   const notice = searchParams.get('notice');
   const requestedNext = searchParams.get('next');
 
@@ -45,42 +48,20 @@ const LoginForm = () => {
     setError('');
 
     try {
-      const response = await fetch('/api/auth/login', {
-        method: 'POST',
-        credentials: 'include',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          email: normalizedEmail,
-          password,
-        }),
-      });
-
-      if (!response.ok) {
-        if (response.status === 401) {
-          setError('Wrong email or password.');
-          return;
-        }
-
-        const payload: unknown = await response.json().catch(() => null);
-        const message =
-          typeof payload === 'object' &&
-          payload !== null &&
-          'error' in payload &&
-          typeof payload.error === 'string'
-            ? payload.error
-            : 'Unable to log in. Please try again.';
-
-        setError(message);
-        return;
-      }
-
+      await login(normalizedEmail, password);
       const destination = getSafeRedirect(requestedNext);
       router.replace(destination);
       router.refresh();
-    } catch {
-      setError('Unable to log in. Please try again.');
+    } catch (error) {
+      if (error instanceof ApiError) {
+        if (error.status === 401) {
+          setError('Wrong email or password.');
+        } else {
+          setError(error.message || 'Unable to log in. Please try again.');
+        }
+      } else {
+        setError('Unable to log in. Please try again.');
+      }
     } finally {
       setSubmitting(false);
     }

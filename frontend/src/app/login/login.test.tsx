@@ -1,6 +1,8 @@
 import React, { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
+import { AuthProvider } from '../../context/AuthContext';
+import useAuth from '../../hooks/useAuth';
 
 const mocks = vi.hoisted(() => ({
   replace: vi.fn(),
@@ -31,6 +33,11 @@ vi.mock('../../components', () => ({
 }));
 
 import LoginForm from './LoginForm';
+
+const AuthProbe = () => {
+  const { user } = useAuth();
+  return <span data-testid="auth-user">{user?.email ?? ''}</span>;
+};
 
 type Pending = {
   resolve: (response: Response) => void;
@@ -67,7 +74,15 @@ const setup = async (searchParams: Record<string, string> = {}) => {
   document.body.append(container);
   root = createRoot(container);
 
-  await act(async () => root?.render(<LoginForm />));
+  await act(async () =>
+    root?.render(
+      <AuthProvider>
+        <LoginForm />
+        <AuthProbe />
+      </AuthProvider>
+    )
+  );
+  await respond(0, Response.json({ message: 'Unauthorized' }, { status: 401 }));
 };
 
 const submitLogin = async () => {
@@ -115,16 +130,17 @@ it('renders the notice and both navigation links', async () => {
 it('redirects to / when no ?next is present', async () => {
   await setup();
   await submitLogin();
-  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
   expect(mocks.replace).toHaveBeenCalledWith('/');
   expect(mocks.refresh).toHaveBeenCalled();
+  expect(container.querySelector('[data-testid="auth-user"]')?.textContent).toBe('a@b.com');
 });
 
 it('redirects to ?next path after successful login', async () => {
   await setup({ next: '/inbox' });
   await submitLogin();
-  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
   expect(mocks.replace).toHaveBeenCalledWith('/inbox');
 });
@@ -132,7 +148,7 @@ it('redirects to ?next path after successful login', async () => {
 it('sanitises a protocol-relative ?next to /', async () => {
   await setup({ next: '//evil.com' });
   await submitLogin();
-  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
   expect(mocks.replace).toHaveBeenCalledWith('/');
 });
@@ -140,7 +156,7 @@ it('sanitises a protocol-relative ?next to /', async () => {
 it('sanitises a backslash bypass in ?next to /', async () => {
   await setup({ next: '/\\evil.com' });
   await submitLogin();
-  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
   expect(mocks.replace).toHaveBeenCalledWith('/');
 });
@@ -148,7 +164,7 @@ it('sanitises a backslash bypass in ?next to /', async () => {
 it('sanitises an absolute URL in ?next to /', async () => {
   await setup({ next: 'https://example.com' });
   await submitLogin();
-  await respond(0, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
 
   expect(mocks.replace).toHaveBeenCalledWith('/');
 });
@@ -158,21 +174,21 @@ it('shows the generic credentials error and allows retry', async () => {
   await submitLogin();
 
   expect(container.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(true);
-  await respond(0, Response.json({ error: 'Wrong email or password.' }, { status: 401 }));
+  await respond(1, Response.json({ message: 'Unauthorized' }, { status: 401 }));
 
   expect(container.querySelector('[role="alert"]')?.textContent).toBe('Wrong email or password.');
   expect(container.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(false);
   expect(mocks.replace).not.toHaveBeenCalled();
 
   await submitLogin();
-  await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com' } }));
+  await respond(2, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
   expect(mocks.replace).toHaveBeenCalledWith('/');
 });
 
 it('shows a useful network error instead of failing silently', async () => {
   await setup();
   await submitLogin();
-  await act(async () => pending[0].reject(new TypeError('Failed to fetch')));
+  await act(async () => pending[1].reject(new TypeError('Failed to fetch')));
 
   expect(container.querySelector('[role="alert"]')?.textContent).toContain('Please try again');
   expect(mocks.replace).not.toHaveBeenCalled();
