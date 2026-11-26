@@ -25,23 +25,21 @@ const InfoPage = ({ title, subline, children, cta }: InfoPageProps) => {
   const styles = infoPageStyles();
 
   return (
-    <div className={styles.root()}>
+    <div data-info-page className={styles.root()}>
       <Banner variant="hero" title={title} description={subline} />
 
       <div className={styles.body()}>{children}</div>
 
-      <div className="mt-auto shrink-0">
-        <Banner
-          variant="cta"
-          title={cta.title}
-          description={cta.description}
-          action={
-            <Button type="button" variant="primary" onClick={() => router.push(cta.href)}>
-              {cta.buttonLabel}
-            </Button>
-          }
-        />
-      </div>
+      <Banner
+        variant="cta"
+        title={cta.title}
+        description={cta.description}
+        action={
+          <Button type="button" variant="primary" onClick={() => router.push(cta.href)}>
+            {cta.buttonLabel}
+          </Button>
+        }
+      />
     </div>
   );
 };

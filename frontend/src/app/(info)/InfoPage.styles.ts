@@ -12,7 +12,10 @@ export const infoPageStyles = tv({
       '[&>section:first-child_h1]:text-[38px]',
       '[&>section:first-child_p]:max-w-none',
       '[&>section:first-child_p]:text-[#eaf6fa]',
+      '[&>section:last-child]:mt-auto',
+      '[&>section:last-child]:mb-0',
+      '[&>section:last-child]:shrink-0',
     ],
-    body: ['flex-1', 'w-full', 'max-w-[1140px]', 'mx-auto', 'px-6', 'sm:px-8', 'py-7'],
+    body: ['flex-1', 'w-full', 'max-w-[1140px]', 'mx-auto', 'py-7'],
   },
 });

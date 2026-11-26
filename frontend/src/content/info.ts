@@ -64,4 +64,37 @@ export const infoPages = {
       href: '/items/new',
     },
   },
+
+  safetyTips: {
+    title: 'Safety tips',
+    subline: 'ReDiCycle is built on trust — a few habits keep it that way.',
+    steps: [
+      {
+        step: 1,
+        title: 'Meet in public places',
+        text: 'Cafés, train stations, campus — anywhere with people around. Bring a friend for bigger handovers.',
+      },
+      {
+        step: 2,
+        title: 'Check before you pay',
+        text: 'Inspect the item at handover. Plug it in, try it on, flip through it — then pay.',
+      },
+      {
+        step: 3,
+        title: 'Keep chat on ReDiCycle',
+        text: 'Agree on everything in your inbox thread, so there’s a record if something goes sideways.',
+      },
+      {
+        step: 4,
+        title: 'Trust your gut',
+        text: 'Deal feels off? Price too good? Walk away and report the listing — no explanation needed.',
+      },
+    ],
+    cta: {
+      title: 'Questions we didn’t answer?',
+      description: 'The FAQ covers the rest.',
+      buttonLabel: 'Read the FAQ',
+      href: '/faq',
+    },
+  },
 } as const;
