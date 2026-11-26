@@ -23,7 +23,6 @@ export const layoutStyles = tv({
       '[&>div:has(>[data-info-page])]:flex-1',
       '[&>div:has(>[data-info-page])]:flex-col',
       '[&>div:has(>[data-info-page])]:max-w-none',
-      '[&>div:has(>[data-info-page])]:p-0',
       '[&>div:has(>[data-info-page])]:mb-0',
     ],
 
