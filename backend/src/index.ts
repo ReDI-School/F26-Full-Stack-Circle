@@ -11,6 +11,7 @@ import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
 import homeRowRouter from './routes/homeRowRoutes';
 import threadRouter from './routes/threadRoutes';
+import accountRouter from './routes/accountRoutes';
 
 dotenv.config();
 
@@ -84,6 +85,7 @@ api.get('/health', async (req: Request, res: Response) => {
 
 // Routes
 api.use('/auth', authRouter);
+api.use('/me', accountRouter);
 api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
