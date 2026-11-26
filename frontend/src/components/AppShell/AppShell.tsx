@@ -1,7 +1,7 @@
 'use client';
 import { Footer } from '../Footer';
 import { Layout } from '../Layout';
-import { Navbar } from '../Navbar';
+import { Navbar, NavbarLoading } from '../Navbar';
 import { ToastProvider } from '../ToastProvider';
 import type { AppShellProps } from './AppShell.types';
 import { useApi, useAuth } from '@/hooks';
@@ -101,7 +101,9 @@ const AppShell = ({ children }: AppShellProps) => {
       <Layout
         variant={pathname === '/login' || pathname === '/register' ? 'bare' : 'default'}
         navbar={
-          !loading && (
+          loading ? (
+            <NavbarLoading />
+          ) : (
             <Navbar
               user={user}
               unreadCount={unreadCount}
