@@ -2,26 +2,47 @@ import React, { act } from 'react';
 import { createRoot, type Root } from 'react-dom/client';
 import { afterEach, beforeEach, expect, it, vi } from 'vitest';
 import { AuthProvider } from '../../context/AuthContext';
-import Login from './page';
+import useAuth from '../../hooks/useAuth';
 
-// ---------------------------------------------------------------------------
-// Mock next/navigation
-// ---------------------------------------------------------------------------
-
-const mockPush = vi.fn();
-let mockSearchParams: Record<string, string> = {};
-
-vi.mock('next/navigation', () => ({
-  useRouter: () => ({ push: mockPush, replace: vi.fn() }),
-  useSearchParams: () => ({
-    get: (key: string) => mockSearchParams[key] ?? null,
-  }),
-  usePathname: () => '/',
+const mocks = vi.hoisted(() => ({
+  push: vi.fn(),
+  searchParams: {} as Record<string, string>,
 }));
 
-// ---------------------------------------------------------------------------
-// Infrastructure
-// ---------------------------------------------------------------------------
+vi.mock('next/navigation', () => ({
+  useRouter: () => ({ push: mocks.push }),
+  useSearchParams: () => ({
+    get: (key: string) => mocks.searchParams[key] ?? null,
+  }),
+}));
+
+vi.mock('next/link', () => ({
+  __esModule: true,
+  default: ({ href, children, ...props }: React.ComponentProps<'a'>) =>
+    React.createElement('a', { href, ...props }, children),
+}));
+
+vi.mock('../../components', () => ({
+  Button: ({
+    children,
+    stretch: _stretch,
+    ...props
+  }: React.ComponentProps<'button'> & {
+    stretch?: boolean;
+  }) => {
+    void _stretch;
+    return React.createElement('button', props, children);
+  },
+  TextField: ({ label, ...props }: React.ComponentProps<'input'> & { label: string }) =>
+    React.createElement('label', null, label, React.createElement('input', props)),
+}));
+
+import LoginForm from './LoginForm';
+
+const AuthProbe = () => {
+  const { user } = useAuth();
+  return <span data-testid="auth-user">{user?.email ?? ''}</span>;
+};
 
 type Pending = {
   resolve: (response: Response) => void;
@@ -36,15 +57,21 @@ const respond = async (index: number, response: Response) => {
   await act(async () => pending[index].resolve(response));
 };
 
-/** Mount the Login page inside AuthProvider and wait for it to be ready. */
-const setup = async (searchParams: Record<string, string> = {}) => {
-  mockSearchParams = searchParams;
-  mockPush.mockReset();
+const setInputValue = async (name: string, value: string) => {
+  await act(async () => {
+    const input = container.querySelector<HTMLInputElement>(`input[name="${name}"]`);
+    expect(input).not.toBeNull();
 
-  if (root) {
-    await act(async () => root!.unmount());
-    container.remove();
-  }
+    const setter = Object.getOwnPropertyDescriptor(HTMLInputElement.prototype, 'value')?.set;
+    setter?.call(input, value);
+    input?.dispatchEvent(new Event('input', { bubbles: true }));
+    input?.dispatchEvent(new Event('change', { bubbles: true }));
+  });
+};
+
+const setup = async (searchParams: Record<string, string> = {}) => {
+  mocks.searchParams = searchParams;
+  mocks.push.mockReset();
   pending = [];
 
   container = document.createElement('div');
@@ -52,20 +79,23 @@ const setup = async (searchParams: Record<string, string> = {}) => {
   root = createRoot(container);
 
   await act(async () =>
-    root!.render(
+    root?.render(
       <AuthProvider>
-        <Login />
+        <LoginForm />
+        <AuthProbe />
       </AuthProvider>
     )
   );
-  // Settle the /auth/me mount call as a 401 (guest)
   await respond(0, Response.json({ message: 'Unauthorized' }, { status: 401 }));
 };
 
-const clickLogin = async () => {
-  const btn = container.querySelector<HTMLButtonElement>('button');
-  expect(btn).not.toBeNull();
-  await act(async () => btn!.click());
+const submitLogin = async () => {
+  await setInputValue('email', 'lena@redi-school.org');
+  await setInputValue('password', 'redicycle123');
+
+  const button = container.querySelector<HTMLButtonElement>('button[type="submit"]');
+  expect(button).not.toBeNull();
+  await act(async () => button?.click());
 };
 
 beforeEach(() => {
@@ -81,79 +111,88 @@ beforeEach(() => {
         })
     )
   );
-  container = document.createElement('div');
-  document.body.append(container);
-  root = createRoot(container);
 });
 
 afterEach(async () => {
   if (root) {
-    await act(async () => root!.unmount());
+    await act(async () => root?.unmount());
     root = null;
   }
-  container.remove();
+  container?.remove();
   vi.unstubAllGlobals();
   vi.restoreAllMocks();
 });
 
-// ---------------------------------------------------------------------------
-// Tests
-// ---------------------------------------------------------------------------
+it('renders the notice and both navigation links', async () => {
+  await setup({ notice: 'Log in to see your messages' });
+
+  expect(container.textContent).toContain('Log in to see your messages');
+  expect(container.querySelector('a[href="/register"]')).not.toBeNull();
+  expect(container.querySelector('a[href="/"]')).not.toBeNull();
+});
 
 it('redirects to / when no ?next is present', async () => {
   await setup();
-  await clickLogin();
-  // pending[1] is the POST /auth/login
+  await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
+
+  expect(mocks.push).toHaveBeenCalledWith('/');
+  expect(container.querySelector('[data-testid="auth-user"]')?.textContent).toBe('a@b.com');
 });
 
-it('redirects to ?next path after a successful login', async () => {
-  await setup({ next: '/account' });
-  await clickLogin();
+it('redirects to ?next path after successful login', async () => {
+  await setup({ next: '/inbox' });
+  await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/account');
+
+  expect(mocks.push).toHaveBeenCalledWith('/inbox');
 });
 
 it('sanitises a protocol-relative ?next to /', async () => {
   await setup({ next: '//evil.com' });
-  await clickLogin();
+  await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
+
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('sanitises a backslash bypass in ?next to /', async () => {
   await setup({ next: '/\\evil.com' });
-  await clickLogin();
+  await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
+
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('sanitises an absolute URL in ?next to /', async () => {
-  await setup({ next: 'https://evil.example/steal' });
-  await clickLogin();
+  await setup({ next: 'https://example.com' });
+  await submitLogin();
   await respond(1, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
+
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
-it('shows the API login error and allows a retry without navigating', async () => {
+it('shows the generic credentials error and allows retry', async () => {
   await setup();
-  await clickLogin();
-  expect(container.querySelector('button')?.disabled).toBe(true);
-  await respond(1, Response.json({ error: 'Wrong email or password.' }, { status: 401 }));
+  await submitLogin();
+
+  expect(container.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(true);
+  await respond(1, Response.json({ message: 'Unauthorized' }, { status: 401 }));
+
   expect(container.querySelector('[role="alert"]')?.textContent).toBe('Wrong email or password.');
-  expect(container.querySelector('button')?.disabled).toBe(false);
-  expect(mockPush).not.toHaveBeenCalled();
-  await clickLogin();
-  expect(container.querySelector('[role="alert"]')).toBeNull();
+  expect(container.querySelector<HTMLButtonElement>('button[type="submit"]')?.disabled).toBe(false);
+  expect(mocks.push).not.toHaveBeenCalled();
+
+  await submitLogin();
   await respond(2, Response.json({ user: { name: 'Alice', email: 'a@b.com', isAdmin: false } }));
-  expect(mockPush).toHaveBeenCalledWith('/');
+  expect(mocks.push).toHaveBeenCalledWith('/');
 });
 
 it('shows a useful network error instead of failing silently', async () => {
   await setup();
-  await clickLogin();
+  await submitLogin();
   await act(async () => pending[1].reject(new TypeError('Failed to fetch')));
+
   expect(container.querySelector('[role="alert"]')?.textContent).toContain('Please try again');
-  expect(mockPush).not.toHaveBeenCalled();
+  expect(mocks.push).not.toHaveBeenCalled();
 });

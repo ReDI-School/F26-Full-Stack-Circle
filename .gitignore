@@ -46,6 +46,7 @@ coverage/
 *.lcov
 .nyc_output/
 .jest/
+/frontend/.vitest-attachments/
 
 # Dependency directories
 jspm_packages/

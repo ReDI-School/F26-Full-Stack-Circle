@@ -1,75 +1,35 @@
-'use client';
-import Button from '@/components/Button/Button';
-import TextField from '@/components/TextField/TextField';
-import { useAuth } from '@/hooks';
-import { pushNext } from '@/lib/navigation';
-import { ApiError } from '@/config/api';
-import { useState } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import Link from 'next/link';
 import { Suspense } from 'react';
 
-/**
- * The log in page.
- *
- * TODO: build the two-column layout from the prototype, with the form on
- * one side. Use the TextField and Button components once you have built them.
- */
-const LoginForm = () => {
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const { login } = useAuth();
-  const router = useRouter();
-  const searchParams = useSearchParams();
-  const notice = searchParams.get('notice');
-  return (
-    <>
-      {notice && <p>{notice}</p>}
-      <TextField label="Email" value={email} onChange={(e) => setEmail(e.target.value)} />
-      <TextField
-        label="Password"
-        type="password"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-      />
-      <Button
-        type="button"
-        disabled={submitting}
-        onClick={async () => {
-          setError(null);
-          setSubmitting(true);
-          try {
-            await login(email, password);
-            pushNext(router, searchParams);
-          } catch (error) {
-            setError(
-              error instanceof ApiError ? error.message : 'Unable to log in. Please try again.'
-            );
-          } finally {
-            setSubmitting(false);
-          }
-        }}
-      >
-        Log in
-      </Button>
-      {error && (
-        <p role="alert" className="text-danger-text">
-          {error}
-        </p>
-      )}
-    </>
-  );
-};
-const Login = () => {
-  return (
-    <>
-      <h1>Log in</h1>
-      <Suspense>
+import { Layout, Logo } from '../../components';
+import LoginForm from './LoginForm';
+
+const LoginPage = () => (
+  <Layout variant="bare">
+    <div className="fixed inset-0 grid grid-cols-1 overflow-y-auto min-[800px]:grid-cols-2">
+      <aside className="hidden flex-col justify-between bg-tertiary p-16 text-white min-[800px]:flex">
+        <Link href="/" aria-label="ReDiCycle home" className="[&>span>span]:!text-white">
+          <Logo size={36} />
+        </Link>
+
+        <div>
+          <h1 className="max-w-[520px] font-display text-[52px] font-black leading-[1.1] tracking-[-1px] text-white">
+            Give your stuff a second life.
+          </h1>
+          <p className="mt-5 max-w-[420px] text-[17px] text-[#bcd3db]">
+            Buy and sell secondhand treasures with people near you. No fees, no middleman — you
+            settle payment directly with the seller.
+          </p>
+        </div>
+
+        <p className="font-mono text-[12px] text-[#8fb0bc]">Fullstack Circle · ReDi School</p>
+      </aside>
+
+      <Suspense fallback={null}>
         <LoginForm />
       </Suspense>
-    </>
-  );
-};
+    </div>
+  </Layout>
+);
 
-export default Login;
+export default LoginPage;
