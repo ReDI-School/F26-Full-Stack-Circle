@@ -50,7 +50,7 @@ export const getItemsQuerySchema = z.object({
   take: z
     .string()
     .optional()
-    .transform((val) => (val === undefined ? 50 : Number(val)))
+    .transform((val) => (val === undefined ? 20 : Number(val)))
     .pipe(z.number().int().positive().max(100)),
   skip: z
     .string()

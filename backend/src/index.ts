@@ -9,6 +9,7 @@ import authRouter from './routes/authRoutes';
 import userRouter from './routes/userRoutes';
 import itemRouter from './routes/itemRoutes';
 import categoryRouter from './routes/categoryRoutes';
+import shopRouter from '@/routes/shopRoutes';
 import homeRowRouter from './routes/homeRowRoutes';
 import threadRouter from './routes/threadRoutes';
 import accountRouter from './routes/accountRoutes';
@@ -90,6 +91,7 @@ api.use('/users', userRouter);
 
 api.use('/categories', categoryRouter);
 api.use('/items', itemRouter);
+api.use('/shops', shopRouter);
 api.use('/home-rows', homeRowRouter);
 api.use('/threads', threadRouter);
 app.use('/api', api);
