@@ -12,7 +12,19 @@ export const layoutStyles = tv({
 
     // flex-1 grows <main> to fill the leftover height, which keeps the footer
     // at the bottom of a short page instead of halfway up the screen
-    main: ['flex', 'w-full', 'flex-1', 'flex-col'],
+    main: [
+      'flex',
+      'w-full',
+      'flex-1',
+      'flex-col',
+
+      // Let the info page fill the main area.
+      '[&>div:has(>[data-info-page])]:flex',
+      '[&>div:has(>[data-info-page])]:flex-1',
+      '[&>div:has(>[data-info-page])]:flex-col',
+      '[&>div:has(>[data-info-page])]:max-w-none',
+      '[&>div:has(>[data-info-page])]:mb-0',
+    ],
 
     content: ['mx-auto', 'w-full', 'max-w-[1140px]', 'px-8'],
   },
